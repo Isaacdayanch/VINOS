@@ -119,12 +119,22 @@ preguntarle si esas botellas de verdad ya salieron, para registrarlas bien.
   a ciegas, la versión más nueva en npm es un release candidate de Prisma 8
   con CLI distinto). Cliente generado en `src/generated/prisma` (gitignored,
   se regenera con `npx prisma generate` o al migrar/sembrar).
-- **Base de datos de desarrollo**: SQLite (`prisma/dev.db`, gitignored). Para
-  producción (cuando lo pongamos en internet) hay que migrar a una base de
-  datos real hosteada (ej. Supabase o Neon) — SQLite no sirve en Vercel
-  porque el disco no persiste entre despliegues. Cuando se haga ese cambio,
-  simplificar `src/lib/prisma.ts` (ahora tiene un workaround de ruta absoluta
-  específico para SQLite local).
+- **Base de datos**: PostgreSQL en **Supabase** (proyecto "Isaacdayanch's
+  Project", organización "Vinos-CRM" — separado de su otro negocio Daymart,
+  que vive en su propia organización de Supabase). Se usa el *connection
+  pooler* de Supabase: `DATABASE_URL` (puerto 6543, modo transacción, la usa
+  la app) y `DIRECT_URL` (puerto 5432, modo sesión, la usa Prisma solo para
+  migraciones) — ambas en `.env` (gitignored) y replicadas como variables de
+  entorno en Vercel para producción.
+  - Ojo: desde este entorno de desarrollo (sandbox de Claude) **no hay salida
+    de red directa a Postgres** (solo HTTPS vía proxy), así que las
+    migraciones y el seed no se pueden correr desde aquí contra Supabase.
+    Por eso el build de Vercel corre `prisma migrate deploy` automáticamente
+    (ver `package.json` → `build`), y los datos reales se cargaron una sola
+    vez visitando `/api/seed-inicial?secreto=...` ya en producción (ruta
+    protegida con la variable `SEED_SECRET`, pensada para BORRARSE del código
+    después de usarla una vez — nunca debe volver a correr con datos reales
+    ya cargados, porque empieza borrando todo).
 - **Tailwind CSS v4** con paleta de vino (bordó `--wine` / crema
   `--background`), tema claro/oscuro automático vía `prefers-color-scheme`.
 - **Fotos de producto**: por ahora se guardan en `public/uploads/` (solo

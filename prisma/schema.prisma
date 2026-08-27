@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum CategoriaPrecio {
+  LISTA
+  DESCUENTO_CHICO
+  DESCUENTO_GRANDE
+}
+
+enum Moneda {
+  MXN
+  USD
+}
+
+model Producto {
+  id                    String    @id @default(cuid())
+  nombre                String
+  sku                   String    @unique
+  piezasPorCaja         Int
+  anio                  Int?
+  proveedor             String?
+  categoria             String?
+  activo                Boolean   @default(true)
+  fotoUrl               String?
+  stockMinimo           Int?
+  precioLista           Float?
+  precioDescuentoChico  Float?
+  precioDescuentoGrande Float?
+  createdAt             DateTime  @default(now())
+
+  entradas       EntradaLinea[]
+  salidas        Salida[]
+  ordenLineas    OrdenLinea[]
+  preciosCliente PrecioClienteProducto[]
+}
+
+model Cliente {
+  id              String          @id @default(cuid())
+  nombre          String
+  telefono        String?
+  email           String?
+  categoriaPrecio CategoriaPrecio @default(LISTA)
+  notas           String?
+  createdAt       DateTime        @default(now())
+
+  ordenes         Orden[]
+  preciosProducto PrecioClienteProducto[]
+}
+
+model PrecioClienteProducto {
+  id         String   @id @default(cuid())
+  clienteId  String
+  productoId String
+  precio     Float
+  updatedAt  DateTime @updatedAt
+
+  cliente  Cliente  @relation(fields: [clienteId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@unique([clienteId, productoId])
+}
+
+model Socio {
+  id     String @id @default(cuid())
+  nombre String
+
+  pagos Pago[]
+}
+
+model Pedido {
+  id            String   @id @default(cuid())
+  folio         String   @unique
+  fecha         DateTime
+  proveedor     String?
+  tipoCambio    Float? // pesos por dólar, para convertir costos en USD de este pedido
+  logisticaUSD  Float? // flete + seguro (dólares)
+  logisticaMXN  Float? // aduana + maniobras + otros gastos (pesos)
+  notas         String?
+  createdAt     DateTime @default(now())
+
+  entradas EntradaLinea[]
+  pagos    Pago[]
+}
+
+model EntradaLinea {
+  id             String   @id @default(cuid())
+  pedidoId       String
+  productoId     String
+  fecha          DateTime
+  cajasRecibidas Float
+  piezasPorCaja  Int
+  costoPorCaja   Float // dólares
+  createdAt      DateTime @default(now())
+
+  pedido   Pedido   @relation(fields: [pedidoId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
+}
+
+model Orden {
+  id        String   @id @default(cuid())
+  folio     String   @unique
+  fecha     DateTime
+  clienteId String
+  estatus   String   @default("Cotización")
+  createdAt DateTime @default(now())
+
+  cliente Cliente      @relation(fields: [clienteId], references: [id])
+  lineas  OrdenLinea[]
+  cobros  Cobro[]
+}
+
+model OrdenLinea {
+  id               String @id @default(cuid())
+  ordenId          String
+  productoId       String
+  cantidadBotellas Int
+  precioUnitario   Float
+  costoUnitario    Float // costo por botella al momento de vender (para calcular margen)
+
+  orden    Orden    @relation(fields: [ordenId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
+}
+
+model Salida {
+  id         String   @id @default(cuid())
+  fecha      DateTime
+  productoId String
+  botellas   Int
+  motivo     String // "Venta", "Muestra/Degustación", "Consumo interno", "Merma/Otro"
+  ordenId    String?
+  notas      String?
+  createdAt  DateTime @default(now())
+
+  producto Producto @relation(fields: [productoId], references: [id])
+}
+
+model Cobro {
+  id         String   @id @default(cuid())
+  ordenId    String
+  fecha      DateTime
+  monto      Float
+  metodoPago String?
+  notas      String?
+
+  orden Orden @relation(fields: [ordenId], references: [id])
+}
+
+model Pago {
+  id         String   @id @default(cuid())
+  fecha      DateTime
+  pedidoId   String?
+  concepto   String
+  moneda     Moneda
+  monto      Float
+  tipoCambio Float? // solo si moneda = USD, para saber a cuántos pesos equivale
+  metodoPago String?
+  socioId    String? // null = dividido entre socios
+  dividido   Boolean  @default(false)
+  notas      String?
+  createdAt  DateTime @default(now())
+
+  pedido Pedido? @relation(fields: [pedidoId], references: [id])
+  socio  Socio?  @relation(fields: [socioId], references: [id])
+}

@@ -41,8 +41,10 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
    cobrado/pendiente, alertas de stock bajo. ✅ Construido.
 2. **Órdenes** — crear una orden de venta: cliente, vinos, cantidades, precio
    autocompletado según la categoría del cliente (o el último precio que se
-   le dio a ese cliente en ese vino específico — se debe recordar
-   automáticamente). Al confirmar, descuenta stock solo. ⏳ Pendiente.
+   le dio a ese cliente en ese vino específico — se recuerda automático en
+   `PrecioClienteProducto`). Al confirmar, descuenta stock solo (crea la
+   `Salida` de cada línea). ✅ Construido (falta probar en producción, ver
+   Estado actual).
 3. **Recibos** — de una orden ya hecha, generar su recibo en PDF para el
    cliente. ⏳ Pendiente.
 4. **Stock** — inventario actual por vino (botellas/cajas), costo promedio,
@@ -57,7 +59,7 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
    mínimo. Incluye exportar **catálogo en PDF con fotos** (imprimible desde
    el navegador). ✅ Construido.
 7. **Clientes** — nombre, teléfono, categoría de precio default, notas.
-   ⏳ Pendiente.
+   ✅ Construido (catálogo simple: alta y lista).
 8. **Finanzas** — pagos/aportaciones de los pedidos (con tipo de cambio por
    pago, ya que el flete es en USD y la aduana en MXN), quién de los socios
    puso el dinero (Isaac / Beto / dividido 50-50), cobros por orden, ganancia.
@@ -156,10 +158,46 @@ npx prisma db seed       # volver a cargar los datos reales de ejemplo (BORRA to
 
 ## Estado actual (última sesión)
 
-Construido y probado (build + pantallazos en navegador): Dashboard, Stock
-(con registrar entrada y crear pedido), Productos (crear/editar con foto,
-catálogo PDF). Números de inventario verificados contra el Excel original.
+Construido y probado en navegador (contra base de datos local SQLite, antes
+de migrar a Postgres): Dashboard, Stock, Productos. Números de inventario
+verificados contra el Excel original.
 
-**Siguiente paso**: construir Órdenes (crear venta, con precio inteligente
-por cliente), Recibos (PDF de una orden), Clientes, y Finanzas/Socios —
-todos con "va" de Isaac antes de empezar cada uno.
+Después se migró la base de datos a **PostgreSQL en Supabase** (ver sección
+de Stack técnico) para poder desplegar en Vercel. Se construyeron además
+**Clientes** y **Órdenes** (crear venta con precio inteligente por cliente),
+pero esto ya no se pudo probar en el navegador desde este entorno de
+desarrollo, porque no hay salida de red directa a Postgres desde aquí (solo
+desde Vercel/Supabase sí hay). El build y el chequeo de tipos de TypeScript
+sí pasan.
+
+### Vercel — estado del despliegue
+
+Isaac tiene varios proyectos duplicados en Vercel de intentos anteriores
+(`vinos-crm`, `vinos-1wiz`, `vinos`, además de `daymart-crm` que es de su
+otro negocio y NO se debe tocar). Quedó pendiente que él:
+1. Borre los proyectos de vinos duplicados y deje solo uno limpio.
+2. Vuelva a importar el repo una sola vez con las variables de entorno
+   (`DATABASE_URL`, `DIRECT_URL`, `SEED_SECRET` — ver Stack técnico) puestas
+   desde el inicio.
+3. Corra el SQL de `crear_tablas.sql` (ya se lo pasamos) en el SQL Editor de
+   Supabase para crear las tablas — el build de Vercel YA NO corre
+   `prisma migrate deploy` (se quitó del script `build` en package.json
+   porque el contenedor de build de Vercel no lograba conectarse a Postgres
+   por el puerto de sesión 5432; en cambio el runtime normal de la app sí
+   conecta bien por el puerto 6543/pooler transacción).
+4. Visite `/api/seed-inicial?secreto=<SEED_SECRET>` una vez para cargar los
+   datos reales (después hay que borrar esa ruta del código).
+
+**Bug ya resuelto**: el primer intento de despliegue en Vercel daba error 500
+("Prisma Client could not locate the Query Engine for runtime
+rhel-openssl-3.0.x") — faltaba declarar `binaryTargets = ["native",
+"rhel-openssl-3.0.x"]` en el generator de `prisma/schema.prisma` (ya
+corregido y en el repo). Este bug no debería repetirse.
+
+Isaac decidió pausar el tema de Vercel por lo confuso que se puso (múltiples
+proyectos duplicados) y pidió seguir construyendo el sistema primero.
+Retomar el despliegue cuando él lo pida — debería ser rápido ya que el bug
+real de Prisma está resuelto y solo falta la limpieza de proyectos.
+
+**Siguiente paso de producto**: Recibos (PDF de una orden) y
+Finanzas/Socios — con "va" de Isaac antes de empezar cada uno.

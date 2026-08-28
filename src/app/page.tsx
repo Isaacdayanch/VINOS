@@ -5,24 +5,15 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  let resumen, productos, cobros, ordenes;
-  try {
-    [resumen, productos, cobros, ordenes] = await Promise.all([
-      calcularResumenInventario(),
-      prisma.producto.findMany(),
-      prisma.cobro.findMany(),
-      prisma.orden.findMany({
-        include: { lineas: true, cliente: true },
-        orderBy: { fecha: "desc" },
-      }),
-    ]);
-  } catch (error) {
-    return (
-      <pre className="whitespace-pre-wrap text-xs bg-red-50 text-red-900 p-4 rounded-lg border border-red-300">
-        {error instanceof Error ? `${error.name}: ${error.message}\n\n${error.stack}` : String(error)}
-      </pre>
-    );
-  }
+  const [resumen, productos, cobros, ordenes] = await Promise.all([
+    calcularResumenInventario(),
+    prisma.producto.findMany(),
+    prisma.cobro.findMany(),
+    prisma.orden.findMany({
+      include: { lineas: true, cliente: true },
+      orderBy: { fecha: "desc" },
+    }),
+  ]);
 
   let valorInventario = 0;
   let totalBotellas = 0;

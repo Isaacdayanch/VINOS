@@ -30,9 +30,17 @@ export default async function DetalleOrdenPage({
             {new Date(orden.fecha).toLocaleDateString("es-MX")}
           </span>
         </div>
-        <p className="text-muted text-sm">
-          {orden.cliente.nombre.replace("Cliente Especial - ", "")} · {orden.estatus}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-muted text-sm">
+            {orden.cliente.nombre.replace("Cliente Especial - ", "")} · {orden.estatus}
+          </p>
+          <Link
+            href={`/ordenes/${orden.id}/recibo`}
+            className="text-sm text-wine underline whitespace-nowrap"
+          >
+            Ver recibo
+          </Link>
+        </div>
       </div>
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">

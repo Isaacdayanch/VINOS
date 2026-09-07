@@ -46,7 +46,8 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
    `Salida` de cada línea). ✅ Construido (falta probar en producción, ver
    Estado actual).
 3. **Recibos** — de una orden ya hecha, generar su recibo en PDF para el
-   cliente. ⏳ Pendiente.
+   cliente. ✅ Construido (página imprimible `/ordenes/[id]/recibo`, más
+   una lista en `/recibos` para llegar directo a cualquier orden).
 4. **Stock** — inventario actual por vino (botellas/cajas), costo promedio,
    alerta de "reponer". Acción "Registrar entrada". ✅ Construido.
 5. **Entradas** — cuando llega un pedido del proveedor: cajas, costo por

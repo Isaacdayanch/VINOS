@@ -9,7 +9,7 @@ const links = [
   { href: "/stock", label: "Stock", disponible: true },
   { href: "/productos", label: "Productos", disponible: true },
   { href: "/ordenes", label: "Órdenes", disponible: true },
-  { href: "/recibos", label: "Recibos", disponible: false },
+  { href: "/recibos", label: "Recibos", disponible: true },
   { href: "/clientes", label: "Clientes", disponible: true },
   { href: "/finanzas", label: "Finanzas", disponible: false },
 ];

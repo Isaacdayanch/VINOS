@@ -28,12 +28,22 @@ export default async function StockPage() {
             Valor total del inventario: {formatoMXN(valorTotal)}
           </p>
         </div>
-        <Link
-          href="/stock/entradas/nueva"
-          className="rounded-md bg-wine text-white px-4 py-2 text-sm font-medium whitespace-nowrap"
-        >
-          + Registrar entrada
-        </Link>
+        <div className="flex flex-col items-end gap-2">
+          <Link
+            href="/stock/entradas/nueva"
+            className="rounded-md bg-wine text-white px-4 py-2 text-sm font-medium whitespace-nowrap"
+          >
+            + Registrar entrada
+          </Link>
+          <div className="flex gap-3 text-xs">
+            <Link href="/stock/imprimir?precios=si" className="text-wine underline whitespace-nowrap">
+              Imprimir con precios
+            </Link>
+            <Link href="/stock/imprimir" className="text-wine underline whitespace-nowrap">
+              Imprimir sin precios
+            </Link>
+          </div>
+        </div>
       </div>
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">

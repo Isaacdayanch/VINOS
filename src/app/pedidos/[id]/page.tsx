@@ -5,6 +5,8 @@ import {
   eliminarLineaPedido,
   marcarLineaRecibida,
 } from "@/app/pedidos/actions";
+import { DateField } from "@/components/DateField";
+import { ProductoPicker } from "@/components/ProductoPicker";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,8 +15,11 @@ export const dynamic = "force-dynamic";
 
 export default async function DetallePedidoPage({
   params,
+  searchParams,
 }: PageProps<"/pedidos/[id]">) {
   const { id } = await params;
+  const sp = await searchParams;
+  const nuevoProducto = typeof sp.nuevoProducto === "string" ? sp.nuevoProducto : undefined;
   const [pedido, productos] = await Promise.all([
     prisma.pedido.findUnique({
       where: { id },
@@ -136,31 +141,14 @@ export default async function DetallePedidoPage({
       <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-4">
         <p className="text-sm font-medium">+ Agregar producto al pedido</p>
         <form action={agregarLinea} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Producto</span>
-            <select
-              name="productoId"
-              className="rounded-md border border-border bg-surface px-3 py-2"
-              required
-            >
-              {productos.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nombre} ({p.piezasPorCaja} por caja)
-                </option>
-              ))}
-            </select>
-          </label>
+          <ProductoPicker
+            name="productoId"
+            productos={productos}
+            nuevoHref={`/productos/nuevo?volver=/pedidos/${pedido.id}`}
+            seleccionInicial={nuevoProducto}
+          />
 
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Fecha en que lo apartaste</span>
-            <input
-              name="fecha"
-              type="date"
-              defaultValue={hoy}
-              className="rounded-md border border-border bg-surface px-3 py-2"
-              required
-            />
-          </label>
+          <DateField name="fecha" label="Fecha en que lo apartaste" defaultValue={hoy} />
 
           <label className="flex flex-col gap-1 text-sm">
             <span className="font-medium">Cajas</span>
@@ -193,7 +181,7 @@ export default async function DetallePedidoPage({
           {productos.length === 0 && (
             <p className="text-sm text-warn">
               Todavía no tienes productos.{" "}
-              <Link href="/productos/nuevo" className="underline">
+              <Link href={`/productos/nuevo?volver=/pedidos/${pedido.id}`} className="underline">
                 Crea uno primero
               </Link>
               .

@@ -43,13 +43,19 @@ export async function crearProducto(formData: FormData) {
     throw new Error("Nombre, SKU y piezas por caja son obligatorios");
   }
   const fotoUrl = await guardarFoto(formData.get("foto"));
+  const volver = String(formData.get("volver") ?? "").trim();
 
-  await prisma.producto.create({
+  const producto = await prisma.producto.create({
     data: { ...datos, fotoUrl },
   });
 
   revalidatePath("/productos");
   revalidatePath("/stock");
+
+  if (volver.startsWith("/")) {
+    revalidatePath(volver);
+    redirect(`${volver}?nuevoProducto=${producto.id}`);
+  }
   redirect("/productos");
 }
 

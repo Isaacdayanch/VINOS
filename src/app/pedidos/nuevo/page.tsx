@@ -1,4 +1,5 @@
 import { crearPedido, siguienteFolio } from "@/app/pedidos/actions";
+import { DateField } from "@/components/DateField";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,7 @@ export default async function NuevoPedidoPage() {
 
       <form action={crearPedido} className="flex flex-col gap-4">
         <Campo label="Proveedor" name="proveedor" placeholder="Ej. Rashbi Wines Corp" />
-        <Campo label="Fecha del pedido" name="fecha" type="date" defaultValue={hoy} required />
+        <DateField name="fecha" label="Fecha del pedido" defaultValue={hoy} />
 
         <div className="rounded-lg border border-border p-4 flex flex-col gap-4">
           <p className="text-sm font-medium">Costos de importación (opcional, se pueden editar después)</p>

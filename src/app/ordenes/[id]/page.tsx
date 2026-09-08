@@ -1,4 +1,5 @@
 import { crearCobro } from "@/app/ordenes/actions";
+import { DateField } from "@/components/DateField";
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
@@ -116,16 +117,7 @@ export default async function DetalleOrdenPage({
             + Registrar cobro
           </summary>
           <form action={registrarCobro} className="p-4 pt-0 flex flex-col gap-4">
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Fecha</span>
-              <input
-                name="fecha"
-                type="date"
-                defaultValue={hoy}
-                className="rounded-md border border-border bg-surface px-3 py-2"
-                required
-              />
-            </label>
+            <DateField name="fecha" label="Fecha" defaultValue={hoy} />
             <label className="flex flex-col gap-1 text-sm">
               <span className="font-medium">Monto (MXN)</span>
               <input

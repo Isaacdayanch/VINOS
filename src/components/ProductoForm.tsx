@@ -21,15 +21,18 @@ export function ProductoForm({
   action,
   defaultValues,
   botonTexto,
+  volver,
 }: {
   action: (formData: FormData) => void;
   defaultValues?: ProductoDefaults;
   botonTexto: string;
+  volver?: string;
 }) {
   const d = defaultValues ?? {};
 
   return (
     <form action={action} className="flex flex-col gap-4">
+      {volver && <input type="hidden" name="volver" value={volver} />}
       <FotoDropzone fotoActual={d.fotoUrl} />
 
       <Campo label="Nombre del vino" name="nombre" defaultValue={d.nombre} required />

@@ -1,4 +1,5 @@
 import { crearPago } from "@/app/finanzas/actions";
+import { DateField } from "@/components/DateField";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -25,7 +26,7 @@ export default async function NuevoPagoPage() {
       </div>
 
       <form action={crearPago} className="flex flex-col gap-4">
-        <Campo label="Fecha" name="fecha" type="date" defaultValue={hoy} required />
+        <DateField name="fecha" label="Fecha" defaultValue={hoy} />
         <Campo label="Concepto" name="concepto" placeholder="Ej. Mercancía, flete, Uber, envío" required />
 
         <label className="flex flex-col gap-1 text-sm">

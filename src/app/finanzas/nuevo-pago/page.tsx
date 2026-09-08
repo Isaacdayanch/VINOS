@@ -88,6 +88,17 @@ export default async function NuevoPagoPage() {
           </label>
         </div>
 
+        <label className="flex items-center gap-2 text-sm rounded-lg border border-border p-4">
+          <input type="checkbox" name="esMaaser" />
+          <span>
+            <span className="font-medium">Es Maaser (diezmo)</span>
+            <br />
+            <span className="text-muted text-xs">
+              No cuenta como inversión del negocio; se resta de lo que debes de Maaser.
+            </span>
+          </span>
+        </label>
+
         <Campo label="Método de pago (opcional)" name="metodoPago" placeholder="Ej. Transferencia" />
         <Campo label="Notas (opcional)" name="notas" />
 

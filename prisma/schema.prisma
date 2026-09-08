@@ -184,6 +184,7 @@ model Pago {
   tipoCambio Float? // solo si moneda = USD, para saber a cuántos pesos equivale
   cuenta     Cuenta     @default(EFECTIVO) // de dónde salió el dinero
   origen     OrigenPago @default(REINVERSION)
+  esMaaser   Boolean    @default(false) // diezmo (10% de la ganancia), no cuenta como inversión del negocio
   metodoPago String?
   socioId    String? // null = dividido entre socios (o no aplica, si origen = REINVERSION)
   dividido   Boolean    @default(false)

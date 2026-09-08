@@ -23,6 +23,7 @@ export async function crearPago(formData: FormData) {
     | "INYECCION_CAPITAL"
     | "REINVERSION";
   const metodoPago = String(formData.get("metodoPago") ?? "").trim() || null;
+  const esMaaser = formData.get("esMaaser") === "on";
   const socioIdRaw = String(formData.get("socioId") ?? "");
   const dividido = origen === "INYECCION_CAPITAL" && socioIdRaw === "";
   const socioId = origen === "INYECCION_CAPITAL" && socioIdRaw !== "" ? socioIdRaw : null;
@@ -42,6 +43,7 @@ export async function crearPago(formData: FormData) {
       tipoCambio,
       cuenta,
       origen,
+      esMaaser,
       metodoPago,
       socioId,
       dividido,

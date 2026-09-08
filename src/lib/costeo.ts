@@ -136,7 +136,12 @@ export type ResumenFinanzas = {
   saldoCuenta: number;
   socios: ResumenSocio[];
   saldoEntreSocios: SaldoEntreSocios;
+  maaserDebido: number;
+  maaserDado: number;
+  saldoMaaser: number; // positivo = a favor, negativo = debe
 };
+
+const PORCENTAJE_MAASER = 0.1;
 
 function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: number | null) {
   return moneda === "USD" ? monto * (tipoCambio ?? 0) : monto;
@@ -184,10 +189,24 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   let pagadoDesdeCuenta = 0;
   let saldoCaja = 0;
   let saldoCuenta = 0;
+  let maaserDado = 0;
   const aportadoPorSocio = new Map<string, number>();
 
   for (const p of pagos) {
     const monto = montoEnMXN(p.moneda, p.monto, p.tipoCambio);
+
+    // El maaser (diezmo) sí mueve el efectivo real de Caja/Cuenta, pero no
+    // cuenta como inversión del negocio ni como aportación de un socio.
+    if (p.origen === "REINVERSION") {
+      if (p.cuenta === "EFECTIVO") saldoCaja -= monto;
+      else saldoCuenta -= monto;
+    }
+
+    if (p.esMaaser) {
+      maaserDado += monto;
+      continue;
+    }
+
     inversionTotal += monto;
 
     if (p.origen === "INYECCION_CAPITAL") {
@@ -198,8 +217,6 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     }
     if (p.origen === "REINVERSION") {
       totalReinversion += monto;
-      if (p.cuenta === "EFECTIVO") saldoCaja -= monto;
-      else saldoCuenta -= monto;
     }
 
     if (p.cuenta === "EFECTIVO") pagadoDesdeCaja += monto;
@@ -239,6 +256,9 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     }
   }
 
+  const maaserDebido = gananciaTotal * PORCENTAJE_MAASER;
+  const saldoMaaser = maaserDado - maaserDebido;
+
   return {
     inversionTotal,
     totalInyeccionCapital,
@@ -255,6 +275,9 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     saldoCuenta,
     socios: resumenSocios,
     saldoEntreSocios,
+    maaserDebido,
+    maaserDado,
+    saldoMaaser,
   };
 }
 

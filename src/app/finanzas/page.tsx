@@ -71,6 +71,33 @@ export default async function FinanzasPage() {
       </div>
 
       <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
+        <h2 className="font-semibold">Maaser</h2>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <p className="text-muted text-xs">Debido (10% de la ganancia)</p>
+            <p className="font-semibold">{formatoMXN(finanzas.maaserDebido)}</p>
+          </div>
+          <div>
+            <p className="text-muted text-xs">Dado</p>
+            <p className="font-semibold">{formatoMXN(finanzas.maaserDado)}</p>
+          </div>
+        </div>
+        <p className="text-sm">
+          {finanzas.saldoMaaser >= 0 ? (
+            <>
+              Maaser a favor:{" "}
+              <span className="font-bold text-wine">{formatoMXN(finanzas.saldoMaaser)}</span>
+            </>
+          ) : (
+            <>
+              Debes de Maaser:{" "}
+              <span className="font-bold text-warn">{formatoMXN(-finanzas.saldoMaaser)}</span>
+            </>
+          )}
+        </p>
+      </div>
+
+      <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
         <h2 className="font-semibold">Saldo entre socios</h2>
         {finanzas.saldoEntreSocios ? (
           <p className="text-sm">

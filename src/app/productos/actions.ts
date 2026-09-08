@@ -3,9 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import { subirFotoProducto } from "@/lib/supabaseStorage";
 
 function numeroOpcional(valor: FormDataEntryValue | null) {
   if (!valor || valor === "") return null;
@@ -20,13 +18,7 @@ function enteroOpcional(valor: FormDataEntryValue | null) {
 
 async function guardarFoto(foto: FormDataEntryValue | null): Promise<string | null> {
   if (!(foto instanceof File) || foto.size === 0) return null;
-  const extension = foto.name.split(".").pop() || "jpg";
-  const nombreArchivo = `${randomUUID()}.${extension}`;
-  const carpeta = path.join(process.cwd(), "public", "uploads");
-  await mkdir(carpeta, { recursive: true });
-  const bytes = Buffer.from(await foto.arrayBuffer());
-  await writeFile(path.join(carpeta, nombreArchivo), bytes);
-  return `/uploads/${nombreArchivo}`;
+  return subirFotoProducto(foto);
 }
 
 function datosDesdeFormulario(formData: FormData) {

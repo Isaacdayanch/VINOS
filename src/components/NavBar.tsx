@@ -20,7 +20,7 @@ export function NavBar() {
 
   return (
     <header className="sticky top-0 z-20 bg-wine text-white shadow-md">
-      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between relative">
         <Link href="/" className="font-semibold tracking-wide">
           🍷 Vinos CRM
         </Link>
@@ -31,37 +31,50 @@ export function NavBar() {
         >
           ☰
         </button>
+
+        {abierto && (
+          <>
+            <button
+              aria-label="Cerrar menú"
+              onClick={() => setAbierto(false)}
+              className="fixed inset-0 z-10 cursor-default bg-black/20"
+            />
+            <nav className="absolute right-0 top-full mt-2 z-20 w-56 rounded-lg bg-surface text-foreground shadow-xl border border-border overflow-hidden">
+              <ul className="flex flex-col py-1">
+                {links.map((link) => {
+                  const activo = pathname === link.href;
+                  if (!link.disponible) {
+                    return (
+                      <li
+                        key={link.href}
+                        className="px-4 py-2.5 text-muted flex justify-between text-sm"
+                      >
+                        <span>{link.label}</span>
+                        <span className="text-xs italic">Próximamente</span>
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        onClick={() => setAbierto(false)}
+                        className={`block px-4 py-2.5 text-sm ${
+                          activo
+                            ? "bg-wine-light font-semibold text-wine"
+                            : "hover:bg-wine-light/50"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </>
+        )}
       </div>
-      {abierto && (
-        <nav className="border-t border-white/20 bg-wine-dark">
-          <ul className="max-w-5xl mx-auto flex flex-col">
-            {links.map((link) => {
-              const activo = pathname === link.href;
-              if (!link.disponible) {
-                return (
-                  <li key={link.href} className="px-4 py-3 text-white/40 flex justify-between">
-                    <span>{link.label}</span>
-                    <span className="text-xs italic">Próximamente</span>
-                  </li>
-                );
-              }
-              return (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onClick={() => setAbierto(false)}
-                    className={`block px-4 py-3 ${
-                      activo ? "bg-wine font-semibold" : "hover:bg-white/10"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      )}
     </header>
   );
 }

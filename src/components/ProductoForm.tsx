@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef, useState } from "react";
+
 type ProductoDefaults = {
   nombre?: string;
   sku?: string;
@@ -26,15 +30,7 @@ export function ProductoForm({
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      {d.fotoUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={d.fotoUrl}
-          alt="Foto actual"
-          className="w-24 h-24 object-cover rounded-md border border-border"
-        />
-      )}
-      <Campo label="Foto de la botella" name="foto" type="file" accept="image/*" />
+      <FotoDropzone fotoActual={d.fotoUrl} />
 
       <Campo label="Nombre del vino" name="nombre" defaultValue={d.nombre} required />
       <Campo label="SKU" name="sku" defaultValue={d.sku} required />
@@ -100,6 +96,67 @@ export function ProductoForm({
         {botonTexto}
       </button>
     </form>
+  );
+}
+
+function FotoDropzone({ fotoActual }: { fotoActual?: string | null }) {
+  const [preview, setPreview] = useState<string | null>(fotoActual ?? null);
+  const [arrastrando, setArrastrando] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function usarArchivo(archivo: File | undefined) {
+    if (!archivo) return;
+    if (inputRef.current) {
+      const lista = new DataTransfer();
+      lista.items.add(archivo);
+      inputRef.current.files = lista.files;
+    }
+    const url = URL.createObjectURL(archivo);
+    setPreview(url);
+  }
+
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      <span className="font-medium">Foto de la botella</span>
+      <div
+        onClick={() => inputRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setArrastrando(true);
+        }}
+        onDragLeave={() => setArrastrando(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setArrastrando(false);
+          usarArchivo(e.dataTransfer.files?.[0]);
+        }}
+        className={`cursor-pointer rounded-lg border-2 border-dashed ${
+          arrastrando ? "border-wine bg-wine-light/50" : "border-border bg-surface"
+        } flex flex-col items-center justify-center gap-2 py-8 px-4 text-center transition-colors`}
+      >
+        {preview ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={preview}
+            alt="Foto de la botella"
+            className="w-24 h-24 object-cover rounded-md border border-border"
+          />
+        ) : (
+          <span className="text-3xl">📷</span>
+        )}
+        <p className="text-muted text-xs">
+          {preview ? "Cambiar foto — arrastra otra o haz clic" : "Arrastra una foto aquí o haz clic para elegir"}
+        </p>
+      </div>
+      <input
+        ref={inputRef}
+        name="foto"
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => usarArchivo(e.target.files?.[0])}
+      />
+    </label>
   );
 }
 

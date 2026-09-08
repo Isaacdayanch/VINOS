@@ -46,6 +46,17 @@ export default async function StockPage() {
         </div>
       </div>
 
+      <Link
+        href="/productos"
+        className="rounded-lg border border-border bg-surface p-4 flex items-center justify-between gap-3 hover:bg-wine-light/40"
+      >
+        <div>
+          <p className="font-semibold text-wine">Productos</p>
+          <p className="text-xs text-muted">Catálogo, precios y fotos de cada vino</p>
+        </div>
+        <span className="text-wine text-xl">→</span>
+      </Link>
+
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {productos.map((p) => {
           const r = resumen.get(p.id);

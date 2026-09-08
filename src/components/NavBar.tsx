@@ -5,14 +5,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const links = [
+  { href: "/finanzas", label: "Finanzas", disponible: true },
   { href: "/", label: "Dashboard", disponible: true },
   { href: "/stock", label: "Stock", disponible: true },
   { href: "/pedidos", label: "Pedidos", disponible: true },
-  { href: "/productos", label: "Productos", disponible: true },
-  { href: "/ordenes", label: "Órdenes", disponible: true },
+  { href: "/ordenes", label: "Órdenes de clientes", disponible: true },
   { href: "/recibos", label: "Recibos", disponible: true },
   { href: "/clientes", label: "Clientes", disponible: true },
-  { href: "/finanzas", label: "Finanzas", disponible: true },
 ];
 
 export function NavBar() {

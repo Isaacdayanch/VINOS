@@ -31,8 +31,7 @@ export default async function ReciboOrdenPage({
 
       <div className="max-w-lg mx-auto w-full rounded-lg border border-border bg-surface p-6 flex flex-col gap-6 print:border-0 print:p-0">
         <div className="text-center">
-          <p className="text-2xl">🍷</p>
-          <h1 className="text-xl font-bold text-wine">Vinos CRM</h1>
+          <h1 className="text-xl font-bold text-wine">Vinos</h1>
           <p className="text-sm text-muted">Recibo de venta</p>
         </div>
 

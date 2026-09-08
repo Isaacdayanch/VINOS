@@ -116,10 +116,18 @@ function FotoDropzone({ fotoActual }: { fotoActual?: string | null }) {
   }
 
   return (
-    <label className="flex flex-col gap-1 text-sm">
+    <div className="flex flex-col gap-1 text-sm">
       <span className="font-medium">Foto de la botella</span>
       <div
+        role="button"
+        tabIndex={0}
         onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
         onDragOver={(e) => {
           e.preventDefault();
           setArrastrando(true);
@@ -142,7 +150,7 @@ function FotoDropzone({ fotoActual }: { fotoActual?: string | null }) {
             className="w-24 h-24 object-cover rounded-md border border-border"
           />
         ) : (
-          <span className="text-3xl">📷</span>
+          <span className="text-3xl text-muted">+</span>
         )}
         <p className="text-muted text-xs">
           {preview ? "Cambiar foto — arrastra otra o haz clic" : "Arrastra una foto aquí o haz clic para elegir"}
@@ -156,7 +164,7 @@ function FotoDropzone({ fotoActual }: { fotoActual?: string | null }) {
         className="hidden"
         onChange={(e) => usarArchivo(e.target.files?.[0])}
       />
-    </label>
+    </div>
   );
 }
 

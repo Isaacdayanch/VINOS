@@ -53,7 +53,16 @@ body {
 }
 
 @media print {
+  @page {
+    margin: 14mm 10mm;
+  }
+
   header {
     display: none;
+  }
+
+  .print-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }

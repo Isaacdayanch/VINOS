@@ -58,7 +58,7 @@ export default async function ReciboOrdenPage({
           </thead>
           <tbody>
             {orden.lineas.map((l) => (
-              <tr key={l.id} className="border-b border-border/50">
+              <tr key={l.id} className="print-item border-b border-border/50 break-inside-avoid">
                 <td className="py-2">
                   <div className="flex items-center gap-2">
                     <div className="w-7 aspect-[2/3] rounded bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-0.5">

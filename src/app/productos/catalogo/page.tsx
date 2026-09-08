@@ -36,7 +36,7 @@ export default async function CatalogoPage({
         {productos.map((p) => (
           <div
             key={p.id}
-            className="rounded-lg border border-border bg-surface p-3 flex flex-col gap-2 break-inside-avoid"
+            className="print-item rounded-lg border border-border bg-surface p-3 flex flex-col gap-2 break-inside-avoid"
           >
             <div className="w-full aspect-[3/5] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-2">
               {p.fotoUrl ? (

@@ -58,7 +58,7 @@ export default async function ImprimirStockPage({
           {productos.map((p) => {
             const stock = resumen.get(p.id)?.stockActual ?? 0;
             return (
-              <tr key={p.id} className="border-b border-border/50 break-inside-avoid">
+              <tr key={p.id} className="print-item border-b border-border/50 break-inside-avoid">
                 <td className="py-2 pr-2">
                   <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-1">
                     {p.fotoUrl ? (

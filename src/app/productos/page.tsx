@@ -13,19 +13,21 @@ export default async function ProductosPage() {
           <h1 className="text-2xl font-bold text-wine">Productos</h1>
           <p className="text-muted text-sm">Tu catálogo de vinos</p>
         </div>
-        <div className="flex gap-2">
-          <Link
-            href="/productos/catalogo"
-            className="rounded-md border border-wine text-wine px-3 py-2 text-sm font-medium whitespace-nowrap"
-          >
-            Ver catálogo
-          </Link>
+        <div className="flex flex-col items-end gap-2">
           <Link
             href="/productos/nuevo"
             className="rounded-md bg-wine text-white px-3 py-2 text-sm font-medium whitespace-nowrap"
           >
             + Nuevo
           </Link>
+          <div className="flex gap-3 text-xs">
+            <Link href="/productos/catalogo?precios=si" className="text-wine underline whitespace-nowrap">
+              Catálogo con precios
+            </Link>
+            <Link href="/productos/catalogo" className="text-wine underline whitespace-nowrap">
+              Catálogo sin precios
+            </Link>
+          </div>
         </div>
       </div>
 

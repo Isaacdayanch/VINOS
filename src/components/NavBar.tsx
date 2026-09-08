@@ -23,7 +23,7 @@ export function NavBar() {
     <header className="sticky top-0 z-20 bg-wine text-white shadow-md">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between relative">
         <Link href="/" className="font-semibold tracking-wide">
-          🍷 Vinos CRM
+          Vinos CRM
         </Link>
         <button
           aria-label="Abrir menú"

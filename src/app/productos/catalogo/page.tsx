@@ -5,7 +5,12 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function CatalogoPage() {
+export default async function CatalogoPage({
+  searchParams,
+}: PageProps<"/productos/catalogo">) {
+  const params = await searchParams;
+  const conPrecios = params.precios === "si";
+
   const productos = await prisma.producto.findMany({
     where: { activo: true },
     orderBy: { nombre: "asc" },
@@ -33,7 +38,7 @@ export default async function CatalogoPage() {
             key={p.id}
             className="rounded-lg border border-border bg-surface p-3 flex flex-col gap-2 break-inside-avoid"
           >
-            <div className="w-full aspect-[3/5] rounded-md bg-wine-light overflow-hidden flex items-center justify-center p-2">
+            <div className="w-full aspect-[3/5] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-2">
               {p.fotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
@@ -41,12 +46,12 @@ export default async function CatalogoPage() {
                 <span className="text-3xl">🍷</span>
               )}
             </div>
-            <div>
+            <div className="border-t border-border pt-2">
               <p className="font-medium text-sm leading-tight">
                 {p.nombre} {p.anio ? `(${p.anio})` : ""}
               </p>
               {p.categoria && <p className="text-xs text-muted">{p.categoria}</p>}
-              {p.precioLista && (
+              {conPrecios && p.precioLista && (
                 <p className="text-sm font-semibold text-wine mt-1">
                   {formatoMXN(p.precioLista)}
                 </p>

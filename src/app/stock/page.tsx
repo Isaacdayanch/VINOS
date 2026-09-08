@@ -53,7 +53,11 @@ export default async function StockPage() {
           const minimo = p.stockMinimo ?? 8;
           const bajo = stock <= minimo;
           return (
-            <div key={p.id} className="p-4 flex items-center gap-3">
+            <Link
+              key={p.id}
+              href={`/productos/${p.id}/editar`}
+              className="p-4 flex items-center gap-3 hover:bg-wine-light/40"
+            >
               <div className="w-12 h-12 rounded-md bg-wine-light overflow-hidden flex items-center justify-center shrink-0">
                 {p.fotoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -74,7 +78,7 @@ export default async function StockPage() {
                 </p>
                 {bajo && <p className="text-xs text-warn">⚠ Reponer</p>}
               </div>
-            </div>
+            </Link>
           );
         })}
         {productos.length === 0 && (

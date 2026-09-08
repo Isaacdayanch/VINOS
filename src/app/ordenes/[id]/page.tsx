@@ -45,14 +45,22 @@ export default async function DetalleOrdenPage({
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {orden.lineas.map((l) => (
-          <div key={l.id} className="p-4 flex items-center justify-between gap-3">
-            <div>
-              <p className="font-medium">{l.producto.nombre}</p>
+          <div key={l.id} className="p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-md bg-wine-light overflow-hidden flex items-center justify-center shrink-0">
+              {l.producto.fotoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={l.producto.fotoUrl} alt={l.producto.nombre} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-lg">🍷</span>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate">{l.producto.nombre}</p>
               <p className="text-xs text-muted">
                 {l.cantidadBotellas} botella{l.cantidadBotellas === 1 ? "" : "s"} × {formatoMXN(l.precioUnitario)}
               </p>
             </div>
-            <span className="font-semibold">
+            <span className="font-semibold whitespace-nowrap">
               {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
             </span>
           </div>

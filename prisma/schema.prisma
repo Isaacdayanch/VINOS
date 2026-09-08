@@ -101,6 +101,7 @@ model EntradaLinea {
   cajasRecibidas Float
   piezasPorCaja  Int
   costoPorCaja   Float // dólares
+  recibida       Boolean  @default(false) // false = apartado con el proveedor, aún no llega físicamente
   createdAt      DateTime @default(now())
 
   pedido   Pedido   @relation(fields: [pedidoId], references: [id])

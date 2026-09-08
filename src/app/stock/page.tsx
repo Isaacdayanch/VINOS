@@ -30,10 +30,10 @@ export default async function StockPage() {
         </div>
         <div className="flex flex-col items-end gap-2">
           <Link
-            href="/stock/entradas/nueva"
+            href="/pedidos"
             className="rounded-md bg-wine text-white px-4 py-2 text-sm font-medium whitespace-nowrap"
           >
-            + Registrar entrada
+            Pedidos a proveedores
           </Link>
           <div className="flex gap-3 text-xs">
             <Link href="/stock/imprimir?precios=si" className="text-wine underline whitespace-nowrap">

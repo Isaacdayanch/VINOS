@@ -132,6 +132,7 @@ export async function sembrarDatosReales(prisma: PrismaClient) {
         cajasRecibidas: e.cajas,
         piezasPorCaja: producto.piezasPorCaja,
         costoPorCaja: e.costoPorCaja,
+        recibida: true,
       },
     });
   }

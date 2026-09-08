@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 export async function calcularCostosPedido(pedidoId: string) {
   const pedido = await prisma.pedido.findUniqueOrThrow({
     where: { id: pedidoId },
-    include: { entradas: true },
+    include: { entradas: { where: { recibida: true } } },
   });
 
   const tipoCambio = pedido.tipoCambio ?? 0;
@@ -56,7 +56,7 @@ export async function calcularResumenInventario(): Promise<
   Map<string, ResumenProducto>
 > {
   const pedidos = await prisma.pedido.findMany({
-    where: { entradas: { some: {} } },
+    where: { entradas: { some: { recibida: true } } },
   });
 
   const acumPorProducto = new Map<

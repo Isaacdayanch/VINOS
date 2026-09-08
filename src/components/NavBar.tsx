@@ -7,6 +7,7 @@ import { useState } from "react";
 const links = [
   { href: "/", label: "Dashboard", disponible: true },
   { href: "/stock", label: "Stock", disponible: true },
+  { href: "/pedidos", label: "Pedidos", disponible: true },
   { href: "/productos", label: "Productos", disponible: true },
   { href: "/ordenes", label: "Órdenes", disponible: true },
   { href: "/recibos", label: "Recibos", disponible: true },

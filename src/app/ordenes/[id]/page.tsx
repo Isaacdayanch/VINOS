@@ -1,3 +1,4 @@
+import { crearCobro } from "@/app/ordenes/actions";
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
@@ -11,12 +12,19 @@ export default async function DetalleOrdenPage({
   const { id } = await params;
   const orden = await prisma.orden.findUnique({
     where: { id },
-    include: { lineas: { include: { producto: true } }, cliente: true, cobros: true },
+    include: {
+      lineas: { include: { producto: true } },
+      cliente: true,
+      cobros: { orderBy: { fecha: "desc" } },
+    },
   });
   if (!orden) notFound();
 
   const total = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
+  const pendiente = total - cobrado;
+  const hoy = new Date().toISOString().slice(0, 10);
+  const registrarCobro = crearCobro.bind(null, orden.id);
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -76,13 +84,96 @@ export default async function DetalleOrdenPage({
           <span>Cobrado</span>
           <span>{formatoMXN(cobrado)}</span>
         </div>
-        {total - cobrado > 0 && (
+        {pendiente > 0 && (
           <div className="flex items-center justify-between text-sm text-warn">
             <span>Pendiente</span>
-            <span>{formatoMXN(total - cobrado)}</span>
+            <span>{formatoMXN(pendiente)}</span>
           </div>
         )}
       </div>
+
+      {orden.cobros.length > 0 && (
+        <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
+          {orden.cobros.map((c) => (
+            <div key={c.id} className="p-3 flex items-center justify-between text-sm">
+              <div>
+                <p>{new Date(c.fecha).toLocaleDateString("es-MX")}</p>
+                <p className="text-xs text-muted">
+                  {c.cuenta === "EFECTIVO" ? "Efectivo" : "Cuenta"}
+                  {c.cuenta === "CUENTA" && c.comisionPct > 0 ? ` (comisión ${c.comisionPct}%)` : ""}
+                  {c.metodoPago ? ` · ${c.metodoPago}` : ""}
+                </p>
+              </div>
+              <span className="font-medium">{formatoMXN(c.monto)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {pendiente > 0 && (
+        <details className="rounded-lg border border-border bg-surface">
+          <summary className="p-4 cursor-pointer text-sm font-medium">
+            + Registrar cobro
+          </summary>
+          <form action={registrarCobro} className="p-4 pt-0 flex flex-col gap-4">
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Fecha</span>
+              <input
+                name="fecha"
+                type="date"
+                defaultValue={hoy}
+                className="rounded-md border border-border bg-surface px-3 py-2"
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Monto (MXN)</span>
+              <input
+                name="monto"
+                type="number"
+                step="0.01"
+                min="0"
+                defaultValue={pendiente}
+                className="rounded-md border border-border bg-surface px-3 py-2"
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">¿Dónde te llegó el dinero?</span>
+              <select
+                name="cuenta"
+                defaultValue="EFECTIVO"
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              >
+                <option value="EFECTIVO">Efectivo (a Caja)</option>
+                <option value="CUENTA">Cuenta / tarjeta</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Comisión % (solo si fue a Cuenta)</span>
+              <input
+                name="comisionPct"
+                type="number"
+                step="0.1"
+                min="0"
+                defaultValue={2}
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Método de pago (opcional)</span>
+              <input
+                name="metodoPago"
+                placeholder="Ej. Transferencia, tarjeta, efectivo"
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              />
+            </label>
+            <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
+              Registrar cobro
+            </button>
+          </form>
+        </details>
+      )}
     </div>
   );
 }

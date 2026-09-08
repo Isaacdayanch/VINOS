@@ -23,21 +23,31 @@ enum Moneda {
   USD
 }
 
+enum Cuenta {
+  EFECTIVO
+  CUENTA // banco / tarjeta / digital
+}
+
+enum OrigenPago {
+  INYECCION_CAPITAL // dinero nuevo que pone un socio de su bolsillo
+  REINVERSION // dinero que ya estaba guardado en Caja/Cuenta, de ventas pasadas
+}
+
 model Producto {
-  id                    String    @id @default(cuid())
+  id                    String   @id @default(cuid())
   nombre                String
-  sku                   String    @unique
+  sku                   String   @unique
   piezasPorCaja         Int
   anio                  Int?
   proveedor             String?
   categoria             String?
-  activo                Boolean   @default(true)
+  activo                Boolean  @default(true)
   fotoUrl               String?
   stockMinimo           Int?
   precioLista           Float?
   precioDescuentoChico  Float?
   precioDescuentoGrande Float?
-  createdAt             DateTime  @default(now())
+  createdAt             DateTime @default(now())
 
   entradas       EntradaLinea[]
   salidas        Salida[]
@@ -75,19 +85,20 @@ model Socio {
   id     String @id @default(cuid())
   nombre String
 
-  pagos Pago[]
+  pagos   Pago[]
+  salidas Salida[]
 }
 
 model Pedido {
-  id            String   @id @default(cuid())
-  folio         String   @unique
-  fecha         DateTime
-  proveedor     String?
-  tipoCambio    Float? // pesos por dólar, para convertir costos en USD de este pedido
-  logisticaUSD  Float? // flete + seguro (dólares)
-  logisticaMXN  Float? // aduana + maniobras + otros gastos (pesos)
-  notas         String?
-  createdAt     DateTime @default(now())
+  id           String   @id @default(cuid())
+  folio        String   @unique
+  fecha        DateTime
+  proveedor    String?
+  tipoCambio   Float? // pesos por dólar, para convertir costos en USD de este pedido
+  logisticaUSD Float? // flete + seguro (dólares)
+  logisticaMXN Float? // aduana + maniobras + otros gastos (pesos)
+  notas        String?
+  createdAt    DateTime @default(now())
 
   entradas EntradaLinea[]
   pagos    Pago[]
@@ -134,42 +145,50 @@ model OrdenLinea {
 }
 
 model Salida {
-  id         String   @id @default(cuid())
-  fecha      DateTime
-  productoId String
-  botellas   Int
-  motivo     String // "Venta", "Muestra/Degustación", "Consumo interno", "Merma/Otro"
-  ordenId    String?
-  notas      String?
-  createdAt  DateTime @default(now())
+  id            String   @id @default(cuid())
+  fecha         DateTime
+  productoId    String
+  botellas      Int
+  motivo        String // "Venta", "Muestra/Degustación", "Consumo personal", "Merma/Otro"
+  costoUnitario Float? // costo por botella al momento de salir (para "Consumo personal")
+  socioId       String? // quién se la llevó, si motivo = "Consumo personal" y no fue compartida
+  dividido      Boolean  @default(false) // true = Isaac y Beto se la repartieron, no genera deuda
+  ordenId       String?
+  notas         String?
+  createdAt     DateTime @default(now())
 
   producto Producto @relation(fields: [productoId], references: [id])
+  socio    Socio?   @relation(fields: [socioId], references: [id])
 }
 
 model Cobro {
-  id         String   @id @default(cuid())
-  ordenId    String
-  fecha      DateTime
-  monto      Float
-  metodoPago String?
-  notas      String?
+  id          String   @id @default(cuid())
+  ordenId     String
+  fecha       DateTime
+  monto       Float
+  cuenta      Cuenta   @default(EFECTIVO)
+  comisionPct Float    @default(0) // % que se descuenta si cuenta = CUENTA (ej. comisión de tarjeta)
+  metodoPago  String?
+  notas       String?
 
   orden Orden @relation(fields: [ordenId], references: [id])
 }
 
 model Pago {
-  id         String   @id @default(cuid())
+  id         String     @id @default(cuid())
   fecha      DateTime
-  pedidoId   String?
+  pedidoId   String? // null = gasto interno, no ligado a un pedido
   concepto   String
   moneda     Moneda
   monto      Float
   tipoCambio Float? // solo si moneda = USD, para saber a cuántos pesos equivale
+  cuenta     Cuenta     @default(EFECTIVO) // de dónde salió el dinero
+  origen     OrigenPago @default(REINVERSION)
   metodoPago String?
-  socioId    String? // null = dividido entre socios
-  dividido   Boolean  @default(false)
+  socioId    String? // null = dividido entre socios (o no aplica, si origen = REINVERSION)
+  dividido   Boolean    @default(false)
   notas      String?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime   @default(now())
 
   pedido Pedido? @relation(fields: [pedidoId], references: [id])
   socio  Socio?  @relation(fields: [socioId], references: [id])

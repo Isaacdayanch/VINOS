@@ -12,7 +12,7 @@ const links = [
   { href: "/ordenes", label: "Órdenes", disponible: true },
   { href: "/recibos", label: "Recibos", disponible: true },
   { href: "/clientes", label: "Clientes", disponible: true },
-  { href: "/finanzas", label: "Finanzas", disponible: false },
+  { href: "/finanzas", label: "Finanzas", disponible: true },
 ];
 
 export function NavBar() {

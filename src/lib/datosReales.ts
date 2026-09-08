@@ -146,6 +146,8 @@ export async function sembrarDatosReales(prisma: PrismaClient) {
       monto: 19528,
       tipoCambio: 17.2,
       metodoPago: "Transferencia",
+      cuenta: "CUENTA",
+      origen: "INYECCION_CAPITAL",
       dividido: true,
     },
   });

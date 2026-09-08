@@ -81,3 +81,25 @@ export async function crearOrden(formData: FormData) {
   revalidatePath("/");
   redirect(`/ordenes/${orden.id}`);
 }
+
+export async function crearCobro(ordenId: string, formData: FormData) {
+  const fecha = String(formData.get("fecha") ?? "");
+  const monto = Number(formData.get("monto"));
+  const cuenta = String(formData.get("cuenta") ?? "EFECTIVO") as "EFECTIVO" | "CUENTA";
+  const comisionPct = cuenta === "CUENTA" ? Number(formData.get("comisionPct") ?? 0) : 0;
+  const metodoPago = String(formData.get("metodoPago") ?? "").trim() || null;
+  const notas = String(formData.get("notas") ?? "").trim() || null;
+
+  if (!fecha || !monto) {
+    throw new Error("Faltan datos del cobro");
+  }
+
+  await prisma.cobro.create({
+    data: { ordenId, fecha: new Date(fecha), monto, cuenta, comisionPct, metodoPago, notas },
+  });
+
+  revalidatePath(`/ordenes/${ordenId}`);
+  revalidatePath("/ordenes");
+  revalidatePath("/finanzas");
+  revalidatePath("/");
+}

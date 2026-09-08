@@ -122,22 +122,34 @@ preguntarle si esas botellas de verdad ya salieron, para registrarlas bien.
   a ciegas, la versión más nueva en npm es un release candidate de Prisma 8
   con CLI distinto). Cliente generado en `src/generated/prisma` (gitignored,
   se regenera con `npx prisma generate` o al migrar/sembrar).
-- **Base de datos**: PostgreSQL en **Supabase** (proyecto "Isaacdayanch's
-  Project", organización "Vinos-CRM" — separado de su otro negocio Daymart,
-  que vive en su propia organización de Supabase). Se usa el *connection
-  pooler* de Supabase: `DATABASE_URL` (puerto 6543, modo transacción, la usa
-  la app) y `DIRECT_URL` (puerto 5432, modo sesión, la usa Prisma solo para
-  migraciones) — ambas en `.env` (gitignored) y replicadas como variables de
-  entorno en Vercel para producción.
+- **Base de datos**: PostgreSQL en **Supabase**, conectado mediante la
+  **integración nativa de Vercel** (proyecto de Vercel "vinos" → pestaña
+  Storage → Connect Database → Supabase → "Create new project", eligiendo la
+  organización "Vinos-CRM" — separada de Daymart). Vercel provisionó el
+  proyecto de Supabase y agregó solo las variables de entorno en el proyecto
+  de Vercel; el código lee esos nombres tal cual, **sin renombrar nada a
+  mano** (justo el problema que causó tantos líos la vez anterior, cuando se
+  copiaba/pegaba el connection string manualmente):
+  - `POSTGRES_PRISMA_URL` → pooler en modo transacción, la usa la app
+    (`datasource db { url }` en `prisma/schema.prisma`).
+  - `POSTGRES_URL_NON_POOLING` → conexión directa, la usa Prisma solo para
+    migraciones (`directUrl`).
+  - (Vercel también agrega `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
+    `SUPABASE_SERVICE_ROLE_KEY`, etc. — no se usan todavía, son para si algún
+    día se necesita Supabase Storage o su cliente JS directo).
   - Ojo: desde este entorno de desarrollo (sandbox de Claude) **no hay salida
     de red directa a Postgres** (solo HTTPS vía proxy), así que las
-    migraciones y el seed no se pueden correr desde aquí contra Supabase.
-    Por eso el build de Vercel corre `prisma migrate deploy` automáticamente
-    (ver `package.json` → `build`), y los datos reales se cargaron una sola
-    vez visitando `/api/seed-inicial?secreto=...` ya en producción (ruta
-    protegida con la variable `SEED_SECRET`, pensada para BORRARSE del código
-    después de usarla una vez — nunca debe volver a correr con datos reales
-    ya cargados, porque empieza borrando todo).
+    migraciones y el seed no se pueden correr desde aquí — el `.env` local
+    solo tiene valores de relleno para que `prisma generate` no truene, no
+    sirven para conectar a nada real.
+  - El build de Vercel **NO** corre `prisma migrate deploy` (se probó y el
+    contenedor de build no lograba conectarse a Postgres por el puerto de
+    sesión); las tablas se crean a mano una vez, pegando el SQL de
+    `crear_tablas.sql` en el SQL Editor de Supabase.
+  - Los datos reales se cargan una sola vez visitando `/api/seed-inicial` ya
+    en producción (sin contraseña — solo corre si la tabla Producto está
+    vacía, para no arriesgar borrar datos reales sin querer). Pendiente:
+    borrar esa ruta del código después de usarla.
 - **Tailwind CSS v4** con paleta de vino (bordó `--wine` / crema
   `--background`), tema claro/oscuro automático vía `prefers-color-scheme`.
 - **Fotos de producto**: por ahora se guardan en `public/uploads/` (solo

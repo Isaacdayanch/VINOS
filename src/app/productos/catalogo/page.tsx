@@ -33,10 +33,10 @@ export default async function CatalogoPage() {
             key={p.id}
             className="rounded-lg border border-border bg-surface p-3 flex flex-col gap-2 break-inside-avoid"
           >
-            <div className="w-full aspect-square rounded-md bg-wine-light overflow-hidden flex items-center justify-center">
+            <div className="w-full aspect-[3/5] rounded-md bg-wine-light overflow-hidden flex items-center justify-center p-2">
               {p.fotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-cover" />
+                <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
               ) : (
                 <span className="text-3xl">🍷</span>
               )}

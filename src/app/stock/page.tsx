@@ -58,10 +58,10 @@ export default async function StockPage() {
               href={`/productos/${p.id}/editar`}
               className="p-4 flex items-center gap-3 hover:bg-wine-light/40"
             >
-              <div className="w-12 h-12 rounded-md bg-wine-light overflow-hidden flex items-center justify-center shrink-0">
+              <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
                 {p.fotoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-cover" />
+                  <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
                 ) : (
                   <span className="text-xl">🍷</span>
                 )}

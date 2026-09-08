@@ -59,7 +59,23 @@ export default async function ReciboOrdenPage({
           <tbody>
             {orden.lineas.map((l) => (
               <tr key={l.id} className="border-b border-border/50">
-                <td className="py-2">{l.producto.nombre}</td>
+                <td className="py-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 aspect-[2/3] rounded bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-0.5">
+                      {l.producto.fotoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={l.producto.fotoUrl}
+                          alt={l.producto.nombre}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <span className="text-xs">🍷</span>
+                      )}
+                    </div>
+                    <span>{l.producto.nombre}</span>
+                  </div>
+                </td>
                 <td className="py-2 text-right">{l.cantidadBotellas}</td>
                 <td className="py-2 text-right">{formatoMXN(l.precioUnitario)}</td>
                 <td className="py-2 text-right">

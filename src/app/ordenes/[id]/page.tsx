@@ -54,10 +54,10 @@ export default async function DetalleOrdenPage({
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {orden.lineas.map((l) => (
           <div key={l.id} className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-md bg-wine-light overflow-hidden flex items-center justify-center shrink-0">
+            <div className="w-10 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
               {l.producto.fotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={l.producto.fotoUrl} alt={l.producto.nombre} className="w-full h-full object-cover" />
+                <img src={l.producto.fotoUrl} alt={l.producto.nombre} className="w-full h-full object-contain" />
               ) : (
                 <span className="text-lg">🍷</span>
               )}

@@ -22,8 +22,11 @@ export function NavBar() {
   return (
     <header className="sticky top-0 z-20 bg-wine text-white shadow-md">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between relative">
-        <Link href="/" className="font-semibold tracking-wide">
-          Vinos CRM
+        <Link href="/" className="flex items-center gap-2 font-semibold tracking-wide">
+          <span>Vinos</span>
+          <span className="text-[10px] font-bold tracking-wider bg-wine-light/25 text-white rounded-full px-2 py-0.5">
+            CRM
+          </span>
         </Link>
         <button
           aria-label="Abrir menú"

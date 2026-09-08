@@ -147,7 +147,7 @@ function FotoDropzone({ fotoActual }: { fotoActual?: string | null }) {
           <img
             src={preview}
             alt="Foto de la botella"
-            className="w-24 h-24 object-cover rounded-md border border-border"
+            className="w-24 aspect-[2/3] object-contain rounded-md border border-border bg-surface p-1"
           />
         ) : (
           <span className="text-3xl text-muted">+</span>

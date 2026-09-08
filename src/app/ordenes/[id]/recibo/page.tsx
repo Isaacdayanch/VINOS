@@ -47,19 +47,25 @@ export default async function ReciboOrdenPage({
           </div>
         </div>
 
-        <table className="w-full text-sm">
+        <table className="w-full text-sm border-separate border-spacing-0">
+          <colgroup>
+            <col />
+            <col className="w-12" />
+            <col className="w-20" />
+            <col className="w-20" />
+          </colgroup>
           <thead>
             <tr className="text-left text-muted border-b border-border">
-              <th className="pb-2 font-medium">Producto</th>
-              <th className="pb-2 font-medium text-right">Cant.</th>
-              <th className="pb-2 font-medium text-right">Precio</th>
-              <th className="pb-2 font-medium text-right">Total</th>
+              <th className="pb-2 pr-2 font-medium">Producto</th>
+              <th className="pb-2 px-2 font-medium text-right">Cant.</th>
+              <th className="pb-2 px-2 font-medium text-right">Precio</th>
+              <th className="pb-2 pl-2 font-medium text-right">Total</th>
             </tr>
           </thead>
           <tbody>
             {orden.lineas.map((l) => (
               <tr key={l.id} className="print-item border-b border-border/50 break-inside-avoid">
-                <td className="py-2">
+                <td className="py-2.5 pr-2">
                   <div className="flex items-center gap-2">
                     <div className="w-7 aspect-[2/3] rounded bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-0.5">
                       {l.producto.fotoUrl ? (
@@ -76,9 +82,13 @@ export default async function ReciboOrdenPage({
                     <span>{l.producto.nombre}</span>
                   </div>
                 </td>
-                <td className="py-2 text-right">{l.cantidadBotellas}</td>
-                <td className="py-2 text-right">{formatoMXN(l.precioUnitario)}</td>
-                <td className="py-2 text-right">
+                <td className="py-2.5 px-2 text-right tabular-nums whitespace-nowrap">
+                  {l.cantidadBotellas}
+                </td>
+                <td className="py-2.5 px-2 text-right tabular-nums whitespace-nowrap">
+                  {formatoMXN(l.precioUnitario)}
+                </td>
+                <td className="py-2.5 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
                   {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
                 </td>
               </tr>

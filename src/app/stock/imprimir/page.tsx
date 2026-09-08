@@ -45,13 +45,13 @@ export default async function ImprimirStockPage({
         </p>
       </div>
 
-      <table className="w-full text-sm border-collapse">
+      <table className="w-full text-sm border-separate border-spacing-0">
         <thead>
           <tr className="text-left border-b border-border">
-            <th className="py-2 pr-2 font-medium">Foto</th>
-            <th className="py-2 pr-2 font-medium">Vino</th>
-            <th className="py-2 pr-2 font-medium">Stock</th>
-            {conPrecios && <th className="py-2 pr-2 font-medium text-right">Precio</th>}
+            <th className="py-2 pr-3 font-medium">Foto</th>
+            <th className="py-2 pr-4 font-medium">Vino</th>
+            <th className="py-2 pr-4 font-medium whitespace-nowrap">Stock</th>
+            {conPrecios && <th className="py-2 pl-2 font-medium text-right">Precio</th>}
           </tr>
         </thead>
         <tbody>
@@ -59,7 +59,7 @@ export default async function ImprimirStockPage({
             const stock = resumen.get(p.id)?.stockActual ?? 0;
             return (
               <tr key={p.id} className="print-item border-b border-border/50 break-inside-avoid">
-                <td className="py-2 pr-2">
+                <td className="py-2.5 pr-3">
                   <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-1">
                     {p.fotoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -69,7 +69,7 @@ export default async function ImprimirStockPage({
                     )}
                   </div>
                 </td>
-                <td className="py-2 pr-2">
+                <td className="py-2.5 pr-4">
                   <p className="font-medium">
                     {p.nombre} {p.anio ? `(${p.anio})` : ""}
                   </p>
@@ -77,9 +77,11 @@ export default async function ImprimirStockPage({
                     {p.sku} {p.categoria ? `· ${p.categoria}` : ""}
                   </p>
                 </td>
-                <td className="py-2 pr-2">{formatearCajasYBotellas(stock, p.piezasPorCaja)}</td>
+                <td className="py-2.5 pr-4 tabular-nums whitespace-nowrap">
+                  {formatearCajasYBotellas(stock, p.piezasPorCaja)}
+                </td>
                 {conPrecios && (
-                  <td className="py-2 pr-2 text-right font-medium">
+                  <td className="py-2.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap">
                     {p.precioLista ? formatoMXN(p.precioLista) : "—"}
                   </td>
                 )}

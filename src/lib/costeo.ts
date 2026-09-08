@@ -122,6 +122,10 @@ export type SaldoEntreSocios = {
 
 export type ResumenFinanzas = {
   inversionTotal: number;
+  totalInyeccionCapital: number;
+  totalReinversion: number;
+  pagadoDesdeCaja: number;
+  pagadoDesdeCuenta: number;
   valorInventario: number;
   botellasStock: number;
   ventasTotales: number;
@@ -174,6 +178,10 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   const totalPendiente = ventasTotales - totalCobrado;
 
   let inversionTotal = 0;
+  let totalInyeccionCapital = 0;
+  let totalReinversion = 0;
+  let pagadoDesdeCaja = 0;
+  let pagadoDesdeCuenta = 0;
   let saldoCaja = 0;
   let saldoCuenta = 0;
   const aportadoPorSocio = new Map<string, number>();
@@ -182,13 +190,20 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     const monto = montoEnMXN(p.moneda, p.monto, p.tipoCambio);
     inversionTotal += monto;
 
-    if (p.origen === "INYECCION_CAPITAL" && p.socioId) {
-      aportadoPorSocio.set(p.socioId, (aportadoPorSocio.get(p.socioId) ?? 0) + monto);
+    if (p.origen === "INYECCION_CAPITAL") {
+      totalInyeccionCapital += monto;
+      if (p.socioId) {
+        aportadoPorSocio.set(p.socioId, (aportadoPorSocio.get(p.socioId) ?? 0) + monto);
+      }
     }
     if (p.origen === "REINVERSION") {
+      totalReinversion += monto;
       if (p.cuenta === "EFECTIVO") saldoCaja -= monto;
       else saldoCuenta -= monto;
     }
+
+    if (p.cuenta === "EFECTIVO") pagadoDesdeCaja += monto;
+    else pagadoDesdeCuenta += monto;
   }
 
   for (const c of cobros) {
@@ -226,6 +241,10 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
 
   return {
     inversionTotal,
+    totalInyeccionCapital,
+    totalReinversion,
+    pagadoDesdeCaja,
+    pagadoDesdeCuenta,
     valorInventario,
     botellasStock,
     ventasTotales,

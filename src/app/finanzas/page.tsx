@@ -49,6 +49,28 @@ export default async function FinanzasPage() {
       </div>
 
       <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
+        <h2 className="font-semibold">Desglose de lo que se ha pagado</h2>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <p className="text-muted text-xs">Inyección de capital</p>
+            <p className="font-semibold">{formatoMXN(finanzas.totalInyeccionCapital)}</p>
+          </div>
+          <div>
+            <p className="text-muted text-xs">Reinversión</p>
+            <p className="font-semibold">{formatoMXN(finanzas.totalReinversion)}</p>
+          </div>
+          <div>
+            <p className="text-muted text-xs">Pagado desde Caja</p>
+            <p className="font-semibold">{formatoMXN(finanzas.pagadoDesdeCaja)}</p>
+          </div>
+          <div>
+            <p className="text-muted text-xs">Pagado desde Cuenta</p>
+            <p className="font-semibold">{formatoMXN(finanzas.pagadoDesdeCuenta)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
         <h2 className="font-semibold">Saldo entre socios</h2>
         {finanzas.saldoEntreSocios ? (
           <p className="text-sm">

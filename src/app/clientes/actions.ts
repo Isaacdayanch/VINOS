@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import type { CategoriaPrecio } from "@/generated/prisma/enums";
+import type { CategoriaPrecio } from "@prisma/client";
 
 export async function crearCliente(formData: FormData) {
   const nombre = String(formData.get("nombre") ?? "").trim();

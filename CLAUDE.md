@@ -120,8 +120,20 @@ preguntarle si esas botellas de verdad ya salieron, para registrarlas bien.
   anteriores.
 - **Prisma 6.19.3** (fijado a esta versión estable; NO usar `prisma@latest`
   a ciegas, la versión más nueva en npm es un release candidate de Prisma 8
-  con CLI distinto). Cliente generado en `src/generated/prisma` (gitignored,
-  se regenera con `npx prisma generate` o al migrar/sembrar).
+  con CLI distinto). Generator `prisma-client-js` (la forma clásica, NO la
+  nueva `prisma-client` basada en ESM) — el cliente se genera en la
+  ubicación default `node_modules/@prisma/client` / `node_modules/.prisma`,
+  se importa como `@prisma/client` normal, y se regenera solo con
+  `npx prisma generate` o al hacer `npm install` (postinstall).
+  **Importante — bug ya resuelto**: se probó primero con el generator nuevo
+  `prisma-client` (salida a `src/generated/prisma`) y aunque el motor de
+  Linux (`rhel-openssl-3.0.x`, el que usa Vercel) sí se generaba, Next.js
+  nunca lo empacaba en las funciones serverless desplegadas (error
+  "Prisma Client could not locate the Query Engine"), ni agregando
+  `outputFileTracingIncludes` a mano. Cambiar al generator clásico
+  `prisma-client-js` lo resolvió de raíz, porque Next.js tiene soporte
+  automático de rastreo de archivos específicamente para esa ubicación
+  default — no usar el generator `prisma-client` en este proyecto.
 - **Base de datos**: PostgreSQL en **Supabase**, conectado mediante la
   **integración nativa de Vercel** (proyecto de Vercel "vinos" → pestaña
   Storage → Connect Database → Supabase → "Create new project", eligiendo la

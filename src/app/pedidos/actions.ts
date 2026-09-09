@@ -136,6 +136,31 @@ export async function agregarAbonoPedido(pedidoId: string, formData: FormData) {
   revalidatePath("/finanzas");
 }
 
+export async function actualizarLineaPedido(
+  pedidoId: string,
+  entradaLineaId: string,
+  formData: FormData,
+) {
+  const fecha = String(formData.get("fecha") ?? "");
+  const cajasRecibidas = Number(formData.get("cajasRecibidas"));
+  const piezasPorCaja = Number(formData.get("piezasPorCaja"));
+  const costoPorCaja = Number(formData.get("costoPorCaja"));
+
+  if (!fecha || !cajasRecibidas || !piezasPorCaja || !costoPorCaja) {
+    throw new Error("Faltan datos para editar el producto del pedido");
+  }
+
+  await prisma.entradaLinea.update({
+    where: { id: entradaLineaId },
+    data: { fecha: new Date(fecha), cajasRecibidas, piezasPorCaja, costoPorCaja },
+  });
+
+  revalidatePath(`/pedidos/${pedidoId}`);
+  revalidatePath("/pedidos");
+  revalidatePath("/stock");
+  revalidatePath("/");
+}
+
 export async function marcarLineaRecibida(pedidoId: string, entradaLineaId: string) {
   await prisma.entradaLinea.update({
     where: { id: entradaLineaId },

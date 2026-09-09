@@ -1,4 +1,5 @@
 import {
+  actualizarLineaPedido,
   actualizarPedido,
   agregarAbonoPedido,
   agregarLineaPedido,
@@ -8,6 +9,7 @@ import {
 } from "@/app/pedidos/actions";
 import { AgregarLineaPedidoForm } from "@/components/AgregarLineaPedidoForm";
 import { DateField } from "@/components/DateField";
+import { LineaPedidoRow } from "@/components/LineaPedidoRow";
 import { montoEnMXN, formatoMXN } from "@/lib/costeo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -60,9 +62,14 @@ export default async function DetallePedidoPage({
   return (
     <div className="flex flex-col gap-6 max-w-lg">
       <div>
-        <Link href="/pedidos" className="text-sm text-wine underline">
-          ← Volver a Pedidos
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link href="/pedidos" className="text-sm text-wine underline">
+            ← Volver a Pedidos
+          </Link>
+          <Link href={`/pedidos/${pedido.id}/imprimir`} className="text-sm text-wine underline">
+            Imprimir orden de compra
+          </Link>
+        </div>
         <h1 className="text-2xl font-bold text-wine mt-2">{pedido.folio}</h1>
         <p className="text-muted text-sm">
           {new Date(pedido.fecha).toLocaleDateString("es-MX")}
@@ -131,59 +138,24 @@ export default async function DetallePedidoPage({
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {pedido.entradas.map((l) => {
+          const actualizar = actualizarLineaPedido.bind(null, pedido.id, l.id);
           const marcarRecibida = marcarLineaRecibida.bind(null, pedido.id, l.id);
           const desmarcar = desmarcarLineaRecibida.bind(null, pedido.id, l.id);
           const eliminar = eliminarLineaPedido.bind(null, pedido.id, l.id);
           return (
-            <div key={l.id} className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-md bg-wine-light overflow-hidden flex items-center justify-center shrink-0">
-                {l.producto.fotoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={l.producto.fotoUrl} alt={l.producto.nombre} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-lg">🍷</span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{l.producto.nombre}</p>
-                <p className="text-xs text-muted">
-                  {l.cajasRecibidas} caja{l.cajasRecibidas === 1 ? "" : "s"} × {l.piezasPorCaja}{" "}
-                  = {l.cajasRecibidas * l.piezasPorCaja} botellas
-                </p>
-                <p className="text-xs text-muted">
-                  ${(l.costoPorCaja / l.piezasPorCaja).toFixed(2)} USD/botella · Total: $
-                  {(l.cajasRecibidas * l.costoPorCaja).toLocaleString("es-MX")} USD
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                {l.recibida ? (
-                  <>
-                    <span className="text-xs font-medium text-wine">✓ Recibido</span>
-                    <form action={desmarcar}>
-                      <button type="submit" className="text-xs text-muted underline">
-                        Deshacer
-                      </button>
-                    </form>
-                  </>
-                ) : (
-                  <>
-                    <form action={marcarRecibida}>
-                      <button
-                        type="submit"
-                        className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap"
-                      >
-                        Marcar recibido
-                      </button>
-                    </form>
-                    <form action={eliminar}>
-                      <button type="submit" className="text-xs text-muted underline">
-                        Quitar
-                      </button>
-                    </form>
-                  </>
-                )}
-              </div>
-            </div>
+            <LineaPedidoRow
+              key={l.id}
+              producto={l.producto}
+              fecha={l.fecha.toISOString().slice(0, 10)}
+              piezasPorCaja={l.piezasPorCaja}
+              cajasRecibidas={l.cajasRecibidas}
+              costoPorCaja={l.costoPorCaja}
+              recibida={l.recibida}
+              actualizarAction={actualizar}
+              marcarRecibidaAction={marcarRecibida}
+              desmarcarAction={desmarcar}
+              eliminarAction={eliminar}
+            />
           );
         })}
         {pedido.entradas.length === 0 && (

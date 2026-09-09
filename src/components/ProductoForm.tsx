@@ -36,7 +36,12 @@ export function ProductoForm({
       <FotoDropzone fotoActual={d.fotoUrl} />
 
       <Campo label="Nombre del vino" name="nombre" defaultValue={d.nombre} required />
-      <Campo label="SKU" name="sku" defaultValue={d.sku} required />
+      <Campo
+        label="SKU (opcional — se genera solo si lo dejas vacío)"
+        name="sku"
+        defaultValue={d.sku}
+        placeholder="Se asigna automático"
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <Campo

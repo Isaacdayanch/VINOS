@@ -29,12 +29,14 @@ export function ProductoPicker({
   productos,
   nuevoHref,
   seleccionInicial,
+  onSeleccionar,
 }: {
   name: string;
   label?: string;
   productos: ProductoOpcion[];
   nuevoHref: string;
   seleccionInicial?: string;
+  onSeleccionar?: (producto: ProductoOpcion) => void;
 }) {
   const [abierto, setAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
@@ -100,6 +102,7 @@ export function ProductoPicker({
                   setSeleccionadoId(p.id);
                   setAbierto(false);
                   setBusqueda("");
+                  onSeleccionar?.(p);
                 }}
                 className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-wine-light/50 ${
                   p.id === seleccionadoId ? "bg-wine-light/40" : ""

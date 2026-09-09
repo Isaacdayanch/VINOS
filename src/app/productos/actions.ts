@@ -21,6 +21,37 @@ async function guardarFoto(foto: FormDataEntryValue | null): Promise<string | nu
   return subirFotoProducto(foto);
 }
 
+const MAPA_ACENTOS: Record<string, string> = {
+  Á: "A", É: "E", Í: "I", Ó: "O", Ú: "U", Ü: "U", Ñ: "N",
+};
+
+function quitarAcentos(texto: string) {
+  return texto
+    .toUpperCase()
+    .split("")
+    .map((c) => MAPA_ACENTOS[c] ?? c)
+    .join("");
+}
+
+async function generarSku(nombre: string): Promise<string> {
+  const letras =
+    quitarAcentos(nombre)
+      .replace(/[^A-Z\s]/g, "")
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((palabra) => palabra[0])
+      .join("")
+      .slice(0, 4) || "VIN";
+
+  for (let intento = 0; intento < 50; intento++) {
+    const numero = String(Math.floor(Math.random() * 900) + 100);
+    const candidato = `${letras}-${numero}`;
+    const existe = await prisma.producto.findUnique({ where: { sku: candidato } });
+    if (!existe) return candidato;
+  }
+  return `${letras}-${Date.now().toString().slice(-6)}`;
+}
+
 function datosDesdeFormulario(formData: FormData) {
   return {
     nombre: String(formData.get("nombre") ?? "").trim(),
@@ -39,14 +70,15 @@ function datosDesdeFormulario(formData: FormData) {
 
 export async function crearProducto(formData: FormData) {
   const datos = datosDesdeFormulario(formData);
-  if (!datos.nombre || !datos.sku || !datos.piezasPorCaja) {
-    throw new Error("Nombre, SKU y piezas por caja son obligatorios");
+  if (!datos.nombre || !datos.piezasPorCaja) {
+    throw new Error("Nombre y piezas por caja son obligatorios");
   }
+  const sku = datos.sku || (await generarSku(datos.nombre));
   const fotoUrl = await guardarFoto(formData.get("foto"));
   const volver = String(formData.get("volver") ?? "").trim();
 
   const producto = await prisma.producto.create({
-    data: { ...datos, fotoUrl },
+    data: { ...datos, sku, fotoUrl },
   });
 
   revalidatePath("/productos");
@@ -61,14 +93,15 @@ export async function crearProducto(formData: FormData) {
 
 export async function actualizarProducto(productoId: string, formData: FormData) {
   const datos = datosDesdeFormulario(formData);
-  if (!datos.nombre || !datos.sku || !datos.piezasPorCaja) {
-    throw new Error("Nombre, SKU y piezas por caja son obligatorios");
+  if (!datos.nombre || !datos.piezasPorCaja) {
+    throw new Error("Nombre y piezas por caja son obligatorios");
   }
+  const sku = datos.sku || (await generarSku(datos.nombre));
   const fotoUrl = await guardarFoto(formData.get("foto"));
 
   await prisma.producto.update({
     where: { id: productoId },
-    data: { ...datos, ...(fotoUrl ? { fotoUrl } : {}) },
+    data: { ...datos, sku, ...(fotoUrl ? { fotoUrl } : {}) },
   });
 
   revalidatePath("/productos");

@@ -5,8 +5,7 @@ import {
   eliminarLineaPedido,
   marcarLineaRecibida,
 } from "@/app/pedidos/actions";
-import { DateField } from "@/components/DateField";
-import { ProductoPicker } from "@/components/ProductoPicker";
+import { AgregarLineaPedidoForm } from "@/components/AgregarLineaPedidoForm";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -140,54 +139,24 @@ export default async function DetallePedidoPage({
 
       <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-4">
         <p className="text-sm font-medium">+ Agregar producto al pedido</p>
-        <form action={agregarLinea} className="flex flex-col gap-4">
-          <ProductoPicker
-            name="productoId"
-            productos={productos}
-            nuevoHref={`/productos/nuevo?volver=/pedidos/${pedido.id}`}
-            seleccionInicial={nuevoProducto}
-          />
-
-          <DateField name="fecha" label="Fecha en que lo apartaste" defaultValue={hoy} />
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Cajas</span>
-            <input
-              name="cajasRecibidas"
-              type="number"
-              step="1"
-              min="1"
-              className="rounded-md border border-border bg-surface px-3 py-2"
-              required
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Costo por caja (USD)</span>
-            <input
-              name="costoPorCaja"
-              type="number"
-              step="0.01"
-              min="0"
-              className="rounded-md border border-border bg-surface px-3 py-2"
-              required
-            />
-          </label>
-
-          <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
-            Agregar al pedido
-          </button>
-
-          {productos.length === 0 && (
-            <p className="text-sm text-warn">
-              Todavía no tienes productos.{" "}
-              <Link href={`/productos/nuevo?volver=/pedidos/${pedido.id}`} className="underline">
-                Crea uno primero
-              </Link>
-              .
-            </p>
-          )}
-        </form>
+        <AgregarLineaPedidoForm
+          action={agregarLinea}
+          productos={productos}
+          nuevoHref={`/productos/nuevo?volver=${encodeURIComponent(`/pedidos/${pedido.id}`)}${
+            pedido.proveedor ? `&proveedor=${encodeURIComponent(pedido.proveedor)}` : ""
+          }`}
+          seleccionInicial={nuevoProducto}
+          hoy={hoy}
+        />
+        {productos.length === 0 && (
+          <p className="text-sm text-warn">
+            Todavía no tienes productos.{" "}
+            <Link href={`/productos/nuevo?volver=/pedidos/${pedido.id}`} className="underline">
+              Crea uno primero
+            </Link>
+            .
+          </p>
+        )}
       </div>
     </div>
   );

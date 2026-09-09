@@ -70,6 +70,7 @@ export async function agregarLineaPedido(pedidoId: string, formData: FormData) {
   const fecha = String(formData.get("fecha") ?? "");
   const cajasRecibidas = Number(formData.get("cajasRecibidas"));
   const costoPorCaja = Number(formData.get("costoPorCaja"));
+  const piezasPorCajaForm = numeroOpcional(formData.get("piezasPorCaja"));
 
   if (!productoId || !fecha || !cajasRecibidas || !costoPorCaja) {
     throw new Error("Faltan datos para agregar el producto al pedido");
@@ -85,7 +86,7 @@ export async function agregarLineaPedido(pedidoId: string, formData: FormData) {
       productoId,
       fecha: new Date(fecha),
       cajasRecibidas,
-      piezasPorCaja: producto.piezasPorCaja,
+      piezasPorCaja: piezasPorCajaForm ?? producto.piezasPorCaja,
       costoPorCaja,
       recibida: false,
     },

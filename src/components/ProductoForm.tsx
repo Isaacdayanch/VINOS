@@ -22,11 +22,13 @@ export function ProductoForm({
   defaultValues,
   botonTexto,
   volver,
+  ocultarPrecios,
 }: {
   action: (formData: FormData) => void;
   defaultValues?: ProductoDefaults;
   botonTexto: string;
   volver?: string;
+  ocultarPrecios?: boolean;
 }) {
   const d = defaultValues ?? {};
 
@@ -75,30 +77,32 @@ export function ProductoForm({
         placeholder="Ej. 8"
       />
 
-      <div className="rounded-lg border border-border p-4 flex flex-col gap-4">
-        <p className="text-sm font-medium">Precios (opcional, se puede ajustar en cada venta)</p>
-        <Campo
-          label="Precio de lista"
-          name="precioLista"
-          type="number"
-          step="0.01"
-          defaultValue={d.precioLista?.toString()}
-        />
-        <Campo
-          label="Precio con descuento chico"
-          name="precioDescuentoChico"
-          type="number"
-          step="0.01"
-          defaultValue={d.precioDescuentoChico?.toString()}
-        />
-        <Campo
-          label="Precio con descuento grande"
-          name="precioDescuentoGrande"
-          type="number"
-          step="0.01"
-          defaultValue={d.precioDescuentoGrande?.toString()}
-        />
-      </div>
+      {!ocultarPrecios && (
+        <div className="rounded-lg border border-border p-4 flex flex-col gap-4">
+          <p className="text-sm font-medium">Precios de venta (opcional, se puede ajustar en cada venta)</p>
+          <Campo
+            label="Precio de lista"
+            name="precioLista"
+            type="number"
+            step="0.01"
+            defaultValue={d.precioLista?.toString()}
+          />
+          <Campo
+            label="Precio con descuento chico"
+            name="precioDescuentoChico"
+            type="number"
+            step="0.01"
+            defaultValue={d.precioDescuentoChico?.toString()}
+          />
+          <Campo
+            label="Precio con descuento grande"
+            name="precioDescuentoGrande"
+            type="number"
+            step="0.01"
+            defaultValue={d.precioDescuentoGrande?.toString()}
+          />
+        </div>
+      )}
 
       <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
         {botonTexto}

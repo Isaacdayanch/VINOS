@@ -50,6 +50,13 @@ export default async function DetallePedidoPage({
     .filter((p) => p.moneda === "USD")
     .reduce((acc, p) => acc + p.monto, 0);
 
+  const costoMercanciaUSD = pedido.entradas.reduce(
+    (acc, l) => acc + l.cajasRecibidas * l.costoPorCaja,
+    0,
+  );
+  const costoTotalUSD = costoMercanciaUSD + (pedido.logisticaUSD ?? 0);
+  const pendienteUSD = costoTotalUSD - totalAbonadoUSD;
+
   return (
     <div className="flex flex-col gap-6 max-w-lg">
       <div>
@@ -97,6 +104,30 @@ export default async function DetallePedidoPage({
       </details>
 
       <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-4">
+        {costoTotalUSD > 0 && (
+          <div className="rounded-md bg-wine-light/40 p-3 flex flex-col gap-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted">Costo del pedido (mercancía + flete)</span>
+              <span className="font-medium">${costoTotalUSD.toLocaleString("es-MX")} USD</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted">Abonado</span>
+              <span className="font-medium">${totalAbonadoUSD.toLocaleString("es-MX")} USD</span>
+            </div>
+            <div className="flex justify-between text-base">
+              <span className="font-semibold">{pendienteUSD > 0.5 ? "Pendiente" : "Estatus"}</span>
+              <span className={`font-bold ${pendienteUSD > 0.5 ? "text-warn" : "text-ok"}`}>
+                {pendienteUSD > 0.5 ? `$${pendienteUSD.toLocaleString("es-MX")} USD` : "✓ Pagado"}
+              </span>
+            </div>
+            {pedido.logisticaMXN ? (
+              <p className="text-xs text-muted">
+                + aduana/maniobras: {formatoMXN(pedido.logisticaMXN)} (aparte, en pesos)
+              </p>
+            ) : null}
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium">Dinero abonado a este pedido</p>
           <p className="text-right">
@@ -233,7 +264,10 @@ export default async function DetallePedidoPage({
                 <p className="font-medium truncate">{l.producto.nombre}</p>
                 <p className="text-xs text-muted">
                   {l.cajasRecibidas} caja{l.cajasRecibidas === 1 ? "" : "s"} × {l.piezasPorCaja}{" "}
-                  = {l.cajasRecibidas * l.piezasPorCaja} botellas · ${l.costoPorCaja} USD/caja
+                  = {l.cajasRecibidas * l.piezasPorCaja} botellas
+                </p>
+                <p className="text-xs text-muted">
+                  ${l.costoPorCaja} USD/caja · ${(l.costoPorCaja / l.piezasPorCaja).toFixed(2)} USD/botella
                 </p>
               </div>
               <div className="flex flex-col items-end gap-1">

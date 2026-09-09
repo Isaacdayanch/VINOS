@@ -6,6 +6,15 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({
+  params,
+}: PageProps<"/ordenes/[id]/recibo">) {
+  const { id } = await params;
+  const orden = await prisma.orden.findUnique({ where: { id }, include: { cliente: true } });
+  const nombreCliente = orden?.cliente.nombre.replace("Cliente Especial - ", "") ?? "";
+  return { title: `Vinos - ${nombreCliente}` };
+}
+
 export default async function ReciboOrdenPage({
   params,
 }: PageProps<"/ordenes/[id]/recibo">) {

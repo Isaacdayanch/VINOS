@@ -40,7 +40,7 @@ export default async function ImprimirPedidoPage({
       <div className="max-w-2xl mx-auto w-full bg-surface border border-border rounded-lg p-8 flex flex-col gap-8 print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-wine pb-6">
           <div>
-            <h1 className="text-2xl font-bold text-wine tracking-tight">Vinos de Halo</h1>
+            <h1 className="text-2xl font-bold text-wine tracking-tight">Vinos</h1>
             <p className="text-sm text-muted mt-1">Purchase Order</p>
           </div>
           <div className="text-right text-sm">

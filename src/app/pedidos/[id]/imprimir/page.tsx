@@ -38,19 +38,19 @@ export default async function ImprimirPedidoPage({
       </div>
 
       <div className="max-w-2xl mx-auto w-full bg-background print:p-5 p-5 flex flex-col gap-4 text-[13px] leading-snug">
-        <div className="flex flex-col items-center gap-2 pb-3 border-b-2 border-wine print-no-break">
+        <div className="flex flex-col items-center gap-3 pt-1 pb-4 border-b-2 border-wine print-no-break">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-wine tracking-wide">Vinos</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted mt-0.5">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-muted mt-1">
               Purchase Order
             </p>
           </div>
-          <div className="flex items-center justify-center gap-8 mt-1">
-            <div className="text-center">
+          <div className="flex items-center justify-center gap-x-10 gap-y-2 flex-wrap">
+            <div className="text-center w-28">
               <p className="text-[10px] uppercase tracking-wide text-muted">Order Number</p>
               <p className="font-bold text-wine">{pedido.folio}</p>
             </div>
-            <div className="text-center">
+            <div className="text-center w-28">
               <p className="text-[10px] uppercase tracking-wide text-muted">Date</p>
               <p className="font-medium">
                 {new Date(pedido.fecha).toLocaleDateString("en-US", {
@@ -60,7 +60,7 @@ export default async function ImprimirPedidoPage({
                 })}
               </p>
             </div>
-            <div className="text-center">
+            <div className="text-center w-28">
               <p className="text-[10px] uppercase tracking-wide text-muted">Seller</p>
               <p className="font-medium">{pedido.proveedor || "—"}</p>
             </div>

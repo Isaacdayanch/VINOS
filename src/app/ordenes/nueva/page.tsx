@@ -10,6 +10,12 @@ const precioPorCategoria = {
   DESCUENTO_GRANDE: "precioDescuentoGrande",
 } as const;
 
+const nombreCategoria = {
+  LISTA: "Lista",
+  DESCUENTO_CHICO: "Descuento chico",
+  DESCUENTO_GRANDE: "Descuento grande",
+} as const;
+
 export default async function NuevaOrdenPage() {
   const [clientes, productos, preciosGuardados] = await Promise.all([
     prisma.cliente.findMany({ orderBy: { nombre: "asc" } }),
@@ -18,16 +24,22 @@ export default async function NuevaOrdenPage() {
   ]);
 
   const preciosPorClienteProducto: Record<string, Record<string, number>> = {};
+  const categoriaPorCliente: Record<string, string> = {};
   for (const c of clientes) {
     preciosPorClienteProducto[c.id] = {};
+    categoriaPorCliente[c.id] = nombreCategoria[c.categoriaPrecio] ?? "Lista";
     for (const p of productos) {
       const campo = precioPorCategoria[c.categoriaPrecio] ?? "precioLista";
       preciosPorClienteProducto[c.id][p.id] = p[campo] ?? p.precioLista ?? 0;
     }
   }
+
+  const esUltimoPrecio: Record<string, Record<string, boolean>> = {};
   for (const pg of preciosGuardados) {
     if (!preciosPorClienteProducto[pg.clienteId]) preciosPorClienteProducto[pg.clienteId] = {};
     preciosPorClienteProducto[pg.clienteId][pg.productoId] = pg.precio;
+    if (!esUltimoPrecio[pg.clienteId]) esUltimoPrecio[pg.clienteId] = {};
+    esUltimoPrecio[pg.clienteId][pg.productoId] = true;
   }
 
   return (
@@ -42,15 +54,7 @@ export default async function NuevaOrdenPage() {
         </p>
       </div>
 
-      {clientes.length === 0 ? (
-        <p className="text-sm text-warn">
-          Primero necesitas un cliente.{" "}
-          <Link href="/clientes/nuevo" className="underline">
-            Crea uno
-          </Link>
-          .
-        </p>
-      ) : productos.length === 0 ? (
+      {productos.length === 0 ? (
         <p className="text-sm text-warn">
           Primero necesitas un producto.{" "}
           <Link href="/productos/nuevo" className="underline">
@@ -63,6 +67,8 @@ export default async function NuevaOrdenPage() {
           clientes={clientes}
           productos={productos}
           preciosPorClienteProducto={preciosPorClienteProducto}
+          categoriaPorCliente={categoriaPorCliente}
+          esUltimoPrecio={esUltimoPrecio}
         />
       )}
     </div>

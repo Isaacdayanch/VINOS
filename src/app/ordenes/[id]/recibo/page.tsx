@@ -30,12 +30,12 @@ export default async function ReciboOrdenPage({
       </div>
 
       <div className="max-w-lg mx-auto w-full rounded-lg border border-border bg-surface p-6 flex flex-col gap-6 print:border-0 print:p-0">
-        <div className="text-center">
+        <div className="text-center print-no-break">
           <h1 className="text-xl font-bold text-wine">Vinos</h1>
           <p className="text-sm text-muted">Recibo de venta</p>
         </div>
 
-        <div className="flex justify-between text-sm border-y border-border py-3">
+        <div className="print-no-break flex justify-between text-sm border-y border-border py-3">
           <div>
             <p className="text-muted">Cliente</p>
             <p className="font-medium">{orden.cliente.nombre.replace("Cliente Especial - ", "")}</p>
@@ -96,7 +96,7 @@ export default async function ReciboOrdenPage({
           </tbody>
         </table>
 
-        <div className="flex flex-col gap-1 items-end text-sm">
+        <div className="print-no-break flex flex-col gap-1 items-end text-sm">
           <div className="flex justify-between w-48">
             <span className="text-muted">Total</span>
             <span className="font-semibold">{formatoMXN(total)}</span>

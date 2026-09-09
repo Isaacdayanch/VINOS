@@ -29,22 +29,25 @@ export function ProductoPicker({
   productos,
   nuevoHref,
   seleccionInicial,
+  sinSeleccionInicial,
   onSeleccionar,
 }: {
   name: string;
   label?: string;
   productos: ProductoOpcion[];
-  nuevoHref: string;
+  nuevoHref?: string;
   seleccionInicial?: string;
+  sinSeleccionInicial?: boolean;
   onSeleccionar?: (producto: ProductoOpcion) => void;
 }) {
   const [abierto, setAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
-  const [seleccionadoId, setSeleccionadoId] = useState(
-    seleccionInicial && productos.some((p) => p.id === seleccionInicial)
-      ? seleccionInicial
-      : (productos[0]?.id ?? ""),
-  );
+  const [seleccionadoId, setSeleccionadoId] = useState(() => {
+    if (seleccionInicial && productos.some((p) => p.id === seleccionInicial)) {
+      return seleccionInicial;
+    }
+    return sinSeleccionInicial ? "" : (productos[0]?.id ?? "");
+  });
   const contenedorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -117,12 +120,14 @@ export function ProductoPicker({
               <p className="px-3 py-4 text-center text-xs text-muted">Sin resultados</p>
             )}
           </div>
-          <Link
-            href={nuevoHref}
-            className="border-t border-border px-3 py-2.5 text-sm font-medium text-wine hover:bg-wine-light/50 text-center"
-          >
-            + Agregar producto nuevo
-          </Link>
+          {nuevoHref && (
+            <Link
+              href={nuevoHref}
+              className="border-t border-border px-3 py-2.5 text-sm font-medium text-wine hover:bg-wine-light/50 text-center"
+            >
+              + Agregar producto nuevo
+            </Link>
+          )}
         </div>
       )}
     </div>

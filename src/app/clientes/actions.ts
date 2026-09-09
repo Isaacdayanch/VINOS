@@ -23,3 +23,17 @@ export async function crearCliente(formData: FormData) {
   revalidatePath("/clientes");
   redirect("/clientes");
 }
+
+export async function crearClienteRapido(nombre: string) {
+  const nombreLimpio = nombre.trim();
+  if (!nombreLimpio) {
+    throw new Error("El nombre es obligatorio");
+  }
+
+  const cliente = await prisma.cliente.create({
+    data: { nombre: nombreLimpio, categoriaPrecio: "LISTA" },
+  });
+
+  revalidatePath("/clientes");
+  return { id: cliente.id, nombre: cliente.nombre };
+}

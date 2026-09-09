@@ -40,7 +40,7 @@ export default async function ImprimirPedidoPage({
       <div className="max-w-2xl mx-auto w-full bg-surface border border-border rounded-lg p-8 flex flex-col gap-8 print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-wine pb-6">
           <div>
-            <h1 className="text-2xl font-bold text-wine tracking-tight">Vinos</h1>
+            <h1 className="text-2xl font-bold text-wine tracking-tight">Vinos de Halo</h1>
             <p className="text-sm text-muted mt-1">Purchase Order</p>
           </div>
           <div className="text-right text-sm">
@@ -64,6 +64,7 @@ export default async function ImprimirPedidoPage({
 
         <table className="w-full text-sm border-separate border-spacing-0">
           <colgroup>
+            <col className="w-14" />
             <col />
             <col className="w-16" />
             <col className="w-20" />
@@ -72,7 +73,8 @@ export default async function ImprimirPedidoPage({
           </colgroup>
           <thead>
             <tr className="text-left text-muted border-b border-border">
-              <th className="pb-2 pr-2 font-medium">Item</th>
+              <th className="pb-2 pr-2 font-medium">Image</th>
+              <th className="pb-2 px-2 font-medium">Item</th>
               <th className="pb-2 px-2 font-medium text-right">Cases</th>
               <th className="pb-2 px-2 font-medium text-right">Btl/Case</th>
               <th className="pb-2 px-2 font-medium text-right">Price/Case</th>
@@ -82,7 +84,21 @@ export default async function ImprimirPedidoPage({
           <tbody>
             {pedido.entradas.map((l) => (
               <tr key={l.id} className="print-item border-b border-border/50 break-inside-avoid">
-                <td className="py-2.5 pr-2">{l.producto.nombre}</td>
+                <td className="py-2.5 pr-2">
+                  <div className="w-10 aspect-[2/3] rounded bg-surface border border-border overflow-hidden flex items-center justify-center p-0.5">
+                    {l.producto.fotoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={l.producto.fotoUrl}
+                        alt={l.producto.nombre}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <span className="text-xs">🍷</span>
+                    )}
+                  </div>
+                </td>
+                <td className="py-2.5 px-2">{l.producto.nombre}</td>
                 <td className="py-2.5 px-2 text-right tabular-nums whitespace-nowrap">
                   {l.cajasRecibidas}
                 </td>
@@ -99,7 +115,7 @@ export default async function ImprimirPedidoPage({
             ))}
             {pedido.entradas.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-6 text-center text-muted">
+                <td colSpan={6} className="py-6 text-center text-muted">
                   No items yet
                 </td>
               </tr>

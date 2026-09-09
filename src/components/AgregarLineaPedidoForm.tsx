@@ -28,8 +28,11 @@ export function AgregarLineaPedidoForm({
     productos.find((p) => p.id === seleccionInicial) ?? productos[0] ?? null;
   const [piezasPorCaja, setPiezasPorCaja] = useState(inicial?.piezasPorCaja ?? 12);
   const [cajas, setCajas] = useState<number | "">("");
+  const [costoBotella, setCostoBotella] = useState<number | "">("");
 
   const totalBotellas = cajas === "" ? 0 : Number(cajas) * piezasPorCaja;
+  const costoPorCaja = costoBotella === "" ? 0 : Number(costoBotella) * piezasPorCaja;
+  const totalLinea = totalBotellas * (costoBotella === "" ? 0 : Number(costoBotella));
 
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -43,20 +46,21 @@ export function AgregarLineaPedidoForm({
 
       <DateField name="fecha" label="Fecha en que lo apartaste" defaultValue={hoy} />
 
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">Costo por botella (USD)</span>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          value={costoBotella}
+          onChange={(e) => setCostoBotella(e.target.value === "" ? "" : Number(e.target.value))}
+          className="rounded-md border border-border bg-surface px-3 py-2"
+          required
+        />
+      </label>
+      <input type="hidden" name="costoPorCaja" value={costoPorCaja} />
+
       <div className="grid grid-cols-2 gap-4">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Cajas</span>
-          <input
-            name="cajasRecibidas"
-            type="number"
-            step="1"
-            min="1"
-            value={cajas}
-            onChange={(e) => setCajas(e.target.value === "" ? "" : Number(e.target.value))}
-            className="rounded-md border border-border bg-surface px-3 py-2"
-            required
-          />
-        </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">Piezas por caja</span>
           <input
@@ -70,25 +74,27 @@ export function AgregarLineaPedidoForm({
             required
           />
         </label>
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium">Cajas</span>
+          <input
+            name="cajasRecibidas"
+            type="number"
+            step="1"
+            min="1"
+            value={cajas}
+            onChange={(e) => setCajas(e.target.value === "" ? "" : Number(e.target.value))}
+            className="rounded-md border border-border bg-surface px-3 py-2"
+            required
+          />
+        </label>
       </div>
 
       {cajas !== "" && (
         <p className="text-xs text-muted -mt-2">
           = {totalBotellas} botella{totalBotellas === 1 ? "" : "s"}
+          {costoBotella !== "" && ` · Total: $${totalLinea.toLocaleString("es-MX")} USD`}
         </p>
       )}
-
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">Costo por caja (USD)</span>
-        <input
-          name="costoPorCaja"
-          type="number"
-          step="0.01"
-          min="0"
-          className="rounded-md border border-border bg-surface px-3 py-2"
-          required
-        />
-      </label>
 
       <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
         Agregar al pedido

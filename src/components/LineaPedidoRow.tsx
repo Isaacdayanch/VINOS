@@ -27,15 +27,18 @@ export function LineaPedidoRow({
   eliminarAction: (formData: FormData) => void;
 }) {
   const [editando, setEditando] = useState(false);
-  const [piezasPorCaja, setPiezasPorCaja] = useState(piezasInicial);
-  const [cajas, setCajas] = useState(cajasInicial);
-  const [costoBotella, setCostoBotella] = useState(
+  const [piezasPorCaja, setPiezasPorCaja] = useState<number | "">(piezasInicial);
+  const [cajas, setCajas] = useState<number | "">(cajasInicial);
+  const [costoBotella, setCostoBotella] = useState<number | "">(
     piezasInicial > 0 ? Math.round((costoInicial / piezasInicial) * 100) / 100 : 0,
   );
 
-  const costoPorCaja = costoBotella * piezasPorCaja;
-  const totalBotellas = cajas * piezasPorCaja;
-  const totalLinea = cajas * costoPorCaja;
+  const piezas = piezasPorCaja === "" ? 0 : piezasPorCaja;
+  const numCajas = cajas === "" ? 0 : cajas;
+  const numCostoBotella = costoBotella === "" ? 0 : costoBotella;
+  const costoPorCaja = numCostoBotella * piezas;
+  const totalBotellas = numCajas * piezas;
+  const totalLinea = numCajas * costoPorCaja;
 
   if (editando) {
     return (
@@ -51,15 +54,20 @@ export function LineaPedidoRow({
           <DateField name="fecha" label="Fecha" defaultValue={fecha} />
           <label className="flex flex-col gap-1 text-sm">
             <span className="font-medium">Costo por botella (USD)</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={costoBotella}
-              onChange={(e) => setCostoBotella(e.target.value === "" ? 0 : Number(e.target.value))}
-              className="rounded-md border border-border bg-surface px-3 py-2"
-              required
-            />
+            <div className="relative">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+                $
+              </span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={costoBotella}
+                onChange={(e) => setCostoBotella(e.target.value === "" ? "" : Number(e.target.value))}
+                className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2"
+                required
+              />
+            </div>
           </label>
           <input type="hidden" name="costoPorCaja" value={costoPorCaja} />
           <div className="grid grid-cols-2 gap-3">
@@ -71,7 +79,7 @@ export function LineaPedidoRow({
                 step="1"
                 min="1"
                 value={piezasPorCaja}
-                onChange={(e) => setPiezasPorCaja(Number(e.target.value) || 0)}
+                onChange={(e) => setPiezasPorCaja(e.target.value === "" ? "" : Number(e.target.value))}
                 className="rounded-md border border-border bg-surface px-3 py-2"
                 required
               />
@@ -84,7 +92,7 @@ export function LineaPedidoRow({
                 step="1"
                 min="1"
                 value={cajas}
-                onChange={(e) => setCajas(Number(e.target.value) || 0)}
+                onChange={(e) => setCajas(e.target.value === "" ? "" : Number(e.target.value))}
                 className="rounded-md border border-border bg-surface px-3 py-2"
                 required
               />

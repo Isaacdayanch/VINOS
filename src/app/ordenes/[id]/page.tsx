@@ -51,6 +51,12 @@ export default async function DetalleOrdenPage({
               Editar
             </Link>
             <Link
+              href={`/ordenes/${orden.id}/replicar`}
+              className="text-sm text-wine underline whitespace-nowrap"
+            >
+              Replicar
+            </Link>
+            <Link
               href={`/ordenes/${orden.id}/recibo`}
               className="text-sm text-wine underline whitespace-nowrap"
             >

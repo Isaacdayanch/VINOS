@@ -12,9 +12,9 @@ type Linea = {
   key: string;
   productoId: string;
   piezasPorCaja: number;
-  cantidad: number;
+  cantidad: number | "";
   unidad: Unidad;
-  precioUnitario: number;
+  precioUnitario: number | "";
 };
 
 function lineaVacia(): Linea {
@@ -34,6 +34,7 @@ export function OrdenForm({
   preciosPorClienteProducto,
   categoriaPorCliente,
   esUltimoPrecio,
+  stockPorProducto,
   clienteIdInicial,
   fechaInicial,
   lineasIniciales,
@@ -45,6 +46,7 @@ export function OrdenForm({
   preciosPorClienteProducto: Record<string, Record<string, number>>;
   categoriaPorCliente: Record<string, string>;
   esUltimoPrecio: Record<string, Record<string, boolean>>;
+  stockPorProducto?: Record<string, number>;
   clienteIdInicial?: string;
   fechaInicial?: string;
   lineasIniciales?: { productoId: string; cantidadBotellas: number; precioUnitario: number }[];
@@ -117,11 +119,16 @@ export function OrdenForm({
   }
 
   function cantidadBotellas(l: Linea) {
-    return l.unidad === "CAJAS" ? l.cantidad * l.piezasPorCaja : l.cantidad;
+    const cantidad = l.cantidad === "" ? 0 : l.cantidad;
+    return l.unidad === "CAJAS" ? cantidad * l.piezasPorCaja : cantidad;
+  }
+
+  function precio(l: Linea) {
+    return l.precioUnitario === "" ? 0 : l.precioUnitario;
   }
 
   const total = useMemo(
-    () => lineas.reduce((acc, l) => acc + cantidadBotellas(l) * l.precioUnitario, 0),
+    () => lineas.reduce((acc, l) => acc + cantidadBotellas(l) * precio(l), 0),
     [lineas],
   );
 
@@ -130,7 +137,7 @@ export function OrdenForm({
     .map((l) => ({
       productoId: l.productoId,
       cantidadBotellas: cantidadBotellas(l),
-      precioUnitario: l.precioUnitario,
+      precioUnitario: precio(l),
     }));
 
   return (
@@ -213,6 +220,7 @@ export function OrdenForm({
                     productos={productos}
                     seleccionInicial={l.productoId || undefined}
                     sinSeleccionInicial={!l.productoId}
+                    stockPorProducto={stockPorProducto}
                     onSeleccionar={(p) =>
                       actualizarLinea(i, { productoId: p.id, piezasPorCaja: p.piezasPorCaja })
                     }
@@ -236,7 +244,9 @@ export function OrdenForm({
                     type="number"
                     min={1}
                     value={l.cantidad}
-                    onChange={(e) => actualizarLinea(i, { cantidad: Number(e.target.value) })}
+                    onChange={(e) =>
+                      actualizarLinea(i, { cantidad: e.target.value === "" ? "" : Number(e.target.value) })
+                    }
                     className="rounded-md border border-border bg-surface px-3 py-2 text-sm"
                   />
                 </label>
@@ -260,14 +270,23 @@ export function OrdenForm({
               )}
               <label className="flex flex-col gap-1 text-xs">
                 <span className="text-muted">Precio por botella</span>
-                <input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={l.precioUnitario}
-                  onChange={(e) => actualizarLinea(i, { precioUnitario: Number(e.target.value) })}
-                  className="rounded-md border border-border bg-surface px-3 py-2 text-sm"
-                />
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={l.precioUnitario}
+                    onChange={(e) =>
+                      actualizarLinea(i, {
+                        precioUnitario: e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                    className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2 text-sm"
+                  />
+                </div>
               </label>
               {l.productoId && (
                 <p className="text-xs text-muted -mt-1">

@@ -26,12 +26,13 @@ export function AgregarLineaPedidoForm({
 }) {
   const inicial =
     productos.find((p) => p.id === seleccionInicial) ?? productos[0] ?? null;
-  const [piezasPorCaja, setPiezasPorCaja] = useState(inicial?.piezasPorCaja ?? 12);
+  const [piezasPorCaja, setPiezasPorCaja] = useState<number | "">(inicial?.piezasPorCaja ?? 12);
   const [cajas, setCajas] = useState<number | "">("");
   const [costoBotella, setCostoBotella] = useState<number | "">("");
 
-  const totalBotellas = cajas === "" ? 0 : Number(cajas) * piezasPorCaja;
-  const costoPorCaja = costoBotella === "" ? 0 : Number(costoBotella) * piezasPorCaja;
+  const piezas = piezasPorCaja === "" ? 0 : piezasPorCaja;
+  const totalBotellas = cajas === "" ? 0 : Number(cajas) * piezas;
+  const costoPorCaja = costoBotella === "" ? 0 : Number(costoBotella) * piezas;
   const totalLinea = totalBotellas * (costoBotella === "" ? 0 : Number(costoBotella));
 
   return (
@@ -48,15 +49,20 @@ export function AgregarLineaPedidoForm({
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">Costo por botella (USD)</span>
-        <input
-          type="number"
-          step="0.01"
-          min="0"
-          value={costoBotella}
-          onChange={(e) => setCostoBotella(e.target.value === "" ? "" : Number(e.target.value))}
-          className="rounded-md border border-border bg-surface px-3 py-2"
-          required
-        />
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+            $
+          </span>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={costoBotella}
+            onChange={(e) => setCostoBotella(e.target.value === "" ? "" : Number(e.target.value))}
+            className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2"
+            required
+          />
+        </div>
       </label>
       <input type="hidden" name="costoPorCaja" value={costoPorCaja} />
 
@@ -69,7 +75,7 @@ export function AgregarLineaPedidoForm({
             step="1"
             min="1"
             value={piezasPorCaja}
-            onChange={(e) => setPiezasPorCaja(Number(e.target.value) || 0)}
+            onChange={(e) => setPiezasPorCaja(e.target.value === "" ? "" : Number(e.target.value))}
             className="rounded-md border border-border bg-surface px-3 py-2"
             required
           />

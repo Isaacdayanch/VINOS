@@ -31,6 +31,7 @@ export function ProductoPicker({
   seleccionInicial,
   sinSeleccionInicial,
   onSeleccionar,
+  stockPorProducto,
 }: {
   name: string;
   label?: string;
@@ -39,6 +40,7 @@ export function ProductoPicker({
   seleccionInicial?: string;
   sinSeleccionInicial?: boolean;
   onSeleccionar?: (producto: ProductoOpcion) => void;
+  stockPorProducto?: Record<string, number>;
 }) {
   const [abierto, setAbierto] = useState(false);
   const [busqueda, setBusqueda] = useState("");
@@ -113,7 +115,15 @@ export function ProductoPicker({
               >
                 <FotoChica producto={p} />
                 <span className="flex-1 min-w-0 truncate text-sm">{p.nombre}</span>
-                <span className="text-xs text-muted whitespace-nowrap">{p.piezasPorCaja}/caja</span>
+                <span className="text-xs text-muted whitespace-nowrap text-right">
+                  {p.piezasPorCaja}/caja
+                  {stockPorProducto && (
+                    <>
+                      <br />
+                      {stockPorProducto[p.id] ?? 0} en stock
+                    </>
+                  )}
+                </span>
               </button>
             ))}
             {filtrados.length === 0 && (

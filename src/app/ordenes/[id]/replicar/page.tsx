@@ -1,4 +1,3 @@
-import { actualizarOrden } from "@/app/ordenes/actions";
 import { OrdenForm } from "@/components/OrdenForm";
 import { construirDatosPrecios } from "@/lib/precios";
 import { calcularResumenInventario } from "@/lib/costeo";
@@ -8,9 +7,9 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function EditarOrdenPage({
+export default async function ReplicarOrdenPage({
   params,
-}: PageProps<"/ordenes/[id]/editar">) {
+}: PageProps<"/ordenes/[id]/replicar">) {
   const { id } = await params;
 
   const [orden, clientes, productos, preciosGuardados, resumen] = await Promise.all([
@@ -27,18 +26,10 @@ export default async function EditarOrdenPage({
     productos,
     preciosGuardados,
   );
-
-  // Las botellas de esta misma orden ya están descontadas del stock actual;
-  // se le regresan para que "disponible" refleje lo que de verdad puedes editar.
   const stockPorProducto: Record<string, number> = {};
   for (const p of productos) {
     stockPorProducto[p.id] = resumen.get(p.id)?.stockActual ?? 0;
   }
-  for (const l of orden.lineas) {
-    stockPorProducto[l.productoId] = (stockPorProducto[l.productoId] ?? 0) + l.cantidadBotellas;
-  }
-
-  const guardar = actualizarOrden.bind(null, orden.id);
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -46,9 +37,10 @@ export default async function EditarOrdenPage({
         <Link href={`/ordenes/${orden.id}`} className="text-sm text-wine underline">
           ← Volver a la orden
         </Link>
-        <h1 className="text-2xl font-bold text-wine mt-2">Editar {orden.folio}</h1>
+        <h1 className="text-2xl font-bold text-wine mt-2">Replicar {orden.folio}</h1>
         <p className="text-muted text-sm">
-          Puedes cambiar el cliente, los vinos, cantidades y precios.
+          Se crea una orden nueva con los mismos vinos y cantidades. Cambia el cliente si es
+          para alguien más.
         </p>
       </div>
 
@@ -60,14 +52,12 @@ export default async function EditarOrdenPage({
         esUltimoPrecio={esUltimoPrecio}
         stockPorProducto={stockPorProducto}
         clienteIdInicial={orden.clienteId}
-        fechaInicial={orden.fecha.toISOString().slice(0, 10)}
         lineasIniciales={orden.lineas.map((l) => ({
           productoId: l.productoId,
           cantidadBotellas: l.cantidadBotellas,
           precioUnitario: l.precioUnitario,
         }))}
-        action={guardar}
-        botonTexto="Guardar cambios"
+        botonTexto="Crear orden"
       />
     </div>
   );

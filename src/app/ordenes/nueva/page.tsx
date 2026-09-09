@@ -1,20 +1,9 @@
 import { prisma } from "@/lib/prisma";
+import { construirDatosPrecios } from "@/lib/precios";
 import { OrdenForm } from "@/components/OrdenForm";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
-
-const precioPorCategoria = {
-  LISTA: "precioLista",
-  DESCUENTO_CHICO: "precioDescuentoChico",
-  DESCUENTO_GRANDE: "precioDescuentoGrande",
-} as const;
-
-const nombreCategoria = {
-  LISTA: "Lista",
-  DESCUENTO_CHICO: "Descuento chico",
-  DESCUENTO_GRANDE: "Descuento grande",
-} as const;
 
 export default async function NuevaOrdenPage() {
   const [clientes, productos, preciosGuardados] = await Promise.all([
@@ -23,24 +12,11 @@ export default async function NuevaOrdenPage() {
     prisma.precioClienteProducto.findMany(),
   ]);
 
-  const preciosPorClienteProducto: Record<string, Record<string, number>> = {};
-  const categoriaPorCliente: Record<string, string> = {};
-  for (const c of clientes) {
-    preciosPorClienteProducto[c.id] = {};
-    categoriaPorCliente[c.id] = nombreCategoria[c.categoriaPrecio] ?? "Lista";
-    for (const p of productos) {
-      const campo = precioPorCategoria[c.categoriaPrecio] ?? "precioLista";
-      preciosPorClienteProducto[c.id][p.id] = p[campo] ?? p.precioLista ?? 0;
-    }
-  }
-
-  const esUltimoPrecio: Record<string, Record<string, boolean>> = {};
-  for (const pg of preciosGuardados) {
-    if (!preciosPorClienteProducto[pg.clienteId]) preciosPorClienteProducto[pg.clienteId] = {};
-    preciosPorClienteProducto[pg.clienteId][pg.productoId] = pg.precio;
-    if (!esUltimoPrecio[pg.clienteId]) esUltimoPrecio[pg.clienteId] = {};
-    esUltimoPrecio[pg.clienteId][pg.productoId] = true;
-  }
+  const { preciosPorClienteProducto, categoriaPorCliente, esUltimoPrecio } = construirDatosPrecios(
+    clientes,
+    productos,
+    preciosGuardados,
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">

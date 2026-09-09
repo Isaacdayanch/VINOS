@@ -35,6 +35,10 @@ export function OrdenForm({
   categoriaPorCliente,
   esUltimoPrecio,
   clienteIdInicial,
+  fechaInicial,
+  lineasIniciales,
+  action,
+  botonTexto = "Crear orden",
 }: {
   clientes: Cliente[];
   productos: Producto[];
@@ -42,11 +46,25 @@ export function OrdenForm({
   categoriaPorCliente: Record<string, string>;
   esUltimoPrecio: Record<string, Record<string, boolean>>;
   clienteIdInicial?: string;
+  fechaInicial?: string;
+  lineasIniciales?: { productoId: string; cantidadBotellas: number; precioUnitario: number }[];
+  action?: (formData: FormData) => void;
+  botonTexto?: string;
 }) {
   const [clientes, setClientes] = useState(clientesIniciales);
   const [clienteId, setClienteId] = useState(clienteIdInicial ?? clientes[0]?.id ?? "");
-  const [fecha] = useState(() => new Date().toISOString().slice(0, 10));
-  const [lineas, setLineas] = useState<Linea[]>([lineaVacia()]);
+  const [fecha] = useState(fechaInicial ?? (() => new Date().toISOString().slice(0, 10))());
+  const [lineas, setLineas] = useState<Linea[]>(() => {
+    if (!lineasIniciales || lineasIniciales.length === 0) return [lineaVacia()];
+    return lineasIniciales.map((l) => ({
+      key: Math.random().toString(36).slice(2),
+      productoId: l.productoId,
+      piezasPorCaja: productos.find((p) => p.id === l.productoId)?.piezasPorCaja ?? 1,
+      cantidad: l.cantidadBotellas,
+      unidad: "BOTELLAS" as Unidad,
+      precioUnitario: l.precioUnitario,
+    }));
+  });
   const [agregandoCliente, setAgregandoCliente] = useState(false);
   const [nombreNuevoCliente, setNombreNuevoCliente] = useState("");
   const [guardandoCliente, setGuardandoCliente] = useState(false);
@@ -116,7 +134,7 @@ export function OrdenForm({
     }));
 
   return (
-    <form action={crearOrden} className="flex flex-col gap-4">
+    <form action={action ?? crearOrden} className="flex flex-col gap-4">
       <input type="hidden" name="fecha" value={fecha} />
       <input type="hidden" name="lineas" value={JSON.stringify(lineasParaEnviar)} />
 
@@ -193,7 +211,8 @@ export function OrdenForm({
                   <ProductoPicker
                     name={`__producto_${i}`}
                     productos={productos}
-                    sinSeleccionInicial
+                    seleccionInicial={l.productoId || undefined}
+                    sinSeleccionInicial={!l.productoId}
                     onSeleccionar={(p) =>
                       actualizarLinea(i, { productoId: p.id, piezasPorCaja: p.piezasPorCaja })
                     }
@@ -277,7 +296,7 @@ export function OrdenForm({
       </div>
 
       <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
-        Crear orden
+        {botonTexto}
       </button>
     </form>
   );

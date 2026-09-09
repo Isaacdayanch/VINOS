@@ -43,12 +43,20 @@ export default async function DetalleOrdenPage({
           <p className="text-muted text-sm">
             {orden.cliente.nombre.replace("Cliente Especial - ", "")} · {orden.estatus}
           </p>
-          <Link
-            href={`/ordenes/${orden.id}/recibo`}
-            className="text-sm text-wine underline whitespace-nowrap"
-          >
-            Ver recibo
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href={`/ordenes/${orden.id}/editar`}
+              className="text-sm text-wine underline whitespace-nowrap"
+            >
+              Editar
+            </Link>
+            <Link
+              href={`/ordenes/${orden.id}/recibo`}
+              className="text-sm text-wine underline whitespace-nowrap"
+            >
+              Ver recibo
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -82,6 +82,70 @@ export async function crearOrden(formData: FormData) {
   redirect(`/ordenes/${orden.id}`);
 }
 
+export async function actualizarOrden(ordenId: string, formData: FormData) {
+  const clienteId = String(formData.get("clienteId") ?? "");
+  const fecha = String(formData.get("fecha") ?? "");
+  const lineasJson = String(formData.get("lineas") ?? "[]");
+
+  if (!clienteId || !fecha) {
+    throw new Error("Faltan datos de la orden");
+  }
+
+  const lineas: LineaForm[] = JSON.parse(lineasJson).filter(
+    (l: LineaForm) => l.productoId && l.cantidadBotellas > 0,
+  );
+
+  if (lineas.length === 0) {
+    throw new Error("Agrega al menos un vino a la orden");
+  }
+
+  const resumen = await calcularResumenInventario();
+
+  await prisma.salida.deleteMany({ where: { ordenId } });
+  await prisma.ordenLinea.deleteMany({ where: { ordenId } });
+
+  await prisma.orden.update({
+    where: { id: ordenId },
+    data: { clienteId, fecha: new Date(fecha) },
+  });
+
+  for (const l of lineas) {
+    const costoUnitario = resumen.get(l.productoId)?.costoPromedioPorBotella ?? 0;
+
+    await prisma.ordenLinea.create({
+      data: {
+        ordenId,
+        productoId: l.productoId,
+        cantidadBotellas: l.cantidadBotellas,
+        precioUnitario: l.precioUnitario,
+        costoUnitario,
+      },
+    });
+
+    await prisma.salida.create({
+      data: {
+        fecha: new Date(fecha),
+        productoId: l.productoId,
+        botellas: l.cantidadBotellas,
+        motivo: "Venta",
+        ordenId,
+      },
+    });
+
+    await prisma.precioClienteProducto.upsert({
+      where: { clienteId_productoId: { clienteId, productoId: l.productoId } },
+      create: { clienteId, productoId: l.productoId, precio: l.precioUnitario },
+      update: { precio: l.precioUnitario },
+    });
+  }
+
+  revalidatePath("/ordenes");
+  revalidatePath(`/ordenes/${ordenId}`);
+  revalidatePath("/stock");
+  revalidatePath("/");
+  redirect(`/ordenes/${ordenId}`);
+}
+
 export async function crearCobro(ordenId: string, formData: FormData) {
   const fecha = String(formData.get("fecha") ?? "");
   const monto = Number(formData.get("monto"));

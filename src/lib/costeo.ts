@@ -143,7 +143,7 @@ export type ResumenFinanzas = {
 
 const PORCENTAJE_MAASER = 0.1;
 
-function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: number | null) {
+export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: number | null) {
   return moneda === "USD" ? monto * (tipoCambio ?? 0) : monto;
 }
 

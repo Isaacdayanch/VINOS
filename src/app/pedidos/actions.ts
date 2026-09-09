@@ -97,6 +97,45 @@ export async function agregarLineaPedido(pedidoId: string, formData: FormData) {
   redirect(`/pedidos/${pedidoId}`);
 }
 
+export async function agregarAbonoPedido(pedidoId: string, formData: FormData) {
+  const fecha = String(formData.get("fecha") ?? "");
+  const monto = Number(formData.get("monto"));
+  const moneda = String(formData.get("moneda") ?? "USD") as "MXN" | "USD";
+  const tipoCambio = numeroOpcional(formData.get("tipoCambio"));
+  const cuenta = String(formData.get("cuenta") ?? "CUENTA") as "EFECTIVO" | "CUENTA";
+  const origen = String(formData.get("origen") ?? "REINVERSION") as
+    | "INYECCION_CAPITAL"
+    | "REINVERSION";
+  const socioIdRaw = String(formData.get("socioId") ?? "");
+  const dividido = origen === "INYECCION_CAPITAL" && socioIdRaw === "";
+  const socioId = origen === "INYECCION_CAPITAL" && socioIdRaw !== "" ? socioIdRaw : null;
+  const notas = String(formData.get("notas") ?? "").trim() || null;
+
+  if (!fecha || !monto) {
+    throw new Error("Faltan datos del abono");
+  }
+
+  await prisma.pago.create({
+    data: {
+      fecha: new Date(fecha),
+      pedidoId,
+      concepto: "Abono a proveedor",
+      moneda,
+      monto,
+      tipoCambio,
+      cuenta,
+      origen,
+      socioId,
+      dividido,
+      notas,
+    },
+  });
+
+  revalidatePath(`/pedidos/${pedidoId}`);
+  revalidatePath("/pedidos");
+  revalidatePath("/finanzas");
+}
+
 export async function marcarLineaRecibida(pedidoId: string, entradaLineaId: string) {
   await prisma.entradaLinea.update({
     where: { id: entradaLineaId },

@@ -67,13 +67,13 @@ export default async function ReciboOrdenPage({
               <tr key={l.id} className="print-item border-b border-border/50 break-inside-avoid">
                 <td className="py-2.5 pr-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 aspect-[2/3] rounded bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-0.5">
+                    <div className="w-8 h-12 rounded bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-0.5">
                       {l.producto.fotoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={l.producto.fotoUrl}
                           alt={l.producto.nombre}
-                          className="w-full h-full object-contain"
+                          className="max-w-full max-h-full object-contain"
                         />
                       ) : (
                         <span className="text-xs">🍷</span>

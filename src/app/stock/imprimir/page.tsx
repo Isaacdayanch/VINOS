@@ -60,10 +60,10 @@ export default async function ImprimirStockPage({
             return (
               <tr key={p.id} className="print-item border-b border-border/50 break-inside-avoid">
                 <td className="py-2.5 pr-3">
-                  <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-1">
+                  <div className="w-12 h-[72px] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-1">
                     {p.fotoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
+                      <img src={p.fotoUrl} alt={p.nombre} className="max-w-full max-h-full object-contain" />
                     ) : (
                       <span className="text-lg">🍷</span>
                     )}

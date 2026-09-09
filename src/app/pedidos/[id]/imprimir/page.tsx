@@ -29,7 +29,7 @@ export default async function ImprimirPedidoPage({
   const saldoUSD = costoTotalUSD - abonadoUSD;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 bg-background print:bg-background">
       <div className="flex items-center justify-between print:hidden">
         <Link href={`/pedidos/${pedido.id}`} className="text-sm text-wine underline">
           ← Volver al pedido
@@ -37,34 +37,37 @@ export default async function ImprimirPedidoPage({
         <BotonImprimir />
       </div>
 
-      <div className="max-w-2xl mx-auto w-full bg-surface border border-border rounded-lg p-8 flex flex-col gap-8 print:border-0 print:p-0">
-        <div className="flex items-start justify-between border-b-2 border-wine pb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-wine tracking-tight">Vinos</h1>
-            <p className="text-sm text-muted mt-1">Purchase Order</p>
+      <div className="max-w-2xl mx-auto w-full bg-background print:p-6 p-6 flex flex-col gap-6">
+        <div className="flex flex-col items-center gap-3 pt-2 pb-5 border-b-2 border-wine print-no-break">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-wine tracking-wide">Vinos</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted mt-1">Purchase Order</p>
           </div>
-          <div className="text-right text-sm">
-            <p className="text-muted">Order Number</p>
-            <p className="font-bold text-lg text-wine">{pedido.folio}</p>
-            <p className="text-muted mt-2">Date</p>
-            <p className="font-medium">
-              {new Date(pedido.fecha).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
+          <div className="flex items-center justify-center gap-10 text-sm mt-2">
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-wide text-muted">Order Number</p>
+              <p className="font-bold text-wine">{pedido.folio}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-wide text-muted">Date</p>
+              <p className="font-medium">
+                {new Date(pedido.fecha).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-wide text-muted">Seller</p>
+              <p className="font-medium">{pedido.proveedor || "—"}</p>
+            </div>
           </div>
-        </div>
-
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted mb-1">Vendor</p>
-          <p className="font-medium">{pedido.proveedor || "—"}</p>
         </div>
 
         <table className="w-full text-sm border-separate border-spacing-0">
           <colgroup>
-            <col className="w-14" />
+            <col className="w-16" />
             <col />
             <col className="w-16" />
             <col className="w-20" />
@@ -72,7 +75,7 @@ export default async function ImprimirPedidoPage({
             <col className="w-24" />
           </colgroup>
           <thead>
-            <tr className="text-left text-muted border-b border-border">
+            <tr className="text-left text-muted border-b border-border print-no-break">
               <th className="pb-2 pr-2 font-medium">Image</th>
               <th className="pb-2 px-2 font-medium">Item</th>
               <th className="pb-2 px-2 font-medium text-right">Cases</th>
@@ -85,16 +88,16 @@ export default async function ImprimirPedidoPage({
             {pedido.entradas.map((l) => (
               <tr key={l.id} className="print-item border-b border-border/50 break-inside-avoid">
                 <td className="py-2.5 pr-2">
-                  <div className="w-10 aspect-[2/3] rounded bg-surface border border-border overflow-hidden flex items-center justify-center p-0.5">
+                  <div className="w-12 h-[72px] rounded bg-surface border border-border overflow-hidden flex items-center justify-center p-1">
                     {l.producto.fotoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={l.producto.fotoUrl}
                         alt={l.producto.nombre}
-                        className="w-full h-full object-contain"
+                        className="max-w-full max-h-full object-contain"
                       />
                     ) : (
-                      <span className="text-xs">🍷</span>
+                      <span className="text-lg">🍷</span>
                     )}
                   </div>
                 </td>
@@ -123,7 +126,7 @@ export default async function ImprimirPedidoPage({
           </tbody>
         </table>
 
-        <div className="flex flex-col gap-1 items-end text-sm ml-auto w-56">
+        <div className="print-no-break flex flex-col gap-1 items-end text-sm ml-auto w-56">
           <div className="flex justify-between w-full">
             <span className="text-muted">Merchandise</span>
             <span className="tabular-nums">${costoMercanciaUSD.toLocaleString("en-US")}</span>
@@ -156,7 +159,7 @@ export default async function ImprimirPedidoPage({
           )}
         </div>
 
-        <p className="text-center text-xs text-muted border-t border-border pt-4">
+        <p className="print-no-break text-center text-xs text-muted border-t border-border pt-4">
           Thank you for your business.
         </p>
       </div>

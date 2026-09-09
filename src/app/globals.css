@@ -53,8 +53,29 @@ body {
 }
 
 @media print {
+  /* Siempre imprimir con los colores claros, sin importar si el
+     dispositivo tiene modo oscuro activado. */
+  :root {
+    --background: #faf7f4;
+    --surface: #ffffff;
+    --foreground: #2a1418;
+    --muted: #7a6a6d;
+    --border: #e7dcd7;
+    --wine: #6d1631;
+    --wine-dark: #4a0f21;
+    --wine-light: #f3e4e9;
+    --ok: #2f7d4f;
+    --warn: #b8860b;
+    --warn-bg: #fdf3dc;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   @page {
-    margin: 14mm 10mm;
+    margin: 8mm;
   }
 
   header {
@@ -62,6 +83,11 @@ body {
   }
 
   .print-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-no-break {
     break-inside: avoid;
     page-break-inside: avoid;
   }

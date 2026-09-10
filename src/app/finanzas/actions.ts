@@ -55,7 +55,7 @@ export async function crearPago(formData: FormData) {
   redirect("/finanzas");
 }
 
-export async function crearConsumoPersonal(formData: FormData) {
+function datosConsumoPersonal(formData: FormData) {
   const fecha = String(formData.get("fecha") ?? "");
   const productoId = String(formData.get("productoId") ?? "");
   const botellas = Number(formData.get("botellas"));
@@ -70,24 +70,30 @@ export async function crearConsumoPersonal(formData: FormData) {
     throw new Error("Faltan datos del consumo");
   }
 
-  const resumen = await calcularResumenInventario();
-  const costoUnitario = resumen.get(productoId)?.costoPromedioPorBotella ?? 0;
-
   const dividido = quien === "COMPARTIDO";
   const socioId = dividido ? null : quien || null;
 
+  return { fecha, productoId, botellas, socioId, dividido, montoRepuesto, cuentaRepuesto, notas };
+}
+
+export async function crearConsumoPersonal(formData: FormData) {
+  const datos = datosConsumoPersonal(formData);
+
+  const resumen = await calcularResumenInventario();
+  const costoUnitario = resumen.get(datos.productoId)?.costoPromedioPorBotella ?? 0;
+
   await prisma.salida.create({
     data: {
-      fecha: new Date(fecha),
-      productoId,
-      botellas,
+      fecha: new Date(datos.fecha),
+      productoId: datos.productoId,
+      botellas: datos.botellas,
       motivo: "Consumo personal",
       costoUnitario,
-      socioId,
-      dividido,
-      montoRepuesto,
-      cuentaRepuesto,
-      notas,
+      socioId: datos.socioId,
+      dividido: datos.dividido,
+      montoRepuesto: datos.montoRepuesto,
+      cuentaRepuesto: datos.cuentaRepuesto,
+      notas: datos.notas,
     },
   });
 
@@ -95,4 +101,44 @@ export async function crearConsumoPersonal(formData: FormData) {
   revalidatePath("/stock");
   revalidatePath("/");
   redirect("/finanzas");
+}
+
+export async function actualizarConsumoPersonal(salidaId: string, formData: FormData) {
+  const datos = datosConsumoPersonal(formData);
+
+  const resumen = await calcularResumenInventario();
+  const costoUnitario = resumen.get(datos.productoId)?.costoPromedioPorBotella ?? 0;
+
+  await prisma.salida.update({
+    where: { id: salidaId },
+    data: {
+      fecha: new Date(datos.fecha),
+      productoId: datos.productoId,
+      botellas: datos.botellas,
+      costoUnitario,
+      socioId: datos.socioId,
+      dividido: datos.dividido,
+      montoRepuesto: datos.montoRepuesto,
+      cuentaRepuesto: datos.cuentaRepuesto,
+      notas: datos.notas,
+    },
+  });
+
+  revalidatePath("/finanzas");
+  revalidatePath("/finanzas/consumo-personal");
+  revalidatePath("/stock");
+  revalidatePath("/");
+  redirect("/finanzas/consumo-personal");
+}
+
+export async function eliminarConsumoPersonal(formData: FormData) {
+  const salidaId = String(formData.get("salidaId") ?? "");
+  if (!salidaId) throw new Error("Falta el consumo a eliminar");
+
+  await prisma.salida.delete({ where: { id: salidaId } });
+
+  revalidatePath("/finanzas");
+  revalidatePath("/finanzas/consumo-personal");
+  revalidatePath("/stock");
+  revalidatePath("/");
 }

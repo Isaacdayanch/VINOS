@@ -31,6 +31,12 @@ export default async function FinanzasPage() {
           <Link href="/finanzas/nuevo-consumo" className="text-xs text-wine underline whitespace-nowrap">
             + Consumo personal
           </Link>
+          <Link
+            href="/finanzas/consumo-personal"
+            className="text-xs text-wine underline whitespace-nowrap"
+          >
+            Ver / editar consumos
+          </Link>
         </div>
       </div>
 
@@ -142,6 +148,9 @@ export default async function FinanzasPage() {
             <p className="text-xs text-muted">{formatoMXN(finanzas.consumoCompartido.costo)}</p>
           </div>
         </div>
+        <Link href="/finanzas/consumo-personal" className="text-xs text-wine underline self-start">
+          Ver el detalle de cada consumo →
+        </Link>
       </div>
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">

@@ -14,16 +14,30 @@ export function ConsumoPersonalForm({
   socios,
   costoPorProducto,
   hoy,
+  initial,
+  action,
+  botonTexto = "Registrar",
 }: {
   productos: Producto[];
   socios: Socio[];
   costoPorProducto: Record<string, number>;
   hoy: string;
+  initial?: {
+    productoId: string;
+    fecha: string;
+    botellas: number;
+    quien: string;
+    montoRepuesto: number | null;
+    cuentaRepuesto: "EFECTIVO" | "CUENTA" | null;
+    notas: string | null;
+  };
+  action?: (formData: FormData) => void;
+  botonTexto?: string;
 }) {
-  const [productoId, setProductoId] = useState("");
-  const [botellas, setBotellas] = useState<number | "">(1);
-  const [repuso, setRepuso] = useState(false);
-  const [montoRepuesto, setMontoRepuesto] = useState<number | "">("");
+  const [productoId, setProductoId] = useState(initial?.productoId ?? "");
+  const [botellas, setBotellas] = useState<number | "">(initial?.botellas ?? 1);
+  const [repuso, setRepuso] = useState(!!initial?.montoRepuesto);
+  const [montoRepuesto, setMontoRepuesto] = useState<number | "">(initial?.montoRepuesto ?? "");
 
   const costoEstimado = useMemo(() => {
     const cantidad = botellas === "" ? 0 : botellas;
@@ -31,11 +45,12 @@ export function ConsumoPersonalForm({
   }, [botellas, productoId, costoPorProducto]);
 
   return (
-    <form action={crearConsumoPersonal} className="flex flex-col gap-4">
+    <form action={action ?? crearConsumoPersonal} className="flex flex-col gap-4">
       <ProductoPicker
         name="productoId"
         productos={productos}
-        sinSeleccionInicial
+        seleccionInicial={initial?.productoId || undefined}
+        sinSeleccionInicial={!initial?.productoId}
         onSeleccionar={(p) => {
           setProductoId(p.id);
           if (repuso) {
@@ -45,7 +60,7 @@ export function ConsumoPersonalForm({
         }}
       />
 
-      <DateField name="fecha" label="Fecha" defaultValue={hoy} />
+      <DateField name="fecha" label="Fecha" defaultValue={initial?.fecha ?? hoy} />
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">Botellas</span>
@@ -78,6 +93,7 @@ export function ConsumoPersonalForm({
         <span className="font-medium">¿Quién se la llevó?</span>
         <select
           name="quien"
+          defaultValue={initial?.quien}
           className="rounded-md border border-border bg-surface px-3 py-2"
           required
         >
@@ -130,7 +146,7 @@ export function ConsumoPersonalForm({
             <span className="font-medium">¿Dónde lo pusiste?</span>
             <select
               name="cuentaRepuesto"
-              defaultValue="EFECTIVO"
+              defaultValue={initial?.cuentaRepuesto ?? "EFECTIVO"}
               className="rounded-md border border-border bg-surface px-3 py-2"
             >
               <option value="EFECTIVO">Efectivo (a Caja)</option>
@@ -145,11 +161,15 @@ export function ConsumoPersonalForm({
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">Notas (opcional)</span>
-        <input name="notas" className="rounded-md border border-border bg-surface px-3 py-2" />
+        <input
+          name="notas"
+          defaultValue={initial?.notas ?? ""}
+          className="rounded-md border border-border bg-surface px-3 py-2"
+        />
       </label>
 
       <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
-        Registrar
+        {botonTexto}
       </button>
     </form>
   );

@@ -6,6 +6,12 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
+const DATOS_TRANSFERENCIA = {
+  beneficiario: "Victor Manuel Casimiro Fuentes",
+  banco: "albo",
+  clabe: "721180100037251277",
+};
+
 export async function generateMetadata({
   params,
 }: PageProps<"/ordenes/[id]/recibo">) {
@@ -123,6 +129,21 @@ export default async function ReciboOrdenPage({
             </span>
           </div>
         </div>
+
+        {pendiente > 0 && (
+          <div className="print-no-break rounded-md border border-wine/30 bg-wine-light/40 p-3 text-center">
+            <p className="text-[10px] uppercase tracking-wide text-wine font-semibold mb-1.5">
+              Pago por transferencia
+            </p>
+            <p className="font-bold">{DATOS_TRANSFERENCIA.beneficiario}</p>
+            <p>
+              Banco: <span className="font-bold">{DATOS_TRANSFERENCIA.banco}</span>
+            </p>
+            <p>
+              CLABE: <span className="font-bold tabular-nums">{DATOS_TRANSFERENCIA.clabe}</span>
+            </p>
+          </div>
+        )}
 
         <p className="text-center text-[11px] text-muted pt-1">¡Gracias por tu compra!</p>
       </div>

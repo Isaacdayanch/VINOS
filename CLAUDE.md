@@ -158,10 +158,10 @@ preguntarle si esas botellas de verdad ya salieron, para registrarlas bien.
     contenedor de build no lograba conectarse a Postgres por el puerto de
     sesión); las tablas se crean a mano una vez, pegando el SQL de
     `crear_tablas.sql` en el SQL Editor de Supabase.
-  - Los datos reales se cargan una sola vez visitando `/api/seed-inicial` ya
-    en producción (sin contraseña — solo corre si la tabla Producto está
-    vacía, para no arriesgar borrar datos reales sin querer). Pendiente:
-    borrar esa ruta del código después de usarla.
+  - Los datos reales se cargaron una sola vez visitando `/api/seed-inicial` en
+    producción (sin contraseña — solo corría si la tabla Producto estaba
+    vacía). Ya se usó y Isaac confirmó que los datos están bien, así que esa
+    ruta **ya se borró del código**.
 - **Tailwind CSS v4** con paleta de vino (bordó `--wine` / crema
   `--background`), tema claro/oscuro automático vía `prefers-color-scheme`.
 - **Fotos de producto**: por ahora se guardan en `public/uploads/` (solo
@@ -210,8 +210,8 @@ otro negocio y NO se debe tocar). Quedó pendiente que él:
    porque el contenedor de build de Vercel no lograba conectarse a Postgres
    por el puerto de sesión 5432; en cambio el runtime normal de la app sí
    conecta bien por el puerto 6543/pooler transacción).
-4. Visite `/api/seed-inicial?secreto=<SEED_SECRET>` una vez para cargar los
-   datos reales (después hay que borrar esa ruta del código).
+4. ~~Visite `/api/seed-inicial?secreto=<SEED_SECRET>` una vez para cargar los
+   datos reales~~ — ya hecho, y la ruta ya se borró del código.
 
 **Bug ya resuelto**: el primer intento de despliegue en Vercel daba error 500
 ("Prisma Client could not locate the Query Engine for runtime

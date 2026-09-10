@@ -1,16 +1,21 @@
-import { crearConsumoPersonal } from "@/app/finanzas/actions";
-import { DateField } from "@/components/DateField";
+import { ConsumoPersonalForm } from "@/components/ConsumoPersonalForm";
+import { calcularResumenInventario } from "@/lib/costeo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function NuevoConsumoPersonalPage() {
-  const [productos, socios] = await Promise.all([
+  const [productos, socios, resumen] = await Promise.all([
     prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.socio.findMany(),
+    calcularResumenInventario(),
   ]);
   const hoy = new Date().toISOString().slice(0, 10);
+  const costoPorProducto: Record<string, number> = {};
+  for (const p of productos) {
+    costoPorProducto[p.id] = resumen.get(p.id)?.costoPromedioPorBotella ?? 0;
+  }
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -25,61 +30,12 @@ export default async function NuevoConsumoPersonalPage() {
         </p>
       </div>
 
-      <form action={crearConsumoPersonal} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Producto</span>
-          <select
-            name="productoId"
-            className="rounded-md border border-border bg-surface px-3 py-2"
-            required
-          >
-            {productos.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nombre}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <DateField name="fecha" label="Fecha" defaultValue={hoy} />
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Botellas</span>
-          <input
-            name="botellas"
-            type="number"
-            step="1"
-            min="1"
-            className="rounded-md border border-border bg-surface px-3 py-2"
-            required
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">¿Quién se la llevó?</span>
-          <select
-            name="quien"
-            className="rounded-md border border-border bg-surface px-3 py-2"
-            required
-          >
-            {socios.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.nombre}
-              </option>
-            ))}
-            <option value="COMPARTIDO">Isaac y Beto (se la repartieron)</option>
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Notas (opcional)</span>
-          <input name="notas" className="rounded-md border border-border bg-surface px-3 py-2" />
-        </label>
-
-        <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
-          Registrar
-        </button>
-      </form>
+      <ConsumoPersonalForm
+        productos={productos}
+        socios={socios}
+        costoPorProducto={costoPorProducto}
+        hoy={hoy}
+      />
     </div>
   );
 }

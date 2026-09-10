@@ -61,6 +61,10 @@ export async function crearConsumoPersonal(formData: FormData) {
   const botellas = Number(formData.get("botellas"));
   const quien = String(formData.get("quien") ?? ""); // socioId, o "COMPARTIDO"
   const notas = String(formData.get("notas") ?? "").trim() || null;
+  const montoRepuesto = numeroOpcional(formData.get("montoRepuesto"));
+  const cuentaRepuesto = montoRepuesto
+    ? (String(formData.get("cuentaRepuesto") ?? "EFECTIVO") as "EFECTIVO" | "CUENTA")
+    : null;
 
   if (!fecha || !productoId || !botellas) {
     throw new Error("Faltan datos del consumo");
@@ -81,6 +85,8 @@ export async function crearConsumoPersonal(formData: FormData) {
       costoUnitario,
       socioId,
       dividido,
+      montoRepuesto,
+      cuentaRepuesto,
       notas,
     },
   });

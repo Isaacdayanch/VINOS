@@ -153,6 +153,8 @@ model Salida {
   costoUnitario Float? // costo por botella al momento de salir (para "Consumo personal")
   socioId       String? // quién se la llevó, si motivo = "Consumo personal" y no fue compartida
   dividido      Boolean  @default(false) // true = Isaac y Beto se la repartieron, no genera deuda
+  montoRepuesto Float? // si en "Consumo personal" repuso el dinero de la botella a Caja/Cuenta
+  cuentaRepuesto Cuenta? // dónde repuso el dinero (si montoRepuesto tiene valor)
   ordenId       String?
   notas         String?
   createdAt     DateTime @default(now())

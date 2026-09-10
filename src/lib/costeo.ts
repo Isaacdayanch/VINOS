@@ -108,7 +108,7 @@ export type ResumenSocio = {
   socioId: string;
   nombre: string;
   aportado: number; // capital que puso de su bolsillo (pagos "Inyección de capital" a su nombre)
-  consumoPersonal: number; // costo de botellas que se llevó él solo (Salida "Consumo personal")
+  consumoPersonal: number; // costo de botellas que se llevó él solo, menos lo que ya repuso a Caja/Cuenta
   neto: number; // aportado - consumoPersonal
 };
 
@@ -231,8 +231,14 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
 
   const consumoPorSocio = new Map<string, number>();
   for (const s of salidasPersonales) {
+    // Si ya repuso el dinero a Caja/Cuenta, ese efectivo entra directo (abajo) y
+    // aquí se descuenta para no generarle deuda contra el otro socio.
+    if (s.montoRepuesto) {
+      if (s.cuentaRepuesto === "CUENTA") saldoCuenta += s.montoRepuesto;
+      else saldoCaja += s.montoRepuesto;
+    }
     if (s.socioId && !s.dividido) {
-      const costo = (s.costoUnitario ?? 0) * s.botellas;
+      const costo = (s.costoUnitario ?? 0) * s.botellas - (s.montoRepuesto ?? 0);
       consumoPorSocio.set(s.socioId, (consumoPorSocio.get(s.socioId) ?? 0) + costo);
     }
   }

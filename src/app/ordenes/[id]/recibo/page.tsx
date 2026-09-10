@@ -44,13 +44,13 @@ export default async function ReciboOrdenPage({
         <BotonImprimir />
       </div>
 
-      <div className="max-w-lg mx-auto w-full bg-background print:p-5 p-5 flex flex-col gap-3 text-[13px] leading-snug">
-        <div className="text-center print-no-break pb-1">
+      <div className="max-w-lg mx-auto w-full bg-background print:p-5 p-5 text-[13px] leading-snug">
+        <div className="text-center print-no-break pb-1 mb-3">
           <h1 className="text-xl font-bold text-wine">Vinos</h1>
           <p className="text-xs text-muted">Recibo de venta</p>
         </div>
 
-        <div className="print-no-break flex justify-between border-y border-border py-2">
+        <div className="print-no-break flex justify-between border-y border-border py-2 mb-3">
           <div>
             <p className="text-muted text-xs">Cliente</p>
             <p className="font-medium">{orden.cliente.nombre.replace("Cliente Especial - ", "")}</p>
@@ -64,7 +64,7 @@ export default async function ReciboOrdenPage({
           </div>
         </div>
 
-        <table className="w-full border-separate border-spacing-0">
+        <table className="w-full border-separate border-spacing-0 mb-3">
           <colgroup>
             <col />
             <col className="w-10" />
@@ -113,39 +113,43 @@ export default async function ReciboOrdenPage({
           </tbody>
         </table>
 
-        <div className="print-no-break flex flex-col gap-0.5 items-end">
-          <div className="flex justify-between w-44">
-            <span className="text-muted">Total</span>
-            <span className="font-semibold">{formatoMXN(total)}</span>
+        {/* Todo lo de aquí para abajo se mueve junto a la siguiente hoja si no
+            cabe entero en la primera — nunca se corta a la mitad. */}
+        <div className="print-no-break">
+          <div className="flex flex-col gap-0.5 items-end">
+            <div className="flex justify-between w-44">
+              <span className="text-muted">Total</span>
+              <span className="font-semibold">{formatoMXN(total)}</span>
+            </div>
+            <div className="flex justify-between w-44">
+              <span className="text-muted">Cobrado</span>
+              <span>{formatoMXN(cobrado)}</span>
+            </div>
+            <div className="flex justify-between w-44 text-sm">
+              <span className="font-medium">{pendiente > 0 ? "Pendiente" : "Pagado"}</span>
+              <span className={`font-bold ${pendiente > 0 ? "text-warn" : "text-ok"}`}>
+                {pendiente > 0 ? formatoMXN(pendiente) : "✓"}
+              </span>
+            </div>
           </div>
-          <div className="flex justify-between w-44">
-            <span className="text-muted">Cobrado</span>
-            <span>{formatoMXN(cobrado)}</span>
-          </div>
-          <div className="flex justify-between w-44 text-sm">
-            <span className="font-medium">{pendiente > 0 ? "Pendiente" : "Pagado"}</span>
-            <span className={`font-bold ${pendiente > 0 ? "text-warn" : "text-ok"}`}>
-              {pendiente > 0 ? formatoMXN(pendiente) : "✓"}
-            </span>
-          </div>
+
+          {pendiente > 0 && (
+            <div className="rounded-md border border-wine/30 bg-wine-light/40 p-3 text-center mt-3">
+              <p className="text-[10px] uppercase tracking-wide text-wine font-semibold mb-1.5">
+                Pago por transferencia
+              </p>
+              <p className="font-bold">{DATOS_TRANSFERENCIA.beneficiario}</p>
+              <p>
+                Banco: <span className="font-bold">{DATOS_TRANSFERENCIA.banco}</span>
+              </p>
+              <p>
+                CLABE: <span className="font-bold tabular-nums">{DATOS_TRANSFERENCIA.clabe}</span>
+              </p>
+            </div>
+          )}
+
+          <p className="text-center text-[11px] text-muted pt-1 mt-3">¡Gracias por tu compra!</p>
         </div>
-
-        {pendiente > 0 && (
-          <div className="print-no-break rounded-md border border-wine/30 bg-wine-light/40 p-3 text-center">
-            <p className="text-[10px] uppercase tracking-wide text-wine font-semibold mb-1.5">
-              Pago por transferencia
-            </p>
-            <p className="font-bold">{DATOS_TRANSFERENCIA.beneficiario}</p>
-            <p>
-              Banco: <span className="font-bold">{DATOS_TRANSFERENCIA.banco}</span>
-            </p>
-            <p>
-              CLABE: <span className="font-bold tabular-nums">{DATOS_TRANSFERENCIA.clabe}</span>
-            </p>
-          </div>
-        )}
-
-        <p className="text-center text-[11px] text-muted pt-1">¡Gracias por tu compra!</p>
       </div>
     </div>
   );

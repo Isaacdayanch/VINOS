@@ -110,6 +110,8 @@ export type ResumenSocio = {
   aportado: number; // capital que puso de su bolsillo (pagos "Inyección de capital" a su nombre)
   consumoPersonal: number; // costo de botellas que se llevó él solo, menos lo que ya repuso a Caja/Cuenta
   neto: number; // aportado - consumoPersonal
+  botellasPersonal: number; // botellas que se llevó él solo (consumo personal), sin contar lo repuesto
+  costoPersonalBruto: number; // costo total de esas botellas, sin restar lo repuesto
 };
 
 export type SaldoEntreSocios = {
@@ -139,6 +141,7 @@ export type ResumenFinanzas = {
   maaserDebido: number;
   maaserDado: number;
   saldoMaaser: number; // positivo = a favor, negativo = debe
+  consumoCompartido: { botellas: number; costo: number }; // botellas que Isaac y Beto se repartieron
 };
 
 const PORCENTAJE_MAASER = 0.1;
@@ -230,6 +233,10 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   }
 
   const consumoPorSocio = new Map<string, number>();
+  const botellasPorSocio = new Map<string, number>();
+  const costoBrutoPorSocio = new Map<string, number>();
+  let compartidoBotellas = 0;
+  let compartidoCosto = 0;
   for (const s of salidasPersonales) {
     // Si ya repuso el dinero a Caja/Cuenta, ese efectivo entra directo (abajo) y
     // aquí se descuenta para no generarle deuda contra el otro socio.
@@ -237,16 +244,30 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
       if (s.cuentaRepuesto === "CUENTA") saldoCuenta += s.montoRepuesto;
       else saldoCaja += s.montoRepuesto;
     }
-    if (s.socioId && !s.dividido) {
-      const costo = (s.costoUnitario ?? 0) * s.botellas - (s.montoRepuesto ?? 0);
-      consumoPorSocio.set(s.socioId, (consumoPorSocio.get(s.socioId) ?? 0) + costo);
+    const costoBruto = (s.costoUnitario ?? 0) * s.botellas;
+    if (s.dividido) {
+      compartidoBotellas += s.botellas;
+      compartidoCosto += costoBruto;
+    } else if (s.socioId) {
+      const costoNeto = costoBruto - (s.montoRepuesto ?? 0);
+      consumoPorSocio.set(s.socioId, (consumoPorSocio.get(s.socioId) ?? 0) + costoNeto);
+      botellasPorSocio.set(s.socioId, (botellasPorSocio.get(s.socioId) ?? 0) + s.botellas);
+      costoBrutoPorSocio.set(s.socioId, (costoBrutoPorSocio.get(s.socioId) ?? 0) + costoBruto);
     }
   }
 
   const resumenSocios: ResumenSocio[] = socios.map((s) => {
     const aportado = aportadoPorSocio.get(s.id) ?? 0;
     const consumoPersonal = consumoPorSocio.get(s.id) ?? 0;
-    return { socioId: s.id, nombre: s.nombre, aportado, consumoPersonal, neto: aportado - consumoPersonal };
+    return {
+      socioId: s.id,
+      nombre: s.nombre,
+      aportado,
+      consumoPersonal,
+      neto: aportado - consumoPersonal,
+      botellasPersonal: botellasPorSocio.get(s.id) ?? 0,
+      costoPersonalBruto: costoBrutoPorSocio.get(s.id) ?? 0,
+    };
   });
 
   let saldoEntreSocios: SaldoEntreSocios = null;
@@ -281,6 +302,7 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     saldoCuenta,
     socios: resumenSocios,
     saldoEntreSocios,
+    consumoCompartido: { botellas: compartidoBotellas, costo: compartidoCosto },
     maaserDebido,
     maaserDado,
     saldoMaaser,

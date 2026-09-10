@@ -120,6 +120,30 @@ export default async function FinanzasPage() {
         </div>
       </div>
 
+      <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
+        <h2 className="font-semibold">Cuánto se ha llevado cada quién</h2>
+        <p className="text-xs text-muted -mt-2">Botellas para consumo propio (no ventas), a costo.</p>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          {finanzas.socios.map((s) => (
+            <div key={s.socioId} className="rounded-md border border-border p-3">
+              <p className="font-medium">{s.nombre}</p>
+              <p className="text-xs text-muted mt-1">
+                {s.botellasPersonal} botella{s.botellasPersonal === 1 ? "" : "s"}
+              </p>
+              <p className="text-xs text-muted">{formatoMXN(s.costoPersonalBruto)}</p>
+            </div>
+          ))}
+          <div className="rounded-md border border-border p-3">
+            <p className="font-medium">Entre los dos</p>
+            <p className="text-xs text-muted mt-1">
+              {finanzas.consumoCompartido.botellas} botella
+              {finanzas.consumoCompartido.botellas === 1 ? "" : "s"}
+            </p>
+            <p className="text-xs text-muted">{formatoMXN(finanzas.consumoCompartido.costo)}</p>
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         <div className="p-4">
           <h2 className="font-semibold">Pagos y gastos recientes</h2>

@@ -14,10 +14,13 @@ export async function calcularCostosPedido(pedidoId: string) {
   const tipoCambio = pedido.tipoCambio ?? 0;
   const logisticaTotalMXN =
     (pedido.logisticaUSD ?? 0) * tipoCambio + (pedido.logisticaMXN ?? 0);
+  const factorDescuento = 1 - (pedido.descuentoPct ?? 0) / 100;
 
   const lineas = pedido.entradas.map((e) => {
     const botellas = e.cajasRecibidas * e.piezasPorCaja;
-    const costoMercanciaMXN = e.cajasRecibidas * e.costoPorCaja * tipoCambio;
+    // El descuento del proveedor es sobre el costo de la mercancía; el
+    // envío/aduana no se descuenta.
+    const costoMercanciaMXN = e.cajasRecibidas * e.costoPorCaja * tipoCambio * factorDescuento;
     return { entrada: e, botellas, costoMercanciaMXN };
   });
 

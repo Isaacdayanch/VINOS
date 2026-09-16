@@ -26,6 +26,7 @@ export async function crearPedido(formData: FormData) {
   const tipoCambio = numeroOpcional(formData.get("tipoCambio"));
   const logisticaUSD = numeroOpcional(formData.get("logisticaUSD"));
   const logisticaMXN = numeroOpcional(formData.get("logisticaMXN"));
+  const descuentoPct = numeroOpcional(formData.get("descuentoPct"));
 
   if (!fecha) {
     throw new Error("La fecha es obligatoria");
@@ -41,6 +42,7 @@ export async function crearPedido(formData: FormData) {
       tipoCambio,
       logisticaUSD,
       logisticaMXN,
+      descuentoPct,
     },
   });
 
@@ -53,10 +55,17 @@ export async function actualizarPedido(pedidoId: string, formData: FormData) {
   const tipoCambio = numeroOpcional(formData.get("tipoCambio"));
   const logisticaUSD = numeroOpcional(formData.get("logisticaUSD"));
   const logisticaMXN = numeroOpcional(formData.get("logisticaMXN"));
+  const descuentoPct = numeroOpcional(formData.get("descuentoPct"));
 
   await prisma.pedido.update({
     where: { id: pedidoId },
-    data: { proveedor: proveedor || null, tipoCambio, logisticaUSD, logisticaMXN },
+    data: {
+      proveedor: proveedor || null,
+      tipoCambio,
+      logisticaUSD,
+      logisticaMXN,
+      descuentoPct,
+    },
   });
 
   revalidatePath("/pedidos");

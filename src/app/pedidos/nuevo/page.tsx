@@ -36,22 +36,31 @@ export default async function NuevoPedidoPage() {
             placeholder="Ej. 17.20"
           />
           <Campo
-            label="Flete + seguro en dólares (USD)"
+            label="Costo de envío del proveedor en EE.UU. (USD)"
             name="logisticaUSD"
             type="number"
             step="0.01"
             placeholder="Ej. 465"
           />
           <Campo
-            label="Aduana + maniobras en pesos (MXN)"
+            label="Envío y aduana en México (MXN)"
             name="logisticaMXN"
             type="number"
             step="0.01"
             placeholder="Ej. 35000"
           />
+          <Campo
+            label="Descuento del proveedor (%)"
+            name="descuentoPct"
+            type="number"
+            step="0.1"
+            placeholder="Ej. 10"
+          />
           <p className="text-xs text-muted">
-            Estos costos se reparten solos entre las botellas que vayas marcando como recibidas.
-            Los puedes ir ajustando mientras le mandas dinero al proveedor.
+            El envío y la aduana se reparten solos entre las botellas que vayas marcando como
+            recibidas. El descuento se aplica sobre el costo de la mercancía (no sobre el envío)
+            y también se reparte solo. Los puedes ir ajustando mientras le mandas dinero al
+            proveedor.
           </p>
         </div>
 

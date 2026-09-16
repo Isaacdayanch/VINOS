@@ -96,8 +96,9 @@ model Pedido {
   fecha        DateTime
   proveedor    String?
   tipoCambio   Float? // pesos por dólar, para convertir costos en USD de este pedido
-  logisticaUSD Float? // flete + seguro (dólares)
-  logisticaMXN Float? // aduana + maniobras + otros gastos (pesos)
+  logisticaUSD Float? // envío del proveedor en EE.UU. (dólares)
+  logisticaMXN Float? // envío y aduana en México + maniobras (pesos)
+  descuentoPct Float? // % de descuento del proveedor sobre el costo de la mercancía
   notas        String?
   createdAt    DateTime @default(now())
 

@@ -18,10 +18,12 @@ export default async function ImprimirPedidoPage({
   ]);
   if (!pedido) notFound();
 
-  const costoMercanciaUSD = pedido.entradas.reduce(
+  const costoMercanciaBrutoUSD = pedido.entradas.reduce(
     (acc, l) => acc + l.cajasRecibidas * l.costoPorCaja,
     0,
   );
+  const descuentoUSD = (costoMercanciaBrutoUSD * (pedido.descuentoPct ?? 0)) / 100;
+  const costoMercanciaUSD = costoMercanciaBrutoUSD - descuentoUSD;
   const costoTotalUSD = costoMercanciaUSD + (pedido.logisticaUSD ?? 0);
   const abonadoUSD = pagos
     .filter((p) => p.moneda === "USD")
@@ -131,8 +133,14 @@ export default async function ImprimirPedidoPage({
         <div className="print-no-break flex flex-col gap-0.5 items-end ml-auto w-52">
           <div className="flex justify-between w-full">
             <span className="text-muted">Merchandise</span>
-            <span className="tabular-nums">${costoMercanciaUSD.toLocaleString("en-US")}</span>
+            <span className="tabular-nums">${costoMercanciaBrutoUSD.toLocaleString("en-US")}</span>
           </div>
+          {pedido.descuentoPct ? (
+            <div className="flex justify-between w-full">
+              <span className="text-muted">Discount ({pedido.descuentoPct}%)</span>
+              <span className="tabular-nums">-${descuentoUSD.toLocaleString("en-US")}</span>
+            </div>
+          ) : null}
           {pedido.logisticaUSD ? (
             <div className="flex justify-between w-full">
               <span className="text-muted">Freight</span>

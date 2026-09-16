@@ -8,6 +8,7 @@ import {
   marcarLineaRecibida,
 } from "@/app/pedidos/actions";
 import { AgregarLineaPedidoForm } from "@/components/AgregarLineaPedidoForm";
+import { CostosPedidoForm } from "@/components/CostosPedidoForm";
 import { DateField } from "@/components/DateField";
 import { LineaPedidoRow } from "@/components/LineaPedidoRow";
 import { montoEnMXN, formatoMXN } from "@/lib/costeo";
@@ -52,10 +53,12 @@ export default async function DetallePedidoPage({
     .filter((p) => p.moneda === "USD")
     .reduce((acc, p) => acc + p.monto, 0);
 
-  const costoMercanciaUSD = pedido.entradas.reduce(
+  const costoMercanciaBrutoUSD = pedido.entradas.reduce(
     (acc, l) => acc + l.cajasRecibidas * l.costoPorCaja,
     0,
   );
+  const factorDescuento = 1 - (pedido.descuentoPct ?? 0) / 100;
+  const costoMercanciaUSD = costoMercanciaBrutoUSD * factorDescuento;
   const costoTotalUSD = costoMercanciaUSD + (pedido.logisticaUSD ?? 0);
   const pendienteUSD = costoTotalUSD - totalAbonadoUSD;
 
@@ -95,9 +98,18 @@ export default async function DetallePedidoPage({
               {pendienteUSD > 0.5 ? `$${pendienteUSD.toLocaleString("es-MX")} USD` : "✓ Pagado"}
             </span>
           </div>
+          {pedido.descuentoPct ? (
+            <p className="text-xs text-muted">
+              Ya incluye {pedido.descuentoPct}% de descuento del proveedor (−$
+              {(costoMercanciaBrutoUSD - costoMercanciaUSD).toLocaleString("es-MX", {
+                maximumFractionDigits: 2,
+              })}{" "}
+              USD)
+            </p>
+          ) : null}
           {pedido.logisticaMXN ? (
             <p className="text-xs text-muted">
-              + aduana/maniobras: {formatoMXN(pedido.logisticaMXN)} (aparte, en pesos)
+              + envío y aduana en México: {formatoMXN(pedido.logisticaMXN)} (aparte, en pesos)
             </p>
           ) : null}
         </div>
@@ -107,33 +119,15 @@ export default async function DetallePedidoPage({
         <summary className="p-4 cursor-pointer text-sm font-medium">
           Proveedor y costos de importación
         </summary>
-        <form action={guardarPedido} className="p-4 pt-0 flex flex-col gap-4">
-          <Campo label="Proveedor" name="proveedor" defaultValue={pedido.proveedor ?? undefined} />
-          <Campo
-            label="Tipo de cambio (pesos por dólar)"
-            name="tipoCambio"
-            type="number"
-            step="0.01"
-            defaultValue={pedido.tipoCambio?.toString()}
-          />
-          <Campo
-            label="Flete + seguro en dólares (USD)"
-            name="logisticaUSD"
-            type="number"
-            step="0.01"
-            defaultValue={pedido.logisticaUSD?.toString()}
-          />
-          <Campo
-            label="Aduana + maniobras en pesos (MXN)"
-            name="logisticaMXN"
-            type="number"
-            step="0.01"
-            defaultValue={pedido.logisticaMXN?.toString()}
-          />
-          <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
-            Guardar cambios
-          </button>
-        </form>
+        <CostosPedidoForm
+          action={guardarPedido}
+          proveedor={pedido.proveedor ?? undefined}
+          tipoCambio={pedido.tipoCambio}
+          logisticaUSD={pedido.logisticaUSD}
+          logisticaMXN={pedido.logisticaMXN}
+          descuentoPct={pedido.descuentoPct}
+          costoMercanciaBrutoUSD={costoMercanciaBrutoUSD}
+        />
       </details>
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">

@@ -104,9 +104,10 @@ export function NavBar() {
           </span>
         </Link>
         <button
+          type="button"
           aria-label="Abrir menú"
           onClick={() => setAbierto((v) => !v)}
-          className="p-2 -mr-2 text-2xl leading-none cursor-pointer"
+          className="relative z-30 p-2 -mr-2 text-2xl leading-none cursor-pointer touch-manipulation select-none"
         >
           ☰
         </button>
@@ -114,9 +115,10 @@ export function NavBar() {
         {abierto && (
           <>
             <button
+              type="button"
               aria-label="Cerrar menú"
               onClick={() => setAbierto(false)}
-              className="fixed inset-0 z-10 cursor-default bg-black/20"
+              className="fixed inset-0 z-10 cursor-default bg-black/20 touch-manipulation"
             />
             <nav className="absolute right-0 top-full mt-2 z-20 w-60 rounded-lg bg-surface text-foreground shadow-xl border border-border overflow-hidden">
               <ul className="flex flex-col py-1">

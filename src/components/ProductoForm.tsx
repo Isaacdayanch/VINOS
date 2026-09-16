@@ -14,6 +14,7 @@ type ProductoDefaults = {
   precioLista?: number | null;
   precioDescuentoChico?: number | null;
   precioDescuentoGrande?: number | null;
+  precioDistribuidor?: number | null;
   fotoUrl?: string | null;
 };
 
@@ -100,6 +101,13 @@ export function ProductoForm({
             type="number"
             step="0.01"
             defaultValue={d.precioDescuentoGrande?.toString()}
+          />
+          <Campo
+            label="Precio distribuidor"
+            name="precioDistribuidor"
+            type="number"
+            step="0.01"
+            defaultValue={d.precioDistribuidor?.toString()}
           />
         </div>
       )}

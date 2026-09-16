@@ -65,6 +65,7 @@ function datosDesdeFormulario(formData: FormData) {
     precioLista: numeroOpcional(formData.get("precioLista")),
     precioDescuentoChico: numeroOpcional(formData.get("precioDescuentoChico")),
     precioDescuentoGrande: numeroOpcional(formData.get("precioDescuentoGrande")),
+    precioDistribuidor: numeroOpcional(formData.get("precioDistribuidor")),
   };
 }
 

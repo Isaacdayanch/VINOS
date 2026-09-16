@@ -47,6 +47,7 @@ model Producto {
   precioLista           Float?
   precioDescuentoChico  Float?
   precioDescuentoGrande Float?
+  precioDistribuidor    Float?
   createdAt             DateTime @default(now())
 
   entradas       EntradaLinea[]

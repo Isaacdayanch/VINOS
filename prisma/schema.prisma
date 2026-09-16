@@ -50,10 +50,11 @@ model Producto {
   precioDistribuidor    Float?
   createdAt             DateTime @default(now())
 
-  entradas       EntradaLinea[]
-  salidas        Salida[]
-  ordenLineas    OrdenLinea[]
-  preciosCliente PrecioClienteProducto[]
+  entradas               EntradaLinea[]
+  salidas                Salida[]
+  ordenLineas            OrdenLinea[]
+  preciosCliente         PrecioClienteProducto[]
+  notaConsignacionLineas NotaConsignacionLinea[]
 }
 
 model Cliente {
@@ -147,19 +148,20 @@ model OrdenLinea {
 }
 
 model Salida {
-  id            String   @id @default(cuid())
-  fecha         DateTime
-  productoId    String
-  botellas      Int
-  motivo        String // "Venta", "Muestra/Degustación", "Consumo personal", "Merma/Otro"
-  costoUnitario Float? // costo por botella al momento de salir (para "Consumo personal")
-  socioId       String? // quién se la llevó, si motivo = "Consumo personal" y no fue compartida
-  dividido      Boolean  @default(false) // true = Isaac y Beto se la repartieron, no genera deuda
-  montoRepuesto Float? // si en "Consumo personal" repuso el dinero de la botella a Caja/Cuenta
-  cuentaRepuesto Cuenta? // dónde repuso el dinero (si montoRepuesto tiene valor)
-  ordenId       String?
-  notas         String?
-  createdAt     DateTime @default(now())
+  id                 String   @id @default(cuid())
+  fecha              DateTime
+  productoId         String
+  botellas           Int
+  motivo             String // "Venta", "Muestra/Degustación", "Consumo personal", "Merma/Otro"
+  costoUnitario      Float? // costo por botella al momento de salir (para "Consumo personal")
+  socioId            String? // quién se la llevó, si motivo = "Consumo personal" y no fue compartida
+  dividido           Boolean  @default(false) // true = Isaac y Beto se la repartieron, no genera deuda
+  montoRepuesto      Float? // si en "Consumo personal" repuso el dinero de la botella a Caja/Cuenta
+  cuentaRepuesto     Cuenta? // dónde repuso el dinero (si montoRepuesto tiene valor)
+  ordenId            String?
+  notaConsignacionId String?
+  notas              String?
+  createdAt          DateTime @default(now())
 
   producto Producto @relation(fields: [productoId], references: [id])
   socio    Socio?   @relation(fields: [socioId], references: [id])
@@ -197,4 +199,51 @@ model Pago {
 
   pedido Pedido? @relation(fields: [pedidoId], references: [id])
   socio  Socio?  @relation(fields: [socioId], references: [id])
+}
+
+model Distribuidor {
+  id        String   @id @default(cuid())
+  nombre    String
+  telefono  String?
+  notas     String?
+  createdAt DateTime @default(now())
+
+  notasConsignacion NotaConsignacion[]
+}
+
+model NotaConsignacion {
+  id             String   @id @default(cuid())
+  folio          String   @unique
+  fecha          DateTime
+  distribuidorId String
+  createdAt      DateTime @default(now())
+
+  distribuidor Distribuidor            @relation(fields: [distribuidorId], references: [id])
+  lineas       NotaConsignacionLinea[]
+  cobros       CobroConsignacion[]
+}
+
+model NotaConsignacionLinea {
+  id                 String @id @default(cuid())
+  notaConsignacionId String
+  productoId         String
+  cantidadBotellas   Int
+  precioUnitario     Float
+  costoUnitario      Float // costo por botella al momento de entregarla (para calcular margen)
+
+  notaConsignacion NotaConsignacion @relation(fields: [notaConsignacionId], references: [id])
+  producto         Producto         @relation(fields: [productoId], references: [id])
+}
+
+model CobroConsignacion {
+  id                 String   @id @default(cuid())
+  notaConsignacionId String
+  fecha              DateTime
+  monto              Float
+  cuenta             Cuenta   @default(EFECTIVO)
+  comisionPct        Float    @default(0)
+  metodoPago         String?
+  notas              String?
+
+  notaConsignacion NotaConsignacion @relation(fields: [notaConsignacionId], references: [id])
 }

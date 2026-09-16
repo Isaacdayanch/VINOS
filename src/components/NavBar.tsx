@@ -71,6 +71,13 @@ const iconos: Record<string, (props: SVGProps<SVGSVGElement>) => React.ReactElem
       <path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5" />
     </Icono>
   ),
+  "/distribuidores": (p) => (
+    <Icono {...p}>
+      <path d="M4 20V9l8-5 8 5v11" />
+      <path d="M9 20v-6h6v6" />
+      <path d="M4 9h16" />
+    </Icono>
+  ),
   "/recibos": (p) => (
     <Icono {...p}>
       <path d="M6 3h12v18l-2.5-1.5L13 21l-2.5-1.5L8 21l-2-1.5V3Z" />
@@ -87,6 +94,7 @@ const links = [
   { href: "/ordenes", label: "Órdenes de clientes", disponible: true },
   { href: "/precios", label: "Precios", disponible: true },
   { href: "/clientes", label: "Clientes", disponible: true },
+  { href: "/distribuidores", label: "Distribuidores", disponible: true },
   { href: "/recibos", label: "Recibos", disponible: true },
 ];
 

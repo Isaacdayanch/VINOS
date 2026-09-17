@@ -50,10 +50,22 @@ function FilaPrecio({ producto: p }: { producto: ProductoPrecio }) {
   const [precioDistribuidor, setPrecioDistribuidor] = useState<number | "">(
     p.precioDistribuidor ?? "",
   );
+  const [estado, setEstado] = useState<"listo" | "guardando" | "guardado" | "error">("listo");
   const accion = actualizarPreciosProducto.bind(null, p.id);
 
+  async function guardar(formData: FormData) {
+    setEstado("guardando");
+    try {
+      await accion(formData);
+      setEstado("guardado");
+      setTimeout(() => setEstado("listo"), 2000);
+    } catch {
+      setEstado("error");
+    }
+  }
+
   return (
-    <form action={accion} className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
+    <form action={guardar} className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <div className="w-9 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
           {p.fotoUrl ? (
@@ -115,12 +127,21 @@ function FilaPrecio({ producto: p }: { producto: ProductoPrecio }) {
         </label>
       </div>
 
-      <button
-        type="submit"
-        className="self-start rounded-md bg-wine text-white px-3 py-1.5 text-sm font-medium"
-      >
-        Guardar
-      </button>
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={estado === "guardando"}
+          className="self-start rounded-md bg-wine text-white px-3 py-1.5 text-sm font-medium cursor-pointer transition-colors hover:bg-wine-dark active:bg-wine-dark active:scale-[0.97] disabled:opacity-60 disabled:cursor-default"
+        >
+          {estado === "guardando" ? "Guardando..." : "Guardar"}
+        </button>
+        {estado === "guardado" && (
+          <span className="text-sm font-medium text-ok">✓ Guardado</span>
+        )}
+        {estado === "error" && (
+          <span className="text-sm font-medium text-warn">No se pudo guardar, intenta de nuevo</span>
+        )}
+      </div>
     </form>
   );
 }

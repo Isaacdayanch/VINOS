@@ -44,27 +44,27 @@ export default async function ReciboOrdenPage({
         <BotonImprimir />
       </div>
 
-      <div className="max-w-lg mx-auto w-full bg-background print:p-5 p-5 text-[13px] leading-snug">
-        <div className="text-center print-no-break pb-1 mb-3">
-          <h1 className="text-xl font-bold text-wine">Vinos</h1>
-          <p className="text-xs text-muted">Recibo de venta</p>
+      <div className="max-w-lg mx-auto w-full bg-background print:p-4 p-4 text-[12px] leading-snug">
+        <div className="text-center print-no-break pb-0.5 mb-2">
+          <h1 className="text-lg font-bold text-wine">Vinos</h1>
+          <p className="text-[11px] text-muted">Recibo de venta</p>
         </div>
 
-        <div className="print-no-break flex justify-between border-y border-border py-2 mb-3">
+        <div className="print-no-break flex justify-between border-y border-border py-1.5 mb-2">
           <div>
-            <p className="text-muted text-xs">Cliente</p>
+            <p className="text-muted text-[11px]">Cliente</p>
             <p className="font-medium">{orden.cliente.nombre.replace("Cliente Especial - ", "")}</p>
           </div>
           <div className="text-right">
-            <p className="text-muted text-xs">Folio</p>
+            <p className="text-muted text-[11px]">Folio</p>
             <p className="font-medium">{orden.folio}</p>
-            <p className="text-muted text-xs mt-0.5">
+            <p className="text-muted text-[11px] mt-0.5">
               {new Date(orden.fecha).toLocaleDateString("es-MX")}
             </p>
           </div>
         </div>
 
-        <table className="w-full border-separate border-spacing-0 mb-3">
+        <table className="w-full border-separate border-spacing-0 mb-2">
           <colgroup>
             <col />
             <col className="w-10" />
@@ -73,18 +73,18 @@ export default async function ReciboOrdenPage({
           </colgroup>
           <thead>
             <tr className="text-left text-muted border-b border-border">
-              <th className="pb-1.5 pr-2 font-medium">Producto</th>
-              <th className="pb-1.5 px-2 font-medium text-right">Cant.</th>
-              <th className="pb-1.5 px-2 font-medium text-right">Precio</th>
-              <th className="pb-1.5 pl-2 font-medium text-right">Total</th>
+              <th className="pb-1 pr-2 font-medium">Producto</th>
+              <th className="pb-1 px-2 font-medium text-right">Cant.</th>
+              <th className="pb-1 px-2 font-medium text-right">Precio</th>
+              <th className="pb-1 pl-2 font-medium text-right">Total</th>
             </tr>
           </thead>
           <tbody>
             {orden.lineas.map((l) => (
               <tr key={l.id} className="print-item border-b border-border/50 break-inside-avoid">
-                <td className="py-1.5 pr-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-10 rounded bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-0.5">
+                <td className="py-1 pr-2">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-7 rounded bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-0.5">
                       {l.producto.fotoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -93,19 +93,19 @@ export default async function ReciboOrdenPage({
                           className="max-w-full max-h-full object-contain"
                         />
                       ) : (
-                        <span className="text-xs">🍷</span>
+                        <span className="text-[10px]">🍷</span>
                       )}
                     </div>
-                    <span className="leading-snug">{l.producto.nombre}</span>
+                    <span className="leading-tight">{l.producto.nombre}</span>
                   </div>
                 </td>
-                <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
+                <td className="py-1 px-2 text-right tabular-nums whitespace-nowrap">
                   {l.cantidadBotellas}
                 </td>
-                <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
+                <td className="py-1 px-2 text-right tabular-nums whitespace-nowrap">
                   {formatoMXN(l.precioUnitario)}
                 </td>
-                <td className="py-1.5 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
+                <td className="py-1 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
                   {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
                 </td>
               </tr>
@@ -134,8 +134,8 @@ export default async function ReciboOrdenPage({
           </div>
 
           {pendiente > 0 && (
-            <div className="rounded-md border border-wine/30 bg-wine-light/40 p-3 text-center mt-3">
-              <p className="text-[10px] uppercase tracking-wide text-wine font-semibold mb-1.5">
+            <div className="rounded-md border border-wine/30 bg-wine-light/40 p-2 text-center mt-2">
+              <p className="text-[9px] uppercase tracking-wide text-wine font-semibold mb-1">
                 Pago por transferencia
               </p>
               <p className="font-bold">{DATOS_TRANSFERENCIA.beneficiario}</p>
@@ -148,7 +148,7 @@ export default async function ReciboOrdenPage({
             </div>
           )}
 
-          <p className="text-center text-[11px] text-muted pt-1 mt-3">¡Gracias por tu compra!</p>
+          <p className="text-center text-[10px] text-muted pt-0.5 mt-2">¡Gracias por tu compra!</p>
         </div>
       </div>
     </div>

@@ -35,7 +35,7 @@ const iconos: Record<string, (props: SVGProps<SVGSVGElement>) => React.ReactElem
   "/finanzas": (p) => (
     <Icono {...p}>
       <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v10M9.3 9.2c0-1.1 1-1.9 2.7-1.9s2.7.9 2.7 2c0 2.7-5.4 1.4-5.4 4.1 0 1.1 1.1 2 2.7 2s2.8-.8 2.8-1.9" />
+      <path d="M12 6.5v11M15.2 8.7h-4a2 2 0 0 0 0 4h1.6a2 2 0 0 1 0 4H8.8" />
     </Icono>
   ),
   "/stock": (p) => (
@@ -93,9 +93,7 @@ const links = [
   { href: "/pedidos", label: "Pedidos a proveedores", disponible: true },
   { href: "/ordenes", label: "Órdenes de clientes", disponible: true },
   { href: "/precios", label: "Precios", disponible: true },
-  { href: "/clientes", label: "Clientes", disponible: true },
   { href: "/distribuidores", label: "Distribuidores", disponible: true },
-  { href: "/recibos", label: "Recibos", disponible: true },
 ];
 
 export function NavBar() {

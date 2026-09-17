@@ -29,14 +29,18 @@ export default async function ClientesPage() {
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {clientes.map((c) => (
-          <div key={c.id} className="p-4 flex items-center justify-between gap-3">
+          <Link
+            key={c.id}
+            href={`/clientes/${c.id}`}
+            className="p-4 flex items-center justify-between gap-3 hover:bg-wine-light/40"
+          >
             <div className="min-w-0">
               <p className="font-medium truncate">{c.nombre.replace("Cliente Especial - ", "")}</p>
               <p className="text-xs text-muted">
                 {c.telefono ?? "Sin teléfono"} · {etiquetaCategoria[c.categoriaPrecio]}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
         {clientes.length === 0 && (
           <p className="p-6 text-center text-muted text-sm">

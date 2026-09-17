@@ -37,3 +37,26 @@ export async function crearClienteRapido(nombre: string) {
   revalidatePath("/clientes");
   return { id: cliente.id, nombre: cliente.nombre };
 }
+
+export async function actualizarPrecioCliente(
+  clienteId: string,
+  productoId: string,
+  formData: FormData,
+) {
+  const valor = formData.get("precio");
+  const precio = valor === null || valor === "" ? null : Number(valor);
+
+  if (precio === null || Number.isNaN(precio) || precio <= 0) {
+    // Sin precio válido = quitar el precio especial, vuelve a usar el de lista.
+    await prisma.precioClienteProducto.deleteMany({ where: { clienteId, productoId } });
+  } else {
+    await prisma.precioClienteProducto.upsert({
+      where: { clienteId_productoId: { clienteId, productoId } },
+      create: { clienteId, productoId, precio },
+      update: { precio },
+    });
+  }
+
+  revalidatePath(`/clientes/${clienteId}`);
+  revalidatePath("/ordenes/nueva");
+}

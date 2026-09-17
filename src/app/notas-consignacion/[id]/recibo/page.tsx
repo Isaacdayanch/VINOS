@@ -40,7 +40,7 @@ export default async function ReciboNotaConsignacionPage({
         <BotonImprimir />
       </div>
 
-      <div className="max-w-lg mx-auto w-full bg-background print:p-4 p-4 text-[12px] leading-snug">
+      <div className="max-w-xl mx-auto w-full bg-background print:p-4 p-4 text-[12px] leading-snug">
         <div className="text-center print-no-break pb-0.5 mb-2">
           <h1 className="text-lg font-bold text-wine">Vinos</h1>
           <p className="text-[11px] text-muted">Nota de consignación</p>
@@ -64,15 +64,23 @@ export default async function ReciboNotaConsignacionPage({
           <colgroup>
             <col />
             <col className="w-10" />
-            <col className="w-16" />
+            <col className="w-[4.5rem]" />
+            <col className="w-[4.5rem]" />
             <col className="w-16" />
           </colgroup>
           <thead>
             <tr className="text-left text-muted border-b border-border">
               <th className="pb-1 pr-2 font-medium">Producto</th>
-              <th className="pb-1 px-2 font-medium text-right">Cant.</th>
-              <th className="pb-1 px-2 font-medium text-right">Precio</th>
-              <th className="pb-1 pl-2 font-medium text-right">Total</th>
+              <th className="pb-1 px-1.5 font-medium text-right">Cant.</th>
+              <th className="pb-1 px-1.5 font-medium text-right">Vende
+                <br />
+                mínimo a
+              </th>
+              <th className="pb-1 px-1.5 font-medium text-right">Tu
+                <br />
+                precio
+              </th>
+              <th className="pb-1 pl-1.5 font-medium text-right">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -95,13 +103,16 @@ export default async function ReciboNotaConsignacionPage({
                     <span className="leading-tight">{l.producto.nombre}</span>
                   </div>
                 </td>
-                <td className="py-1 px-2 text-right tabular-nums whitespace-nowrap">
+                <td className="py-1 px-1.5 text-right tabular-nums whitespace-nowrap">
                   {l.cantidadBotellas}
                 </td>
-                <td className="py-1 px-2 text-right tabular-nums whitespace-nowrap">
+                <td className="py-1 px-1.5 text-right tabular-nums whitespace-nowrap">
+                  {formatoMXN(l.producto.precioLista ?? 0)}
+                </td>
+                <td className="py-1 px-1.5 text-right tabular-nums whitespace-nowrap">
                   {formatoMXN(l.precioUnitario)}
                 </td>
-                <td className="py-1 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
+                <td className="py-1 pl-1.5 text-right tabular-nums font-medium whitespace-nowrap">
                   {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
                 </td>
               </tr>
@@ -127,8 +138,9 @@ export default async function ReciboNotaConsignacionPage({
             </div>
           </div>
 
-          <p className="text-center text-[10px] text-muted pt-0.5 mt-2">
-            Mercancía entregada en consignación. Se liquida conforme se vaya vendiendo.
+          <p className="text-center text-[9px] text-muted pt-0.5 mt-2 leading-snug">
+            Mercancía entregada en consignación. El distribuidor es responsable de resguardarla
+            y de regresar, por cada botella, la mercancía sin vender o su pago correspondiente.
           </p>
         </div>
       </div>

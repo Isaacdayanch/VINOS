@@ -98,7 +98,7 @@ export default async function DetalleNotaConsignacionPage({
               <div>
                 <p>{new Date(c.fecha).toLocaleDateString("es-MX")}</p>
                 <p className="text-xs text-muted">
-                  {c.cuenta === "EFECTIVO" ? "Efectivo" : "Cuenta"}
+                  {c.cuenta === "EFECTIVO" ? "Efectivo" : "Transferencia"}
                   {c.cuenta === "CUENTA" && c.comisionPct > 0 ? ` (comisión ${c.comisionPct}%)` : ""}
                   {c.metodoPago ? ` · ${c.metodoPago}` : ""}
                 </p>
@@ -134,17 +134,17 @@ export default async function DetalleNotaConsignacionPage({
                 className="rounded-md border border-border bg-surface px-3 py-2"
               >
                 <option value="EFECTIVO">Efectivo (a Caja)</option>
-                <option value="CUENTA">Cuenta / tarjeta</option>
+                <option value="CUENTA">Transferencia</option>
               </select>
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Comisión % (solo si fue a Cuenta)</span>
+              <span className="font-medium">Comisión % (solo si fue por Transferencia)</span>
               <input
                 name="comisionPct"
                 type="number"
                 step="0.1"
                 min="0"
-                defaultValue={2}
+                defaultValue={0.6}
                 className="rounded-md border border-border bg-surface px-3 py-2"
               />
             </label>

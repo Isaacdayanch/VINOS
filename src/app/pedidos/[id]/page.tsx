@@ -200,14 +200,23 @@ export default async function DetallePedidoPage({
               <div key={p.id} className="p-3 flex items-center justify-between gap-3 text-sm">
                 <div className="min-w-0">
                   <p className="text-xs text-muted">
-                    {new Date(p.fecha).toLocaleDateString("es-MX")}
+                    {new Date(p.fecha).toLocaleDateString("es-MX")} ·{" "}
+                    {p.origen === "INYECCION_CAPITAL" ? "Inyección de capital" : "Reinversión"}
                     {p.socio ? ` · ${p.socio.nombre}` : p.dividido ? " · Isaac y Beto" : ""}
                   </p>
                   {p.notas && <p className="truncate">{p.notas}</p>}
                 </div>
-                <span className="font-medium whitespace-nowrap">
-                  {p.moneda === "USD" ? `$${p.monto} USD` : formatoMXN(p.monto)}
-                </span>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="font-medium whitespace-nowrap">
+                    {p.moneda === "USD" ? `$${p.monto} USD` : formatoMXN(p.monto)}
+                  </span>
+                  <Link
+                    href={`/finanzas/pagos/${p.id}/editar?volver=${encodeURIComponent(`/pedidos/${pedido.id}`)}`}
+                    className="text-xs text-wine underline"
+                  >
+                    Editar
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
@@ -274,7 +283,7 @@ export default async function DetallePedidoPage({
                     defaultValue="CUENTA"
                     className="rounded-md border border-border bg-surface px-3 py-2"
                   >
-                    <option value="CUENTA">Cuenta</option>
+                    <option value="CUENTA">Transferencia</option>
                     <option value="EFECTIVO">Caja (efectivo)</option>
                   </select>
                 </label>

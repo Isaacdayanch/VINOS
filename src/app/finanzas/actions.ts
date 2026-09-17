@@ -11,7 +11,7 @@ function numeroOpcional(valor: FormDataEntryValue | null) {
   return Number.isNaN(n) ? null : n;
 }
 
-export async function crearPago(formData: FormData) {
+function datosPago(formData: FormData) {
   const fecha = String(formData.get("fecha") ?? "");
   const pedidoId = String(formData.get("pedidoId") ?? "") || null;
   const concepto = String(formData.get("concepto") ?? "").trim();
@@ -33,25 +33,49 @@ export async function crearPago(formData: FormData) {
     throw new Error("Faltan datos del pago");
   }
 
+  return {
+    fecha,
+    pedidoId,
+    concepto,
+    moneda,
+    monto,
+    tipoCambio,
+    cuenta,
+    origen,
+    esMaaser,
+    metodoPago,
+    socioId,
+    dividido,
+    notas,
+  };
+}
+
+export async function crearPago(formData: FormData) {
+  const datos = datosPago(formData);
+
   await prisma.pago.create({
-    data: {
-      fecha: new Date(fecha),
-      pedidoId,
-      concepto,
-      moneda,
-      monto,
-      tipoCambio,
-      cuenta,
-      origen,
-      esMaaser,
-      metodoPago,
-      socioId,
-      dividido,
-      notas,
-    },
+    data: { ...datos, fecha: new Date(datos.fecha) },
   });
 
   revalidatePath("/finanzas");
+  redirect("/finanzas");
+}
+
+export async function actualizarPago(pagoId: string, formData: FormData) {
+  const datos = datosPago(formData);
+  const volver = String(formData.get("volver") ?? "").trim();
+
+  await prisma.pago.update({
+    where: { id: pagoId },
+    data: { ...datos, fecha: new Date(datos.fecha) },
+  });
+
+  revalidatePath("/finanzas");
+  if (datos.pedidoId) revalidatePath(`/pedidos/${datos.pedidoId}`);
+  if (volver.startsWith("/")) {
+    revalidatePath(volver);
+    redirect(volver);
+  }
   redirect("/finanzas");
 }
 

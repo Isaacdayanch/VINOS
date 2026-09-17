@@ -150,7 +150,7 @@ export function ConsumoPersonalForm({
               className="rounded-md border border-border bg-surface px-3 py-2"
             >
               <option value="EFECTIVO">Efectivo (a Caja)</option>
-              <option value="CUENTA">Cuenta / tarjeta</option>
+              <option value="CUENTA">Transferencia</option>
             </select>
           </label>
           <p className="text-xs text-muted">

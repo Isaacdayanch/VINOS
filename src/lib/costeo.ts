@@ -158,12 +158,13 @@ export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: num
  * saldo de Caja/Cuenta, y el saldo entre socios (quién le debe a quién).
  */
 export async function calcularFinanzas(): Promise<ResumenFinanzas> {
-  const [resumenInventario, socios, pagos, cobros, ordenes, salidasPersonales] =
+  const [resumenInventario, socios, pagos, cobros, cobrosConsignacion, ordenes, salidasPersonales] =
     await Promise.all([
       calcularResumenInventario(),
       prisma.socio.findMany(),
       prisma.pago.findMany(),
       prisma.cobro.findMany(),
+      prisma.cobroConsignacion.findMany(),
       prisma.orden.findMany({ include: { lineas: true } }),
       prisma.salida.findMany({ where: { motivo: "Consumo personal" } }),
     ]);
@@ -230,6 +231,15 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   }
 
   for (const c of cobros) {
+    const montoNeto = c.monto * (1 - c.comisionPct / 100);
+    if (c.cuenta === "EFECTIVO") saldoCaja += montoNeto;
+    else saldoCuenta += montoNeto;
+  }
+
+  // Lo que pagan los distribuidores también es efectivo/transferencia real,
+  // aunque esa venta todavía no cuente como ganancia reconocida (eso se
+  // queda en el circuito separado de Distribuidores).
+  for (const c of cobrosConsignacion) {
     const montoNeto = c.monto * (1 - c.comisionPct / 100);
     if (c.cuenta === "EFECTIVO") saldoCaja += montoNeto;
     else saldoCuenta += montoNeto;
@@ -310,6 +320,102 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     maaserDado,
     saldoMaaser,
   };
+}
+
+export type MovimientoCuenta = {
+  id: string;
+  fecha: Date;
+  tipo: "entrada" | "salida";
+  monto: number; // siempre positivo; el signo lo da "tipo"
+  concepto: string;
+  detalle: string | null;
+  href: string | null;
+};
+
+/**
+ * Historial de movimientos de una cuenta (Efectivo o Transferencia): junta
+ * cobros de órdenes, pagos de distribuidores, pagos/gastos (reinversión) y
+ * reposiciones de consumo personal — los mismos que usa calcularFinanzas
+ * para sacar el saldo, para que cuadren siempre entre sí.
+ */
+export async function calcularMovimientosCuenta(
+  cuenta: "EFECTIVO" | "CUENTA",
+): Promise<{ saldo: number; movimientos: MovimientoCuenta[] }> {
+  const [cobros, cobrosConsignacion, pagos, salidasRepuesto] = await Promise.all([
+    prisma.cobro.findMany({
+      where: { cuenta },
+      include: { orden: { include: { cliente: true } } },
+    }),
+    prisma.cobroConsignacion.findMany({
+      where: { cuenta },
+      include: { notaConsignacion: { include: { distribuidor: true } } },
+    }),
+    prisma.pago.findMany({
+      where: { cuenta, origen: "REINVERSION" },
+      include: { pedido: true },
+    }),
+    prisma.salida.findMany({
+      where: { motivo: "Consumo personal", cuentaRepuesto: cuenta, montoRepuesto: { not: null } },
+    }),
+  ]);
+
+  const movimientos: MovimientoCuenta[] = [];
+
+  for (const c of cobros) {
+    movimientos.push({
+      id: `cobro-${c.id}`,
+      fecha: c.fecha,
+      tipo: "entrada",
+      monto: c.monto * (1 - c.comisionPct / 100),
+      concepto: `Cobro — ${c.orden.cliente.nombre.replace("Cliente Especial - ", "")}`,
+      detalle: c.orden.folio,
+      href: `/ordenes/${c.orden.id}`,
+    });
+  }
+
+  for (const c of cobrosConsignacion) {
+    movimientos.push({
+      id: `cobroconsig-${c.id}`,
+      fecha: c.fecha,
+      tipo: "entrada",
+      monto: c.monto * (1 - c.comisionPct / 100),
+      concepto: `Pago de ${c.notaConsignacion.distribuidor.nombre}`,
+      detalle: c.notaConsignacion.folio,
+      href: `/notas-consignacion/${c.notaConsignacion.id}`,
+    });
+  }
+
+  for (const p of pagos) {
+    movimientos.push({
+      id: `pago-${p.id}`,
+      fecha: p.fecha,
+      tipo: "salida",
+      monto: montoEnMXN(p.moneda, p.monto, p.tipoCambio),
+      concepto: p.concepto,
+      detalle: p.pedido?.folio ?? "Gasto interno",
+      href: p.pedido ? `/pedidos/${p.pedido.id}` : `/finanzas/pagos/${p.id}/editar`,
+    });
+  }
+
+  for (const s of salidasRepuesto) {
+    movimientos.push({
+      id: `repuesto-${s.id}`,
+      fecha: s.fecha,
+      tipo: "entrada",
+      monto: s.montoRepuesto ?? 0,
+      concepto: "Reposición de consumo personal",
+      detalle: null,
+      href: `/finanzas/consumo-personal/${s.id}/editar`,
+    });
+  }
+
+  movimientos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+  const saldo = movimientos.reduce(
+    (acc, m) => acc + (m.tipo === "entrada" ? m.monto : -m.monto),
+    0,
+  );
+
+  return { saldo, movimientos };
 }
 
 export function formatearCajasYBotellas(botellas: number, piezasPorCaja: number) {

@@ -59,7 +59,7 @@ export default async function ConsumoPersonalListaPage() {
                     <>
                       {" "}
                       · repuso {formatoMXN(s.montoRepuesto)} (
-                      {s.cuentaRepuesto === "CUENTA" ? "Cuenta" : "Efectivo"})
+                      {s.cuentaRepuesto === "CUENTA" ? "Transferencia" : "Efectivo"})
                     </>
                   ) : null}
                 </p>

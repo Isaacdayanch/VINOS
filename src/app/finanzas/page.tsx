@@ -49,9 +49,17 @@ export default async function FinanzasPage() {
         <StatCard label="Botellas en stock" value={finanzas.botellasStock.toString()} />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard label="💵 Caja (efectivo)" value={formatoMXN(finanzas.saldoCaja)} />
-        <StatCard label="🏦 Cuenta" value={formatoMXN(finanzas.saldoCuenta)} />
+      <div className="flex items-center justify-between">
+        <div className="grid grid-cols-2 gap-3 flex-1">
+          <StatCard label="💵 Efectivo" value={formatoMXN(finanzas.saldoCaja)} />
+          <StatCard label="🏦 Transferencia" value={formatoMXN(finanzas.saldoCuenta)} />
+        </div>
+        <Link
+          href="/finanzas/cuentas"
+          className="ml-3 shrink-0 rounded-full bg-wine text-white text-xs font-medium px-3 py-2 whitespace-nowrap"
+        >
+          Cuentas →
+        </Link>
       </div>
 
       <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
@@ -70,29 +78,29 @@ export default async function FinanzasPage() {
             <p className="font-semibold">{formatoMXN(finanzas.pagadoDesdeCaja)}</p>
           </div>
           <div>
-            <p className="text-muted text-xs">Pagado desde Cuenta</p>
+            <p className="text-muted text-xs">Pagado desde Transferencia</p>
             <p className="font-semibold">{formatoMXN(finanzas.pagadoDesdeCuenta)}</p>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
-        <h2 className="font-semibold">Maaser</h2>
+      <div className="rounded-lg border border-warn/40 bg-warn-bg p-4 flex flex-col gap-3">
+        <h2 className="font-semibold text-warn">Maaser</h2>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <p className="text-muted text-xs">Debido (10% de la ganancia)</p>
-            <p className="font-semibold">{formatoMXN(finanzas.maaserDebido)}</p>
+            <p className="font-semibold text-foreground">{formatoMXN(finanzas.maaserDebido)}</p>
           </div>
           <div>
             <p className="text-muted text-xs">Dado</p>
-            <p className="font-semibold">{formatoMXN(finanzas.maaserDado)}</p>
+            <p className="font-semibold text-foreground">{formatoMXN(finanzas.maaserDado)}</p>
           </div>
         </div>
-        <p className="text-sm">
+        <p className="text-sm text-foreground">
           {finanzas.saldoMaaser >= 0 ? (
             <>
               Maaser a favor:{" "}
-              <span className="font-bold text-wine">{formatoMXN(finanzas.saldoMaaser)}</span>
+              <span className="font-bold text-warn">{formatoMXN(finanzas.saldoMaaser)}</span>
             </>
           ) : (
             <>
@@ -166,13 +174,21 @@ export default async function FinanzasPage() {
               <p className="text-xs text-muted">
                 {new Date(p.fecha).toLocaleDateString("es-MX")} ·{" "}
                 {p.origen === "INYECCION_CAPITAL" ? "Inyección de capital" : "Reinversión"} ·{" "}
-                {p.cuenta === "EFECTIVO" ? "Caja" : "Cuenta"}
+                {p.cuenta === "EFECTIVO" ? "Caja" : "Transferencia"}
                 {p.socio ? ` · ${p.socio.nombre}` : p.dividido ? " · Isaac y Beto" : ""}
               </p>
             </div>
-            <span className="font-semibold whitespace-nowrap">
-              {p.moneda === "USD" ? `$${p.monto} USD` : formatoMXN(p.monto)}
-            </span>
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="font-semibold whitespace-nowrap">
+                {p.moneda === "USD" ? `$${p.monto} USD` : formatoMXN(p.monto)}
+              </span>
+              <Link
+                href={`/finanzas/pagos/${p.id}/editar?volver=${encodeURIComponent("/finanzas")}`}
+                className="text-xs text-wine underline"
+              >
+                Editar
+              </Link>
+            </div>
           </div>
         ))}
         {pagos.length === 0 && (

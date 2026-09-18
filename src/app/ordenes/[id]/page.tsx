@@ -41,7 +41,8 @@ export default async function DetalleOrdenPage({
         </div>
         <div className="flex items-center justify-between">
           <p className="text-muted text-sm">
-            {orden.cliente.nombre.replace("Cliente Especial - ", "")} · {orden.estatus}
+            {orden.cliente.nombre.replace("Cliente Especial - ", "")} ·{" "}
+            {pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
           </p>
           <div className="flex gap-3">
             <Link

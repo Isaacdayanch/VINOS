@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function OrdenesPage() {
   const ordenes = await prisma.orden.findMany({
-    include: { lineas: true, cliente: true },
+    include: { lineas: true, cliente: true, cobros: true },
     orderBy: { fecha: "desc" },
   });
 
@@ -43,6 +43,8 @@ export default async function OrdenesPage() {
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {ordenes.map((o) => {
           const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+          const cobrado = o.cobros.reduce((acc, c) => acc + c.monto, 0);
+          const pendiente = total - cobrado;
           return (
             <Link
               key={o.id}
@@ -54,7 +56,10 @@ export default async function OrdenesPage() {
                   {o.folio} · {o.cliente.nombre.replace("Cliente Especial - ", "")}
                 </p>
                 <p className="text-xs text-muted">
-                  {new Date(o.fecha).toLocaleDateString("es-MX")} · {o.estatus}
+                  {new Date(o.fecha).toLocaleDateString("es-MX")} ·{" "}
+                  <span className={pendiente > 0.5 ? "text-warn" : "text-ok"}>
+                    {pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
+                  </span>
                 </p>
               </div>
               <span className="font-semibold text-wine whitespace-nowrap">{formatoMXN(total)}</span>

@@ -8,29 +8,29 @@ export default async function ProductosPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-wine">Productos</h1>
-          <p className="text-muted text-sm">Tu catálogo de vinos</p>
-        </div>
-        <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-wine">Productos</h1>
+            <p className="text-muted text-sm">Tu catálogo de vinos</p>
+          </div>
           <Link
             href="/productos/nuevo"
             className="rounded-md bg-wine text-white px-3 py-2 text-sm font-medium whitespace-nowrap"
           >
             + Nuevo
           </Link>
-          <div className="flex gap-3 text-xs">
-            <Link href="/productos/catalogo?precios=si" className="text-wine underline whitespace-nowrap">
-              Catálogo con precios
-            </Link>
-            <Link href="/productos/catalogo" className="text-wine underline whitespace-nowrap">
-              Catálogo sin precios
-            </Link>
-            <Link href="/productos/publicar-catalogo" className="text-wine underline whitespace-nowrap">
-              Catálogo público
-            </Link>
-          </div>
+        </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+          <Link href="/productos/catalogo?precios=si" className="text-wine underline whitespace-nowrap">
+            Catálogo con precios
+          </Link>
+          <Link href="/productos/catalogo" className="text-wine underline whitespace-nowrap">
+            Catálogo sin precios
+          </Link>
+          <Link href="/productos/publicar-catalogo" className="text-wine underline whitespace-nowrap">
+            Catálogo público
+          </Link>
         </div>
       </div>
 

@@ -39,12 +39,12 @@ export default async function DetalleOrdenPage({
             {new Date(orden.fecha).toLocaleDateString("es-MX")}
           </span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <p className="text-muted text-sm">
             {orden.cliente.nombre.replace("Cliente Especial - ", "")} ·{" "}
             {pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Link
               href={`/ordenes/${orden.id}/editar`}
               className="text-sm text-wine underline whitespace-nowrap"

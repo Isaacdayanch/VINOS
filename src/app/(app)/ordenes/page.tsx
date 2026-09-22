@@ -25,7 +25,7 @@ export default async function OrdenesPage() {
         </Link>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Link
           href="/clientes"
           className="rounded-full bg-wine text-white text-xs font-medium px-3 py-2 whitespace-nowrap"

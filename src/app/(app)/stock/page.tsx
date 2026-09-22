@@ -35,7 +35,7 @@ export default async function StockPage() {
           >
             Pedidos a proveedores
           </Link>
-          <div className="flex gap-3 text-xs">
+          <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-xs">
             <Link href="/stock/imprimir?precios=si" className="text-wine underline whitespace-nowrap">
               Imprimir con precios
             </Link>

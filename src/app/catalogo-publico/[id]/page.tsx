@@ -63,6 +63,13 @@ export default async function FichaVinoPublicaPage({
           </h1>
           {producto.categoria && <p className="text-muted text-sm">{producto.categoria}</p>}
           {precio && <p className="text-xl font-semibold text-wine mt-1">{formatoMXN(precio)}</p>}
+          <button
+            type="button"
+            disabled
+            className="mt-3 w-full rounded-md bg-wine/40 text-white px-4 py-3 text-sm font-medium cursor-not-allowed"
+          >
+            🛒 Próximamente: haz tu pedido aquí
+          </button>
         </div>
 
         {(producto.varietal || producto.region || producto.cuerpo || producto.alcohol) && (

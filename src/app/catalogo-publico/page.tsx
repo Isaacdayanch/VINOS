@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import { BotonImprimir } from "@/components/BotonImprimir";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,7 @@ export const metadata = {
 };
 
 type ProductoPublicado = {
+  id?: string;
   nombre: string;
   fotoUrl: string | null;
   categoria: string | null;
@@ -44,8 +46,8 @@ export default async function CatalogoPublicoPage() {
           break-inside:avoid) — con flujo normal + inline-block sí lo respetan.
         */}
         <div>
-          {productos.map((p, i) => (
-            <div key={i} className="inline-block align-top w-1/2 sm:w-1/3 p-2">
+          {productos.map((p, i) => {
+            const tarjeta = (
               <div className="print-item rounded-lg border border-border bg-surface p-3 flex flex-col gap-2 break-inside-avoid">
                 <div className="w-full aspect-[3/5] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-2">
                   {p.fotoUrl ? (
@@ -67,8 +69,19 @@ export default async function CatalogoPublicoPage() {
                   )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+            return (
+              <div key={p.id ?? i} className="inline-block align-top w-1/2 sm:w-1/3 p-2">
+                {p.id ? (
+                  <Link href={`/catalogo-publico/${p.id}`} className="block">
+                    {tarjeta}
+                  </Link>
+                ) : (
+                  tarjeta
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {productos.length === 0 && (

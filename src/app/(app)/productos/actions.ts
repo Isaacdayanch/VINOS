@@ -66,6 +66,13 @@ function datosDesdeFormulario(formData: FormData) {
     precioDescuentoChico: numeroOpcional(formData.get("precioDescuentoChico")),
     precioDescuentoGrande: numeroOpcional(formData.get("precioDescuentoGrande")),
     precioDistribuidor: numeroOpcional(formData.get("precioDistribuidor")),
+    descripcion: String(formData.get("descripcion") ?? "").trim() || null,
+    maridaje: String(formData.get("maridaje") ?? "").trim() || null,
+    notas: String(formData.get("notas") ?? "").trim() || null,
+    varietal: String(formData.get("varietal") ?? "").trim() || null,
+    region: String(formData.get("region") ?? "").trim() || null,
+    cuerpo: String(formData.get("cuerpo") ?? "").trim() || null,
+    alcohol: numeroOpcional(formData.get("alcohol")),
   };
 }
 
@@ -110,11 +117,37 @@ export async function actualizarProducto(productoId: string, formData: FormData)
   redirect("/productos");
 }
 
+const MAX_IMAGENES_EXTRA = 7;
+
+export async function agregarImagenExtra(productoId: string, formData: FormData) {
+  const archivo = formData.get("imagen");
+  if (!(archivo instanceof File) || archivo.size === 0) {
+    throw new Error("Elige una foto");
+  }
+  const actuales = await prisma.productoImagenExtra.count({ where: { productoId } });
+  if (actuales >= MAX_IMAGENES_EXTRA) {
+    throw new Error(`Ya tienes el máximo de ${MAX_IMAGENES_EXTRA} fotos extra`);
+  }
+  const url = await subirFotoProducto(archivo);
+  await prisma.productoImagenExtra.create({
+    data: { productoId, url, orden: actuales },
+  });
+
+  revalidatePath(`/productos/${productoId}/editar`);
+  revalidatePath(`/catalogo-publico/${productoId}`);
+}
+
+export async function eliminarImagenExtra(imagenId: string, productoId: string) {
+  await prisma.productoImagenExtra.delete({ where: { id: imagenId } });
+  revalidatePath(`/productos/${productoId}/editar`);
+  revalidatePath(`/catalogo-publico/${productoId}`);
+}
+
 export async function publicarCatalogo() {
   const productos = await prisma.producto.findMany({
     where: { activo: true },
     orderBy: { nombre: "asc" },
-    select: { nombre: true, fotoUrl: true, categoria: true, anio: true, precioLista: true },
+    select: { id: true, nombre: true, fotoUrl: true, categoria: true, anio: true, precioLista: true },
   });
 
   await prisma.catalogoPublicado.create({

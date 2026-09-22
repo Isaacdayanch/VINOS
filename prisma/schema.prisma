@@ -48,6 +48,13 @@ model Producto {
   precioDescuentoChico  Float?
   precioDescuentoGrande Float?
   precioDistribuidor    Float?
+  descripcion           String?
+  maridaje              String? // con qué comer
+  notas                 String? // notas de cata
+  varietal              String? // uva
+  region                String?
+  cuerpo                String? // Ligero / Medio / Lleno
+  alcohol               Float? // % de alcohol
   createdAt             DateTime @default(now())
 
   entradas               EntradaLinea[]
@@ -55,6 +62,17 @@ model Producto {
   ordenLineas            OrdenLinea[]
   preciosCliente         PrecioClienteProducto[]
   notaConsignacionLineas NotaConsignacionLinea[]
+  imagenesExtra          ProductoImagenExtra[]
+}
+
+model ProductoImagenExtra {
+  id         String   @id @default(cuid())
+  productoId String
+  url        String
+  orden      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  producto Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
 }
 
 model Cliente {

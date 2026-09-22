@@ -11,7 +11,9 @@ export function middleware(request: NextRequest) {
 
   if (DOMINIO_CATALOGO_PUBLICO && host === DOMINIO_CATALOGO_PUBLICO) {
     const url = request.nextUrl.clone();
-    if (url.pathname !== "/catalogo-publico") {
+    // Deja pasar el catálogo público y las fichas de cada vino (/catalogo-publico/[id]);
+    // cualquier otra ruta (o la raíz "/") se manda al catálogo, para no exponer el resto del sistema.
+    if (url.pathname !== "/catalogo-publico" && !url.pathname.startsWith("/catalogo-publico/")) {
       url.pathname = "/catalogo-publico";
       return NextResponse.rewrite(url);
     }

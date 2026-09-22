@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { sugerirMaridaje } from "@/lib/maridaje";
 
 type ProductoDefaults = {
   nombre?: string;
@@ -16,6 +17,13 @@ type ProductoDefaults = {
   precioDescuentoGrande?: number | null;
   precioDistribuidor?: number | null;
   fotoUrl?: string | null;
+  descripcion?: string | null;
+  maridaje?: string | null;
+  notas?: string | null;
+  varietal?: string | null;
+  region?: string | null;
+  cuerpo?: string | null;
+  alcohol?: number | null;
 };
 
 export function ProductoForm({
@@ -78,6 +86,8 @@ export function ProductoForm({
         placeholder="Ej. 8"
       />
 
+      <FichaCliente d={d} />
+
       {!ocultarPrecios && (
         <div className="rounded-lg border border-border p-4 flex flex-col gap-4">
           <p className="text-sm font-medium">Precios de venta (opcional, se puede ajustar en cada venta)</p>
@@ -116,6 +126,113 @@ export function ProductoForm({
         {botonTexto}
       </button>
     </form>
+  );
+}
+
+function FichaCliente({ d }: { d: ProductoDefaults }) {
+  const varietalRef = useRef<HTMLInputElement>(null);
+  const cuerpoRef = useRef<HTMLSelectElement>(null);
+  const maridajeRef = useRef<HTMLTextAreaElement>(null);
+
+  function sugerir() {
+    const sugerencia = sugerirMaridaje(varietalRef.current?.value, cuerpoRef.current?.value);
+    if (maridajeRef.current) maridajeRef.current.value = sugerencia;
+  }
+
+  return (
+    <div className="rounded-lg border border-border p-4 flex flex-col gap-4">
+      <div>
+        <p className="text-sm font-medium">Ficha para el cliente (opcional)</p>
+        <p className="text-xs text-muted">
+          Esto se muestra en la página pública de cada vino. Si lo dejas vacío, nada más no
+          aparece esa sección.
+        </p>
+      </div>
+
+      <TextArea label="Descripción" name="descripcion" defaultValue={d.descripcion ?? undefined} />
+
+      <div className="grid grid-cols-2 gap-4">
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium">Uva / Varietal</span>
+          <input
+            ref={varietalRef}
+            name="varietal"
+            defaultValue={d.varietal ?? undefined}
+            placeholder="Ej. Cabernet Sauvignon"
+            className="rounded-md border border-border bg-surface px-3 py-2"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium">Cuerpo</span>
+          <select
+            ref={cuerpoRef}
+            name="cuerpo"
+            defaultValue={d.cuerpo ?? ""}
+            className="rounded-md border border-border bg-surface px-3 py-2"
+          >
+            <option value="">Sin especificar</option>
+            <option value="Ligero">Ligero</option>
+            <option value="Medio">Medio</option>
+            <option value="Lleno">Lleno</option>
+          </select>
+        </label>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Campo label="Región" name="region" defaultValue={d.region ?? undefined} />
+        <Campo
+          label="% Alcohol"
+          name="alcohol"
+          type="number"
+          step="0.1"
+          defaultValue={d.alcohol?.toString()}
+        />
+      </div>
+
+      <label className="flex flex-col gap-1 text-sm">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-medium">Con qué comer (maridaje)</span>
+          <button
+            type="button"
+            onClick={sugerir}
+            className="text-xs text-wine underline whitespace-nowrap"
+          >
+            Sugerir según la uva/cuerpo
+          </button>
+        </div>
+        <textarea
+          ref={maridajeRef}
+          name="maridaje"
+          defaultValue={d.maridaje ?? undefined}
+          rows={3}
+          className="rounded-md border border-border bg-surface px-3 py-2"
+        />
+      </label>
+
+      <TextArea label="Notas de cata" name="notas" defaultValue={d.notas ?? undefined} />
+    </div>
+  );
+}
+
+function TextArea({
+  label,
+  name,
+  defaultValue,
+}: {
+  label: string;
+  name: string;
+  defaultValue?: string;
+}) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      <span className="font-medium">{label}</span>
+      <textarea
+        name={name}
+        defaultValue={defaultValue}
+        rows={3}
+        className="rounded-md border border-border bg-surface px-3 py-2"
+      />
+    </label>
   );
 }
 

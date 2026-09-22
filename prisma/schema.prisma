@@ -235,6 +235,12 @@ model NotaConsignacionLinea {
   producto         Producto         @relation(fields: [productoId], references: [id])
 }
 
+model CatalogoPublicado {
+  id              String   @id @default(cuid())
+  fechaPublicado  DateTime @default(now())
+  productos       Json // foto congelada: [{ nombre, fotoUrl, categoria, anio, precioLista }]
+}
+
 model CobroConsignacion {
   id                 String   @id @default(cuid())
   notaConsignacionId String

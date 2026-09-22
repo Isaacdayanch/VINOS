@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { crearOrden } from "@/app/ordenes/actions";
-import { crearClienteRapido } from "@/app/clientes/actions";
+import { crearOrden } from "@/app/(app)/ordenes/actions";
+import { crearClienteRapido } from "@/app/(app)/clientes/actions";
 import { ProductoPicker } from "@/components/ProductoPicker";
 
 type Cliente = { id: string; nombre: string };

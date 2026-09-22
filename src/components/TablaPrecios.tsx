@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { actualizarPreciosProducto } from "@/app/precios/actions";
+import { actualizarPreciosProducto } from "@/app/(app)/precios/actions";
 import { formatoMXN } from "@/lib/costeo";
 
 type ProductoPrecio = {

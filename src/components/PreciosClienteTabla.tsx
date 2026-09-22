@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { actualizarPrecioCliente } from "@/app/clientes/actions";
+import { actualizarPrecioCliente } from "@/app/(app)/clientes/actions";
 
 type Fila = {
   productoId: string;

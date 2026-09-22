@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { crearConsumoPersonal } from "@/app/finanzas/actions";
+import { crearConsumoPersonal } from "@/app/(app)/finanzas/actions";
 import { DateField } from "@/components/DateField";
 import { ProductoPicker } from "@/components/ProductoPicker";
 import { formatoMXN } from "@/lib/costeo";

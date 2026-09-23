@@ -63,6 +63,7 @@ model Producto {
   preciosCliente         PrecioClienteProducto[]
   notaConsignacionLineas NotaConsignacionLinea[]
   imagenesExtra          ProductoImagenExtra[]
+  pendientesEntrega      PendienteEntrega[]
 }
 
 model ProductoImagenExtra {
@@ -85,8 +86,24 @@ model Cliente {
   notas           String?
   createdAt       DateTime        @default(now())
 
-  ordenes         Orden[]
-  preciosProducto PrecioClienteProducto[]
+  ordenes           Orden[]
+  preciosProducto   PrecioClienteProducto[]
+  pendientesEntrega PendienteEntrega[]
+}
+
+model PendienteEntrega {
+  id               String    @id @default(cuid())
+  clienteId        String
+  productoId       String
+  cantidadBotellas Int
+  fechaEstimada    DateTime?
+  notas            String?
+  entregado        Boolean   @default(false)
+  fechaEntregado   DateTime?
+  createdAt        DateTime  @default(now())
+
+  cliente  Cliente  @relation(fields: [clienteId], references: [id])
+  producto Producto @relation(fields: [productoId], references: [id])
 }
 
 model PrecioClienteProducto {

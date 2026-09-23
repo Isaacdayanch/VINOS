@@ -1,9 +1,15 @@
 import { PreciosClienteTabla } from "@/components/PreciosClienteTabla";
+import { DateField } from "@/components/DateField";
 import { formatoMXN } from "@/lib/costeo";
 import { asegurarCodigoCliente } from "@/lib/clienteCodigo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  crearPendienteEntrega,
+  marcarPendienteEntregado,
+  eliminarPendienteEntrega,
+} from "@/app/(app)/clientes/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +24,7 @@ export default async function DetalleClientePage({
 }: PageProps<"/clientes/[id]">) {
   const { id } = await params;
 
-  const [cliente, ordenes, productos, preciosGuardados] = await Promise.all([
+  const [cliente, ordenes, productos, preciosGuardados, pendientesEntrega] = await Promise.all([
     prisma.cliente.findUnique({ where: { id } }),
     prisma.orden.findMany({
       where: { clienteId: id },
@@ -27,6 +33,11 @@ export default async function DetalleClientePage({
     }),
     prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
     prisma.precioClienteProducto.findMany({ where: { clienteId: id } }),
+    prisma.pendienteEntrega.findMany({
+      where: { clienteId: id, entregado: false },
+      include: { producto: true },
+      orderBy: { createdAt: "asc" },
+    }),
   ]);
   if (!cliente) notFound();
   const codigo = await asegurarCodigoCliente(cliente);
@@ -84,6 +95,106 @@ export default async function DetalleClientePage({
         >
           Ver / mandar estado de cuenta →
         </Link>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <h2 className="font-semibold">Pendientes de entregar</h2>
+        <p className="text-xs text-muted -mt-1">
+          Para cuando ya te pagó una botella pero todavía no la tienes en stock (te va a llegar
+          después). No descuenta inventario hasta que le des &quot;Ya se la entregué&quot;.
+        </p>
+
+        {pendientesEntrega.length > 0 && (
+          <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
+            {pendientesEntrega.map((p) => {
+              const entregar = marcarPendienteEntregado.bind(null, p.id, cliente.id);
+              const eliminar = eliminarPendienteEntrega.bind(null, p.id, cliente.id);
+              return (
+                <div key={p.id} className="p-3 flex items-center gap-3 text-sm">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">
+                      {p.cantidadBotellas}× {p.producto.nombre}
+                    </p>
+                    <p className="text-xs text-muted">
+                      {p.fechaEstimada
+                        ? `Llega ${new Date(p.fechaEstimada).toLocaleDateString("es-MX")}`
+                        : "Sin fecha estimada"}
+                      {p.notas ? ` · ${p.notas}` : ""}
+                    </p>
+                  </div>
+                  <form action={entregar}>
+                    <button
+                      type="submit"
+                      className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap hover:bg-wine-dark active:scale-[0.97] transition-colors"
+                    >
+                      Ya se la entregué
+                    </button>
+                  </form>
+                  <form action={eliminar}>
+                    <button
+                      type="submit"
+                      className="text-xs text-muted hover:text-warn underline whitespace-nowrap"
+                    >
+                      Cancelar
+                    </button>
+                  </form>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <details className="rounded-lg border border-border bg-surface">
+          <summary className="p-3 cursor-pointer text-sm font-medium">
+            + Registrar pendiente de entrega
+          </summary>
+          <form
+            action={crearPendienteEntrega.bind(null, cliente.id)}
+            className="p-3 pt-0 flex flex-col gap-3"
+          >
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Vino</span>
+              <select
+                name="productoId"
+                required
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              >
+                <option value="">Elige un vino</option>
+                {productos.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.nombre}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Cantidad de botellas</span>
+              <input
+                name="cantidadBotellas"
+                type="number"
+                min="1"
+                defaultValue={1}
+                required
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              />
+            </label>
+            <DateField name="fechaEstimada" label="Fecha estimada de llegada (opcional)" />
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Notas (opcional)</span>
+              <input
+                name="notas"
+                placeholder="Ej. viene en el pedido de octubre"
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              />
+            </label>
+            <button
+              type="submit"
+              className="rounded-md bg-wine text-white px-4 py-2 text-sm font-medium hover:bg-wine-dark active:scale-[0.97] transition-colors"
+            >
+              Registrar
+            </button>
+          </form>
+        </details>
       </div>
 
       <div className="flex flex-col gap-2">

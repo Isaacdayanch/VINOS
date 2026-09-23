@@ -1,41 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
+
+const FADE_ORILLAS =
+  "linear-gradient(to bottom, transparent 0%, black 10%, black 55%, transparent 98%)";
 
 export function GaleriaVinoPublica({ fotos, nombre }: { fotos: string[]; nombre: string }) {
   const [activa, setActiva] = useState(0);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
   if (fotos.length === 0) return null;
 
+  function onScroll() {
+    const el = scrollerRef.current;
+    if (!el) return;
+    setActiva(Math.round(el.scrollLeft / el.clientWidth));
+  }
+
   return (
-    <div>
+    <div className="relative w-full">
       <div
-        className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden flex items-center justify-center"
-        style={{ background: "radial-gradient(ellipse at center, rgba(212,175,106,0.18), transparent 70%)" }}
+        ref={scrollerRef}
+        onScroll={onScroll}
+        className="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
       >
-        <Image
-          src={fotos[activa]}
-          alt={nombre}
-          fill
-          sizes="(max-width: 672px) 80vw, 540px"
-          priority
-          className="object-contain p-8 drop-shadow-[0_25px_35px_rgba(0,0,0,0.55)] transition-opacity duration-300"
-        />
+        {fotos.map((url, i) => (
+          <div key={i} className="relative w-full shrink-0 snap-center aspect-[4/5]">
+            <Image
+              src={url}
+              alt={i === 0 ? nombre : ""}
+              fill
+              priority={i === 0}
+              sizes="100vw"
+              className="object-cover"
+              style={{ maskImage: FADE_ORILLAS, WebkitMaskImage: FADE_ORILLAS }}
+            />
+          </div>
+        ))}
       </div>
 
       {fotos.length > 1 && (
-        <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-          {fotos.map((url, i) => (
-            <button
+        <div className="absolute inset-x-0 bottom-[38%] flex justify-center gap-1.5">
+          {fotos.map((_, i) => (
+            <span
               key={i}
-              type="button"
-              onClick={() => setActiva(i)}
-              className={`relative w-14 aspect-[3/4] rounded-md overflow-hidden shrink-0 border-2 transition-colors bg-black/20 ${
-                i === activa ? "border-[#d4af6a]" : "border-white/10 hover:border-white/30"
+              className={`h-1.5 rounded-full transition-all ${
+                i === activa ? "w-5 bg-wine" : "w-1.5 bg-wine/25"
               }`}
-            >
-              <Image src={url} alt="" fill sizes="56px" className="object-contain" />
-            </button>
+            />
           ))}
         </div>
       )}

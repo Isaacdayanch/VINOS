@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { calcularResumenInventario } from "@/lib/costeo";
+import { calcularResumenInventario, sincronizarActivoPorStockVarios } from "@/lib/costeo";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -93,6 +93,8 @@ export async function crearNotaConsignacion(distribuidorId: string, formData: Fo
       },
     });
   }
+
+  await sincronizarActivoPorStockVarios(lineas.map((l) => l.productoId));
 
   revalidatePath(`/distribuidores/${distribuidorId}`);
   revalidatePath("/distribuidores");

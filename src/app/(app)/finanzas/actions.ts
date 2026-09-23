@@ -1,7 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { calcularResumenInventario } from "@/lib/costeo";
+import {
+  calcularResumenInventario,
+  sincronizarActivoPorStock,
+  sincronizarActivoPorStockVarios,
+} from "@/lib/costeo";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -121,6 +125,8 @@ export async function crearConsumoPersonal(formData: FormData) {
     },
   });
 
+  await sincronizarActivoPorStock(datos.productoId);
+
   revalidatePath("/finanzas");
   revalidatePath("/stock");
   revalidatePath("/");
@@ -130,6 +136,7 @@ export async function crearConsumoPersonal(formData: FormData) {
 export async function actualizarConsumoPersonal(salidaId: string, formData: FormData) {
   const datos = datosConsumoPersonal(formData);
 
+  const anterior = await prisma.salida.findUniqueOrThrow({ where: { id: salidaId } });
   const resumen = await calcularResumenInventario();
   const costoUnitario = resumen.get(datos.productoId)?.costoPromedioPorBotella ?? 0;
 
@@ -148,6 +155,8 @@ export async function actualizarConsumoPersonal(salidaId: string, formData: Form
     },
   });
 
+  await sincronizarActivoPorStockVarios([anterior.productoId, datos.productoId]);
+
   revalidatePath("/finanzas");
   revalidatePath("/finanzas/consumo-personal");
   revalidatePath("/stock");
@@ -159,7 +168,8 @@ export async function eliminarConsumoPersonal(formData: FormData) {
   const salidaId = String(formData.get("salidaId") ?? "");
   if (!salidaId) throw new Error("Falta el consumo a eliminar");
 
-  await prisma.salida.delete({ where: { id: salidaId } });
+  const eliminado = await prisma.salida.delete({ where: { id: salidaId } });
+  await sincronizarActivoPorStock(eliminado.productoId);
 
   revalidatePath("/finanzas");
   revalidatePath("/finanzas/consumo-personal");

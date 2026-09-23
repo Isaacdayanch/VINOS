@@ -494,6 +494,28 @@ export async function calcularEstadoCuentaCliente(clienteId: string) {
   };
 }
 
+/**
+ * Activa/desactiva un producto solo, según si tiene botellas en stock ahora
+ * mismo. Se llama después de cualquier cambio que mueva su inventario
+ * (entradas o salidas) para que "activo" siempre refleje si hay existencia,
+ * sin que Isaac tenga que acordarse de tocarlo a mano.
+ */
+export async function sincronizarActivoPorStock(productoId: string) {
+  const resumen = await calcularResumenInventario();
+  const stockActual = resumen.get(productoId)?.stockActual ?? 0;
+  await prisma.producto.update({
+    where: { id: productoId },
+    data: { activo: stockActual > 0 },
+  });
+}
+
+export async function sincronizarActivoPorStockVarios(productoIds: string[]) {
+  const unicos = [...new Set(productoIds)];
+  for (const id of unicos) {
+    await sincronizarActivoPorStock(id);
+  }
+}
+
 export function formatearCajasYBotellas(botellas: number, piezasPorCaja: number) {
   if (piezasPorCaja <= 0) return `${botellas} botellas`;
   const cajas = Math.floor(botellas / piezasPorCaja);

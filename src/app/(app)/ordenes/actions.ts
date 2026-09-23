@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { calcularResumenInventario } from "@/lib/costeo";
+import { calcularResumenInventario, sincronizarActivoPorStockVarios } from "@/lib/costeo";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -86,6 +86,8 @@ export async function crearOrden(formData: FormData) {
     }
   }
 
+  await sincronizarActivoPorStockVarios(lineas.map((l) => l.productoId));
+
   revalidatePath("/ordenes");
   revalidatePath("/stock");
   revalidatePath("/");
@@ -110,6 +112,11 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
   }
 
   const resumen = await calcularResumenInventario();
+
+  const lineasAnteriores = await prisma.ordenLinea.findMany({
+    where: { ordenId },
+    select: { productoId: true },
+  });
 
   await prisma.salida.deleteMany({ where: { ordenId } });
   await prisma.ordenLinea.deleteMany({ where: { ordenId } });
@@ -151,6 +158,11 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
       });
     }
   }
+
+  await sincronizarActivoPorStockVarios([
+    ...lineasAnteriores.map((l) => l.productoId),
+    ...lineas.map((l) => l.productoId),
+  ]);
 
   revalidatePath("/ordenes");
   revalidatePath(`/ordenes/${ordenId}`);

@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { sincronizarActivoPorStock } from "@/lib/costeo";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -159,10 +160,11 @@ export async function actualizarLineaPedido(
     throw new Error("Faltan datos para editar el producto del pedido");
   }
 
-  await prisma.entradaLinea.update({
+  const linea = await prisma.entradaLinea.update({
     where: { id: entradaLineaId },
     data: { fecha: new Date(fecha), cajasRecibidas, piezasPorCaja, costoPorCaja },
   });
+  await sincronizarActivoPorStock(linea.productoId);
 
   revalidatePath(`/pedidos/${pedidoId}`);
   revalidatePath("/pedidos");
@@ -171,10 +173,11 @@ export async function actualizarLineaPedido(
 }
 
 export async function marcarLineaRecibida(pedidoId: string, entradaLineaId: string) {
-  await prisma.entradaLinea.update({
+  const linea = await prisma.entradaLinea.update({
     where: { id: entradaLineaId },
     data: { recibida: true },
   });
+  await sincronizarActivoPorStock(linea.productoId);
 
   revalidatePath(`/pedidos/${pedidoId}`);
   revalidatePath("/pedidos");
@@ -183,10 +186,11 @@ export async function marcarLineaRecibida(pedidoId: string, entradaLineaId: stri
 }
 
 export async function desmarcarLineaRecibida(pedidoId: string, entradaLineaId: string) {
-  await prisma.entradaLinea.update({
+  const linea = await prisma.entradaLinea.update({
     where: { id: entradaLineaId },
     data: { recibida: false },
   });
+  await sincronizarActivoPorStock(linea.productoId);
 
   revalidatePath(`/pedidos/${pedidoId}`);
   revalidatePath("/pedidos");

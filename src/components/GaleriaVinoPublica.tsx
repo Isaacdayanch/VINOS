@@ -27,14 +27,17 @@ export function GaleriaVinoPublica({ fotos, nombre }: { fotos: string[]; nombre:
         style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
       >
         {fotos.map((url, i) => (
-          <div key={i} className="relative w-full shrink-0 snap-center aspect-[4/5]">
+          <div
+            key={i}
+            className="relative w-full shrink-0 snap-center aspect-[4/5] bg-wine-light/40"
+          >
             <Image
               src={url}
               alt={i === 0 ? nombre : ""}
               fill
               priority={i === 0}
               sizes="100vw"
-              className="object-cover"
+              className="object-contain p-6"
               style={{ maskImage: FADE_ORILLAS, WebkitMaskImage: FADE_ORILLAS }}
             />
           </div>

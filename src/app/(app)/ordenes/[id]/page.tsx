@@ -22,6 +22,7 @@ export default async function DetalleOrdenPage({
   if (!orden) notFound();
 
   const total = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+  const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
   const pendiente = total - cobrado;
   const hoy = new Date().toISOString().slice(0, 10);
@@ -127,6 +128,10 @@ export default async function DetalleOrdenPage({
         <div className="flex items-center justify-between">
           <span className="font-medium">Total</span>
           <span className="font-bold text-wine text-lg">{formatoMXN(total)}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm text-muted">
+          <span>Total de botellas</span>
+          <span>{totalBotellas}</span>
         </div>
         <div className="flex items-center justify-between text-sm text-muted">
           <span>Cobrado</span>

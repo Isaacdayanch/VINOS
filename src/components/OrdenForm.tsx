@@ -163,6 +163,10 @@ export function OrdenForm({
     () => lineas.reduce((acc, l) => acc + cantidadBotellas(l) * precio(l), 0),
     [lineas],
   );
+  const totalBotellas = useMemo(
+    () => lineas.reduce((acc, l) => acc + cantidadBotellas(l), 0),
+    [lineas],
+  );
 
   const lineasParaEnviar = lineas
     .filter((l) => l.productoId && cantidadBotellas(l) > 0)
@@ -372,11 +376,17 @@ export function OrdenForm({
         </button>
       </div>
 
-      <div className="rounded-lg border border-border bg-wine-light p-4 flex items-center justify-between">
-        <span className="font-medium">Total</span>
-        <span className="font-bold text-wine text-lg">
-          {total.toLocaleString("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 })}
-        </span>
+      <div className="rounded-lg border border-border bg-wine-light p-4 flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <span className="font-medium">Total</span>
+          <span className="font-bold text-wine text-lg">
+            {total.toLocaleString("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 })}
+          </span>
+        </div>
+        <div className="flex items-center justify-between text-sm text-muted">
+          <span>Total de botellas</span>
+          <span>{totalBotellas}</span>
+        </div>
       </div>
 
       <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">

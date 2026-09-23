@@ -32,6 +32,7 @@ export default async function ReciboOrdenPage({
   if (!orden) notFound();
 
   const total = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+  const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
   const pendiente = total - cobrado;
 
@@ -130,6 +131,10 @@ export default async function ReciboOrdenPage({
             <div className="flex justify-between w-44">
               <span className="text-muted">Total</span>
               <span className="font-semibold">{formatoMXN(total)}</span>
+            </div>
+            <div className="flex justify-between w-44">
+              <span className="text-muted">Total de botellas</span>
+              <span>{totalBotellas}</span>
             </div>
             <div className="flex justify-between w-44">
               <span className="text-muted">Cobrado</span>

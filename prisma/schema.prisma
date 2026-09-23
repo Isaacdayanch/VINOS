@@ -63,7 +63,6 @@ model Producto {
   preciosCliente         PrecioClienteProducto[]
   notaConsignacionLineas NotaConsignacionLinea[]
   imagenesExtra          ProductoImagenExtra[]
-  pendientesEntrega      PendienteEntrega[]
 }
 
 model ProductoImagenExtra {
@@ -86,25 +85,10 @@ model Cliente {
   notas           String?
   createdAt       DateTime        @default(now())
 
-  ordenes           Orden[]
-  preciosProducto   PrecioClienteProducto[]
-  pendientesEntrega PendienteEntrega[]
+  ordenes         Orden[]
+  preciosProducto PrecioClienteProducto[]
 }
 
-model PendienteEntrega {
-  id               String    @id @default(cuid())
-  clienteId        String
-  productoId       String
-  cantidadBotellas Int
-  fechaEstimada    DateTime?
-  notas            String?
-  entregado        Boolean   @default(false)
-  fechaEntregado   DateTime?
-  createdAt        DateTime  @default(now())
-
-  cliente  Cliente  @relation(fields: [clienteId], references: [id])
-  producto Producto @relation(fields: [productoId], references: [id])
-}
 
 model PrecioClienteProducto {
   id         String   @id @default(cuid())
@@ -172,13 +156,15 @@ model Orden {
 }
 
 model OrdenLinea {
-  id               String  @id @default(cuid())
+  id               String    @id @default(cuid())
   ordenId          String
   productoId       String
   cantidadBotellas Int
   precioUnitario   Float
   costoUnitario    Float // costo por botella al momento de vender (para calcular margen)
-  esRegalo         Boolean @default(false) // precio $0 a propósito: se cuenta como gasto de marketing, no como venta perdida
+  esRegalo         Boolean   @default(false) // precio $0 a propósito: se cuenta como gasto de marketing, no como venta perdida
+  entregado        Boolean   @default(true) // false = ya se vendió pero todavía no se tiene la botella; no descuenta stock hasta entregarse
+  fechaEstimada    DateTime? // solo si entregado=false: cuándo se espera que llegue
 
   orden    Orden    @relation(fields: [ordenId], references: [id])
   producto Producto @relation(fields: [productoId], references: [id])

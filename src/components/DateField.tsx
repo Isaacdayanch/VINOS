@@ -26,10 +26,12 @@ export function DateField({
   name,
   label,
   defaultValue,
+  onChange,
 }: {
   name: string;
   label?: string;
   defaultValue?: string;
+  onChange?: (iso: string) => void;
 }) {
   const inicial = desdeISO(defaultValue) ?? new Date();
   const [seleccion, setSeleccion] = useState<Date | null>(desdeISO(defaultValue));
@@ -123,6 +125,7 @@ export function DateField({
                     type="button"
                     onClick={() => {
                       setSeleccion(fecha);
+                      onChange?.(aISO(fecha));
                       setAbierto(false);
                     }}
                     className={`w-8 h-8 rounded-full text-sm transition-colors ${
@@ -143,6 +146,7 @@ export function DateField({
             type="button"
             onClick={() => {
               setSeleccion(hoy);
+              onChange?.(aISO(hoy));
               setMesVisible(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
               setAbierto(false);
             }}

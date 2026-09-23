@@ -9,7 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function NuevaOrdenPage() {
   const [clientes, productos, preciosGuardados, resumen] = await Promise.all([
     prisma.cliente.findMany({ orderBy: { nombre: "asc" } }),
-    prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
+    // Se incluyen también los inactivos (sin stock): así puedes ir vendiendo lo
+    // que todavía no llega y marcarlo como "pendiente de surtir" en la línea.
+    prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.precioClienteProducto.findMany(),
     calcularResumenInventario(),
   ]);

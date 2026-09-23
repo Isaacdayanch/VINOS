@@ -20,6 +20,8 @@ type LineaForm = {
   cantidadBotellas: number;
   precioUnitario: number;
   esRegalo?: boolean;
+  entregado?: boolean;
+  fechaEstimada?: string | null;
 };
 
 export async function crearOrden(formData: FormData) {
@@ -53,6 +55,7 @@ export async function crearOrden(formData: FormData) {
 
   for (const l of lineas) {
     const costoUnitario = resumen.get(l.productoId)?.costoPromedioPorBotella ?? 0;
+    const entregado = l.entregado ?? true;
 
     await prisma.ordenLinea.create({
       data: {
@@ -62,18 +65,24 @@ export async function crearOrden(formData: FormData) {
         precioUnitario: l.precioUnitario,
         costoUnitario,
         esRegalo: l.esRegalo ?? false,
+        entregado,
+        fechaEstimada: !entregado && l.fechaEstimada ? new Date(l.fechaEstimada) : null,
       },
     });
 
-    await prisma.salida.create({
-      data: {
-        fecha: new Date(fecha),
-        productoId: l.productoId,
-        botellas: l.cantidadBotellas,
-        motivo: "Venta",
-        ordenId: orden.id,
-      },
-    });
+    // Si todavía no se tiene la botella (entregado=false), no se descuenta
+    // stock hasta que de verdad se le entregue al cliente.
+    if (entregado) {
+      await prisma.salida.create({
+        data: {
+          fecha: new Date(fecha),
+          productoId: l.productoId,
+          botellas: l.cantidadBotellas,
+          motivo: "Venta",
+          ordenId: orden.id,
+        },
+      });
+    }
 
     // Un regalo a $0 no debe quedar guardado como "el precio que le toca a este
     // cliente" — si no, su próxima orden se le sugeriría gratis.
@@ -128,6 +137,7 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
 
   for (const l of lineas) {
     const costoUnitario = resumen.get(l.productoId)?.costoPromedioPorBotella ?? 0;
+    const entregado = l.entregado ?? true;
 
     await prisma.ordenLinea.create({
       data: {
@@ -137,18 +147,22 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
         precioUnitario: l.precioUnitario,
         costoUnitario,
         esRegalo: l.esRegalo ?? false,
+        entregado,
+        fechaEstimada: !entregado && l.fechaEstimada ? new Date(l.fechaEstimada) : null,
       },
     });
 
-    await prisma.salida.create({
-      data: {
-        fecha: new Date(fecha),
-        productoId: l.productoId,
-        botellas: l.cantidadBotellas,
-        motivo: "Venta",
-        ordenId,
-      },
-    });
+    if (entregado) {
+      await prisma.salida.create({
+        data: {
+          fecha: new Date(fecha),
+          productoId: l.productoId,
+          botellas: l.cantidadBotellas,
+          motivo: "Venta",
+          ordenId,
+        },
+      });
+    }
 
     if (!l.esRegalo) {
       await prisma.precioClienteProducto.upsert({
@@ -169,6 +183,40 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
   revalidatePath("/stock");
   revalidatePath("/");
   redirect(`/ordenes/${ordenId}`);
+}
+
+export async function marcarLineaEntregada(ordenLineaId: string, ordenId: string) {
+  const linea = await prisma.ordenLinea.findUnique({ where: { id: ordenLineaId } });
+  if (!linea || linea.entregado) return;
+
+  const resumen = await calcularResumenInventario();
+  const costoUnitario = resumen.get(linea.productoId)?.costoPromedioPorBotella ?? 0;
+
+  await prisma.$transaction([
+    prisma.salida.create({
+      data: {
+        fecha: new Date(),
+        productoId: linea.productoId,
+        botellas: linea.cantidadBotellas,
+        motivo: "Venta",
+        costoUnitario,
+        ordenId,
+        notas: "Entrega de línea marcada como pendiente al vender",
+      },
+    }),
+    prisma.ordenLinea.update({
+      where: { id: ordenLineaId },
+      data: { entregado: true, fechaEstimada: null },
+    }),
+  ]);
+
+  await sincronizarActivoPorStockVarios([linea.productoId]);
+
+  revalidatePath(`/ordenes/${ordenId}`);
+  revalidatePath("/ordenes");
+  revalidatePath("/clientes");
+  revalidatePath("/stock");
+  revalidatePath("/");
 }
 
 export async function crearCobro(ordenId: string, formData: FormData) {

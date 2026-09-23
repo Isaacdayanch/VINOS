@@ -16,7 +16,7 @@ export default async function EditarOrdenPage({
   const [orden, clientes, productos, preciosGuardados, resumen] = await Promise.all([
     prisma.orden.findUnique({ where: { id }, include: { lineas: true } }),
     prisma.cliente.findMany({ orderBy: { nombre: "asc" } }),
-    prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
+    prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.precioClienteProducto.findMany(),
     calcularResumenInventario(),
   ]);
@@ -28,13 +28,15 @@ export default async function EditarOrdenPage({
     preciosGuardados,
   );
 
-  // Las botellas de esta misma orden ya están descontadas del stock actual;
+  // Las botellas de esta misma orden ya están descontadas del stock actual
+  // (solo las líneas ya entregadas — las pendientes nunca descontaron nada);
   // se le regresan para que "disponible" refleje lo que de verdad puedes editar.
   const stockPorProducto: Record<string, number> = {};
   for (const p of productos) {
     stockPorProducto[p.id] = resumen.get(p.id)?.stockActual ?? 0;
   }
   for (const l of orden.lineas) {
+    if (!l.entregado) continue;
     stockPorProducto[l.productoId] = (stockPorProducto[l.productoId] ?? 0) + l.cantidadBotellas;
   }
 
@@ -66,6 +68,8 @@ export default async function EditarOrdenPage({
           cantidadBotellas: l.cantidadBotellas,
           precioUnitario: l.precioUnitario,
           esRegalo: l.esRegalo,
+          entregado: l.entregado,
+          fechaEstimada: l.fechaEstimada?.toISOString().slice(0, 10) ?? null,
         }))}
         action={guardar}
         botonTexto="Guardar cambios"

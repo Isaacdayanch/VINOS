@@ -1,4 +1,4 @@
-import { crearCobro } from "@/app/(app)/ordenes/actions";
+import { crearCobro, marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
 import { DateField } from "@/components/DateField";
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
@@ -86,15 +86,39 @@ export default async function DetalleOrdenPage({
                     🎁 Regalo
                   </span>
                 )}
+                {!l.entregado && (
+                  <span className="ml-2 text-xs font-medium text-warn bg-warn-bg rounded-full px-2 py-0.5">
+                    📦 Pendiente de surtir
+                  </span>
+                )}
               </p>
               <p className="text-xs text-muted">
                 {l.cantidadBotellas} botella{l.cantidadBotellas === 1 ? "" : "s"}
                 {!l.esRegalo && ` × ${formatoMXN(l.precioUnitario)}`}
               </p>
+              {!l.entregado && (
+                <p className="text-xs text-warn">
+                  {l.fechaEstimada
+                    ? `Llega ${new Date(l.fechaEstimada).toLocaleDateString("es-MX")}`
+                    : "Sin fecha estimada"}
+                </p>
+              )}
             </div>
-            <span className="font-semibold whitespace-nowrap">
-              {l.esRegalo ? "Sin costo" : formatoMXN(l.cantidadBotellas * l.precioUnitario)}
-            </span>
+            <div className="flex flex-col items-end gap-1">
+              <span className="font-semibold whitespace-nowrap">
+                {l.esRegalo ? "Sin costo" : formatoMXN(l.cantidadBotellas * l.precioUnitario)}
+              </span>
+              {!l.entregado && (
+                <form action={marcarLineaEntregada.bind(null, l.id, orden.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-md bg-wine text-white px-2.5 py-1 text-xs font-medium whitespace-nowrap hover:bg-wine-dark active:scale-[0.97] transition-colors"
+                  >
+                    Ya se la entregué
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         ))}
       </div>

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { crearOrden } from "@/app/(app)/ordenes/actions";
 import { crearClienteRapido } from "@/app/(app)/clientes/actions";
 import { ProductoPicker } from "@/components/ProductoPicker";
+import { DateField } from "@/components/DateField";
 
 type Cliente = { id: string; nombre: string };
 type Producto = { id: string; nombre: string; fotoUrl: string | null; piezasPorCaja: number };
@@ -17,6 +18,8 @@ type Linea = {
   precioUnitario: number | "";
   precioAntesDeRegalo: number | "";
   esRegalo: boolean;
+  entregado: boolean;
+  fechaEstimada: string;
 };
 
 function lineaVacia(): Linea {
@@ -29,6 +32,8 @@ function lineaVacia(): Linea {
     precioUnitario: 0,
     precioAntesDeRegalo: 0,
     esRegalo: false,
+    entregado: true,
+    fechaEstimada: "",
   };
 }
 
@@ -58,6 +63,8 @@ export function OrdenForm({
     cantidadBotellas: number;
     precioUnitario: number;
     esRegalo?: boolean;
+    entregado?: boolean;
+    fechaEstimada?: string | null;
   }[];
   action?: (formData: FormData) => void;
   botonTexto?: string;
@@ -76,6 +83,8 @@ export function OrdenForm({
       precioUnitario: l.precioUnitario,
       precioAntesDeRegalo: l.esRegalo ? 0 : l.precioUnitario,
       esRegalo: l.esRegalo ?? false,
+      entregado: l.entregado ?? true,
+      fechaEstimada: l.fechaEstimada ?? "",
     }));
   });
   const [agregandoCliente, setAgregandoCliente] = useState(false);
@@ -162,6 +171,8 @@ export function OrdenForm({
       cantidadBotellas: cantidadBotellas(l),
       precioUnitario: precio(l),
       esRegalo: l.esRegalo,
+      entregado: l.entregado,
+      fechaEstimada: l.fechaEstimada || null,
     }));
 
   return (
@@ -321,6 +332,27 @@ export function OrdenForm({
                 />
                 <span>🎁 Es un regalo (precio $0 — se cuenta como gasto de marketing)</span>
               </label>
+              <label className="flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={!l.entregado}
+                  onChange={() =>
+                    actualizarLinea(i, {
+                      entregado: !l.entregado,
+                      fechaEstimada: l.entregado ? l.fechaEstimada : "",
+                    })
+                  }
+                />
+                <span>📦 Aún no lo tengo — se lo debo (no descuenta stock hasta que se lo entregue)</span>
+              </label>
+              {!l.entregado && (
+                <DateField
+                  name={`__fechaEstimada_${i}`}
+                  label="Fecha estimada de llegada (opcional)"
+                  defaultValue={l.fechaEstimada || undefined}
+                  onChange={(iso) => actualizarLinea(i, { fechaEstimada: iso })}
+                />
+              )}
               {l.productoId && !l.esRegalo && (
                 <p className="text-xs text-muted -mt-1">
                   {yaVendido

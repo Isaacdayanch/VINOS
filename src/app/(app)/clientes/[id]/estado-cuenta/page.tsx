@@ -65,9 +65,19 @@ export default async function EstadoCuentaClientePage({
           <span>Total cobrado</span>
           <span>{formatoMXN(totalCobrado)}</span>
         </div>
-        <div className="flex items-center justify-between font-bold text-wine text-lg mt-1">
-          <span>{totalPendiente > 0.5 ? "Saldo pendiente" : "Saldo"}</span>
-          <span>{formatoMXN(Math.max(totalPendiente, 0))}</span>
+        <div
+          className={`flex items-center justify-between font-bold text-lg mt-1 ${
+            totalPendiente < -0.5 ? "text-ok" : "text-wine"
+          }`}
+        >
+          <span>
+            {totalPendiente > 0.5
+              ? "Saldo pendiente"
+              : totalPendiente < -0.5
+                ? "Saldo a favor del cliente"
+                : "Saldo"}
+          </span>
+          <span>{formatoMXN(Math.abs(totalPendiente))}</span>
         </div>
       </div>
     </div>

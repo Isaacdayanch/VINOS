@@ -100,10 +100,16 @@ export default async function DetalleOrdenPage({
           <span>Cobrado</span>
           <span>{formatoMXN(cobrado)}</span>
         </div>
-        {pendiente > 0 && (
+        {pendiente > 0.5 && (
           <div className="flex items-center justify-between text-sm text-warn">
             <span>Pendiente</span>
             <span>{formatoMXN(pendiente)}</span>
+          </div>
+        )}
+        {pendiente < -0.5 && (
+          <div className="flex items-center justify-between text-sm text-ok">
+            <span>Saldo a favor del cliente</span>
+            <span>{formatoMXN(Math.abs(pendiente))}</span>
           </div>
         )}
       </div>

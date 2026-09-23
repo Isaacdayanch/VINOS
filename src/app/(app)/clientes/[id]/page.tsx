@@ -89,6 +89,12 @@ export default async function DetalleClientePage({
             <span>{formatoMXN(totalPendiente)}</span>
           </div>
         )}
+        {totalPendiente < -0.5 && (
+          <div className="flex items-center justify-between text-sm text-ok">
+            <span>Saldo a favor del cliente</span>
+            <span>{formatoMXN(Math.abs(totalPendiente))}</span>
+          </div>
+        )}
         <Link
           href={`/clientes/${cliente.id}/estado-cuenta`}
           className="text-xs text-wine underline mt-1 w-fit"

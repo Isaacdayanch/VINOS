@@ -1,7 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
+import { GaleriaVinoPublica } from "@/components/GaleriaVinoPublica";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Playfair_Display } from "next/font/google";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-serif-vino",
+});
 
 export const dynamic = "force-dynamic";
 
@@ -29,99 +37,78 @@ export default async function FichaVinoPublicaPage({
   );
 
   return (
-    <div className="min-h-full bg-background text-foreground">
-      <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
-        <Link href="/catalogo-publico" className="text-sm text-wine underline">
+    <div
+      className={`${playfair.variable} min-h-full bg-gradient-to-b from-[#2a0f1a] via-[#170810] to-[#2a0f1a] text-[#f3e6d2]`}
+    >
+      <div className="max-w-2xl mx-auto px-5 py-10 flex flex-col gap-8">
+        <Link
+          href="/catalogo-publico"
+          className="text-sm text-[#d4af6a] hover:text-[#f3e6d2] transition-colors w-fit"
+        >
           ← Volver al catálogo
         </Link>
 
-        {fotos.length > 0 && (
-          <div>
-            <div className="w-full aspect-[3/4] rounded-lg border border-border bg-surface overflow-hidden flex items-center justify-center p-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={fotos[0]} alt={producto.nombre} className="w-full h-full object-contain" />
-            </div>
-            {fotos.length > 1 && (
-              <div className="flex gap-2 mt-2 overflow-x-auto">
-                {fotos.slice(1).map((url, i) => (
-                  <div
-                    key={i}
-                    className="w-16 aspect-[3/4] rounded-md border border-border bg-surface overflow-hidden flex items-center justify-center p-1 shrink-0"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" className="w-full h-full object-contain" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        <GaleriaVinoPublica fotos={fotos} nombre={producto.nombre} />
 
-        <div>
-          <h1 className="text-2xl font-bold text-wine">
-            {producto.nombre} {producto.anio ? `(${producto.anio})` : ""}
+        <div className="text-center">
+          {producto.categoria && (
+            <p className="uppercase tracking-[0.25em] text-xs text-[#d4af6a] mb-2">
+              {producto.categoria}
+            </p>
+          )}
+          <h1 className="font-[family-name:var(--font-serif-vino)] text-3xl sm:text-4xl font-bold leading-tight">
+            {producto.nombre} {producto.anio ? `· ${producto.anio}` : ""}
           </h1>
-          {producto.categoria && <p className="text-muted text-sm">{producto.categoria}</p>}
-          {precio && <p className="text-xl font-semibold text-wine mt-1">{formatoMXN(precio)}</p>}
+          {precio && (
+            <p className="text-2xl font-semibold text-[#d4af6a] mt-4">{formatoMXN(precio)}</p>
+          )}
           <button
             type="button"
             disabled
-            className="mt-3 w-full rounded-md bg-wine/40 text-white px-4 py-3 text-sm font-medium cursor-not-allowed"
+            className="mt-5 w-full rounded-full border border-[#d4af6a] text-[#d4af6a] px-6 py-3.5 text-sm font-medium tracking-wide cursor-not-allowed hover:bg-[#d4af6a]/10 transition-colors"
           >
-            🛒 Próximamente: haz tu pedido aquí
+            🛒 Próximamente — haz tu pedido aquí
           </button>
         </div>
 
         {(producto.varietal || producto.region || producto.cuerpo || producto.alcohol) && (
-          <div className="rounded-lg border border-border bg-surface p-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-            {producto.varietal && (
-              <div>
-                <span className="text-muted">Uva: </span>
-                <span className="font-medium">{producto.varietal}</span>
-              </div>
-            )}
-            {producto.region && (
-              <div>
-                <span className="text-muted">Región: </span>
-                <span className="font-medium">{producto.region}</span>
-              </div>
-            )}
-            {producto.cuerpo && (
-              <div>
-                <span className="text-muted">Cuerpo: </span>
-                <span className="font-medium">{producto.cuerpo}</span>
-              </div>
-            )}
-            {producto.alcohol && (
-              <div>
-                <span className="text-muted">Alcohol: </span>
-                <span className="font-medium">{producto.alcohol}%</span>
-              </div>
-            )}
+          <div className="flex flex-wrap justify-center gap-2">
+            {producto.varietal && <Pill>🍇 {producto.varietal}</Pill>}
+            {producto.region && <Pill>📍 {producto.region}</Pill>}
+            {producto.cuerpo && <Pill>🍷 Cuerpo {producto.cuerpo}</Pill>}
+            {producto.alcohol != null && <Pill>{producto.alcohol}% alc.</Pill>}
           </div>
         )}
 
-        {producto.descripcion && (
-          <div>
-            <h2 className="font-medium text-sm mb-1">Descripción</h2>
-            <p className="text-sm text-muted whitespace-pre-line">{producto.descripcion}</p>
-          </div>
-        )}
-
-        {producto.maridaje && (
-          <div>
-            <h2 className="font-medium text-sm mb-1">Con qué comer</h2>
-            <p className="text-sm text-muted whitespace-pre-line">{producto.maridaje}</p>
-          </div>
-        )}
-
-        {producto.notas && (
-          <div>
-            <h2 className="font-medium text-sm mb-1">Notas de cata</h2>
-            <p className="text-sm text-muted whitespace-pre-line">{producto.notas}</p>
-          </div>
-        )}
+        {producto.descripcion && <Seccion titulo="Descripción" texto={producto.descripcion} />}
+        {producto.maridaje && <Seccion titulo="Con qué comer" texto={producto.maridaje} />}
+        {producto.notas && <Seccion titulo="Notas de cata" texto={producto.notas} />}
       </div>
+    </div>
+  );
+}
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-[#f3e6d2] whitespace-nowrap">
+      {children}
+    </span>
+  );
+}
+
+function Seccion({ titulo, texto }: { titulo: string; texto: string }) {
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-2">
+        <span className="h-px flex-1 bg-white/10" />
+        <h2 className="text-xs uppercase tracking-[0.2em] text-[#d4af6a] whitespace-nowrap">
+          {titulo}
+        </h2>
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
+      <p className="text-sm text-[#e8d9c0] opacity-90 whitespace-pre-line text-center leading-relaxed">
+        {texto}
+      </p>
     </div>
   );
 }

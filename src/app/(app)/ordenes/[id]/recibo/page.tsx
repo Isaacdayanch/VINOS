@@ -32,6 +32,11 @@ export default async function ReciboOrdenPage({
   if (!orden) notFound();
 
   const total = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+  const totalSinRegalos = orden.lineas.reduce(
+    (acc, l) => acc + l.cantidadBotellas * (l.esRegalo ? (l.producto.precioLista ?? 0) : l.precioUnitario),
+    0,
+  );
+  const descuentoRegalos = totalSinRegalos - total;
   const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
   const pendiente = total - cobrado;
@@ -128,18 +133,37 @@ export default async function ReciboOrdenPage({
             cabe entero en la primera — nunca se corta a la mitad. */}
         <div className="print-no-break">
           <div className="flex flex-col gap-0.5 items-end">
-            <div className="flex justify-between w-44">
-              <span className="text-muted">Total</span>
-              <span className="font-semibold">{formatoMXN(total)}</span>
-            </div>
+            {descuentoRegalos > 0.5 ? (
+              <>
+                <div className="flex justify-between w-44">
+                  <span className="text-muted">Total</span>
+                  <span className="text-muted line-through">{formatoMXN(totalSinRegalos)}</span>
+                </div>
+                <div className="flex justify-between w-44">
+                  <span className="text-muted">Descuento regalo</span>
+                  <span className="text-wine">-{formatoMXN(descuentoRegalos)}</span>
+                </div>
+                <div className="flex justify-between w-44">
+                  <span className="font-medium">Total a pagar</span>
+                  <span className="font-semibold">{formatoMXN(total)}</span>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-between w-44">
+                <span className="text-muted">Total</span>
+                <span className="font-semibold">{formatoMXN(total)}</span>
+              </div>
+            )}
             <div className="flex justify-between w-44">
               <span className="text-muted">Total de botellas</span>
               <span>{totalBotellas}</span>
             </div>
-            <div className="flex justify-between w-44">
-              <span className="text-muted">Cobrado</span>
-              <span>{formatoMXN(cobrado)}</span>
-            </div>
+            {cobrado > 0 && (
+              <div className="flex justify-between w-44">
+                <span className="text-muted">Cobrado</span>
+                <span>{formatoMXN(cobrado)}</span>
+              </div>
+            )}
             <div className="flex justify-between w-44 text-sm">
               <span className="font-medium">{pendiente > 0 ? "Pendiente" : "Pagado"}</span>
               <span className={`font-bold ${pendiente > 0 ? "text-warn" : "text-ok"}`}>

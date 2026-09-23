@@ -103,10 +103,20 @@ export default async function ReciboOrdenPage({
                   {l.cantidadBotellas}
                 </td>
                 <td className="py-1 px-2 text-right tabular-nums whitespace-nowrap">
-                  {formatoMXN(l.precioUnitario)}
+                  {l.esRegalo && l.producto.precioLista ? (
+                    <span className="text-muted line-through">
+                      {formatoMXN(l.producto.precioLista)}
+                    </span>
+                  ) : (
+                    formatoMXN(l.precioUnitario)
+                  )}
                 </td>
                 <td className="py-1 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
-                  {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
+                  {l.esRegalo ? (
+                    <span className="text-wine">Regalo</span>
+                  ) : (
+                    formatoMXN(l.cantidadBotellas * l.precioUnitario)
+                  )}
                 </td>
               </tr>
             ))}

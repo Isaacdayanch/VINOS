@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import { BotonImprimir } from "@/components/BotonImprimir";
 import Link from "next/link";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -49,10 +50,15 @@ export default async function CatalogoPublicoPage() {
           {productos.map((p, i) => {
             const tarjeta = (
               <div className="print-item rounded-lg border border-border bg-surface p-3 flex flex-col gap-2 break-inside-avoid">
-                <div className="w-full aspect-[3/5] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-2">
+                <div className="relative w-full aspect-[3/5] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-2">
                   {p.fotoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
+                    <Image
+                      src={p.fotoUrl}
+                      alt={p.nombre}
+                      fill
+                      sizes="(max-width: 640px) 45vw, 30vw"
+                      className="object-contain"
+                    />
                   ) : (
                     <span className="text-3xl">🍷</span>
                   )}

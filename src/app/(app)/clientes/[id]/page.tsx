@@ -1,5 +1,6 @@
 import { PreciosClienteTabla } from "@/components/PreciosClienteTabla";
 import { formatoMXN } from "@/lib/costeo";
+import { asegurarCodigoCliente } from "@/lib/clienteCodigo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -28,6 +29,7 @@ export default async function DetalleClientePage({
     prisma.precioClienteProducto.findMany({ where: { clienteId: id } }),
   ]);
   if (!cliente) notFound();
+  const codigo = await asegurarCodigoCliente(cliente);
 
   const precioPorProducto = new Map(preciosGuardados.map((pg) => [pg.productoId, pg.precio]));
   const filasPrecios = productos.map((p) => ({
@@ -56,7 +58,7 @@ export default async function DetalleClientePage({
           {cliente.nombre.replace("Cliente Especial - ", "")}
         </h1>
         <p className="text-muted text-sm">
-          {cliente.telefono ?? "Sin teléfono"} · {etiquetaCategoria[cliente.categoriaPrecio]}
+          {codigo} · {cliente.telefono ?? "Sin teléfono"} · {etiquetaCategoria[cliente.categoriaPrecio]}
         </p>
         {cliente.notas && <p className="text-muted text-sm mt-1">{cliente.notas}</p>}
       </div>
@@ -76,6 +78,12 @@ export default async function DetalleClientePage({
             <span>{formatoMXN(totalPendiente)}</span>
           </div>
         )}
+        <Link
+          href={`/clientes/${cliente.id}/estado-cuenta`}
+          className="text-xs text-wine underline mt-1 w-fit"
+        >
+          Ver / mandar estado de cuenta →
+        </Link>
       </div>
 
       <div className="flex flex-col gap-2">

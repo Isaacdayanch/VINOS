@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { CategoriaPrecio } from "@prisma/client";
+import { siguienteCodigoCliente } from "@/lib/clienteCodigo";
 
 export async function crearCliente(formData: FormData) {
   const nombre = String(formData.get("nombre") ?? "").trim();
@@ -16,8 +17,9 @@ export async function crearCliente(formData: FormData) {
     throw new Error("El nombre es obligatorio");
   }
 
+  const codigo = await siguienteCodigoCliente();
   await prisma.cliente.create({
-    data: { nombre, telefono, email, categoriaPrecio, notas },
+    data: { nombre, telefono, email, categoriaPrecio, notas, codigo },
   });
 
   revalidatePath("/clientes");
@@ -30,8 +32,9 @@ export async function crearClienteRapido(nombre: string) {
     throw new Error("El nombre es obligatorio");
   }
 
+  const codigo = await siguienteCodigoCliente();
   const cliente = await prisma.cliente.create({
-    data: { nombre: nombreLimpio, categoriaPrecio: "LISTA" },
+    data: { nombre: nombreLimpio, categoriaPrecio: "LISTA", codigo },
   });
 
   revalidatePath("/clientes");

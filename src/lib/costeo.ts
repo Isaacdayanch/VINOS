@@ -418,6 +418,74 @@ export async function calcularMovimientosCuenta(
   return { saldo, movimientos };
 }
 
+export type MovimientoEstadoCuenta = {
+  id: string;
+  fecha: Date;
+  concepto: string;
+  cargo: number; // > 0 si es una orden (aumenta lo que debe)
+  abono: number; // > 0 si es un pago (disminuye lo que debe)
+  saldo: number; // acumulado hasta este movimiento
+  ordenId: string;
+};
+
+/**
+ * Estado de cuenta de un cliente: junta todas sus órdenes (cargo) y los
+ * cobros de cada una (abono) en orden cronológico, con saldo acumulado.
+ * Se calcula siempre en vivo a partir de Orden/Cobro — si Isaac edita una
+ * orden ya pagada, el estado de cuenta refleja el cambio automáticamente,
+ * no hay nada que "actualizar" a mano.
+ */
+export async function calcularEstadoCuentaCliente(clienteId: string) {
+  const ordenes = await prisma.orden.findMany({
+    where: { clienteId },
+    include: { lineas: true, cobros: true },
+    orderBy: { fecha: "asc" },
+  });
+
+  const crudos: Omit<MovimientoEstadoCuenta, "saldo">[] = [];
+
+  for (const o of ordenes) {
+    const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+    crudos.push({
+      id: `orden-${o.id}`,
+      fecha: o.fecha,
+      concepto: `Orden ${o.folio}`,
+      cargo: total,
+      abono: 0,
+      ordenId: o.id,
+    });
+    for (const c of o.cobros) {
+      const cuentaTexto = c.cuenta === "EFECTIVO" ? "Efectivo" : "Transferencia";
+      crudos.push({
+        id: `cobro-${c.id}`,
+        fecha: c.fecha,
+        concepto: `Pago — ${cuentaTexto}${c.metodoPago ? ` (${c.metodoPago})` : ""}`,
+        cargo: 0,
+        abono: c.monto,
+        ordenId: o.id,
+      });
+    }
+  }
+
+  crudos.sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+
+  let saldo = 0;
+  const movimientos: MovimientoEstadoCuenta[] = crudos.map((m) => {
+    saldo += m.cargo - m.abono;
+    return { ...m, saldo };
+  });
+
+  const totalFacturado = movimientos.reduce((acc, m) => acc + m.cargo, 0);
+  const totalCobrado = movimientos.reduce((acc, m) => acc + m.abono, 0);
+
+  return {
+    movimientos,
+    totalFacturado,
+    totalCobrado,
+    totalPendiente: totalFacturado - totalCobrado,
+  };
+}
+
 export function formatearCajasYBotellas(botellas: number, piezasPorCaja: number) {
   if (piezasPorCaja <= 0) return `${botellas} botellas`;
   const cajas = Math.floor(botellas / piezasPorCaja);

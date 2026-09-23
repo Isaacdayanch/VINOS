@@ -15,7 +15,12 @@ async function siguienteFolio() {
   return `ORD-${String(maxNumero + 1).padStart(3, "0")}`;
 }
 
-type LineaForm = { productoId: string; cantidadBotellas: number; precioUnitario: number };
+type LineaForm = {
+  productoId: string;
+  cantidadBotellas: number;
+  precioUnitario: number;
+  esRegalo?: boolean;
+};
 
 export async function crearOrden(formData: FormData) {
   const clienteId = String(formData.get("clienteId") ?? "");
@@ -56,6 +61,7 @@ export async function crearOrden(formData: FormData) {
         cantidadBotellas: l.cantidadBotellas,
         precioUnitario: l.precioUnitario,
         costoUnitario,
+        esRegalo: l.esRegalo ?? false,
       },
     });
 
@@ -69,11 +75,15 @@ export async function crearOrden(formData: FormData) {
       },
     });
 
-    await prisma.precioClienteProducto.upsert({
-      where: { clienteId_productoId: { clienteId, productoId: l.productoId } },
-      create: { clienteId, productoId: l.productoId, precio: l.precioUnitario },
-      update: { precio: l.precioUnitario },
-    });
+    // Un regalo a $0 no debe quedar guardado como "el precio que le toca a este
+    // cliente" — si no, su próxima orden se le sugeriría gratis.
+    if (!l.esRegalo) {
+      await prisma.precioClienteProducto.upsert({
+        where: { clienteId_productoId: { clienteId, productoId: l.productoId } },
+        create: { clienteId, productoId: l.productoId, precio: l.precioUnitario },
+        update: { precio: l.precioUnitario },
+      });
+    }
   }
 
   revalidatePath("/ordenes");
@@ -119,6 +129,7 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
         cantidadBotellas: l.cantidadBotellas,
         precioUnitario: l.precioUnitario,
         costoUnitario,
+        esRegalo: l.esRegalo ?? false,
       },
     });
 
@@ -132,11 +143,13 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
       },
     });
 
-    await prisma.precioClienteProducto.upsert({
-      where: { clienteId_productoId: { clienteId, productoId: l.productoId } },
-      create: { clienteId, productoId: l.productoId, precio: l.precioUnitario },
-      update: { precio: l.precioUnitario },
-    });
+    if (!l.esRegalo) {
+      await prisma.precioClienteProducto.upsert({
+        where: { clienteId_productoId: { clienteId, productoId: l.productoId } },
+        create: { clienteId, productoId: l.productoId, precio: l.precioUnitario },
+        update: { precio: l.precioUnitario },
+      });
+    }
   }
 
   revalidatePath("/ordenes");

@@ -65,6 +65,7 @@ export default async function EditarOrdenPage({
           productoId: l.productoId,
           cantidadBotellas: l.cantidadBotellas,
           precioUnitario: l.precioUnitario,
+          esRegalo: l.esRegalo,
         }))}
         action={guardar}
         botonTexto="Guardar cambios"

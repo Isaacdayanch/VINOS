@@ -145,6 +145,7 @@ export type ResumenFinanzas = {
   maaserDado: number;
   saldoMaaser: number; // positivo = a favor, negativo = debe
   consumoCompartido: { botellas: number; costo: number }; // botellas que Isaac y Beto se repartieron
+  regalosClientes: { botellas: number; costo: number }; // botellas regaladas a clientes (marketing)
 };
 
 const PORCENTAJE_MAASER = 0.1;
@@ -178,10 +179,16 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
 
   let ventasTotales = 0;
   let costoVentas = 0;
+  let regalosBotellas = 0;
+  let regalosCosto = 0;
   for (const o of ordenes) {
     for (const l of o.lineas) {
       ventasTotales += l.cantidadBotellas * l.precioUnitario;
       costoVentas += l.cantidadBotellas * l.costoUnitario;
+      if (l.esRegalo) {
+        regalosBotellas += l.cantidadBotellas;
+        regalosCosto += l.cantidadBotellas * l.costoUnitario;
+      }
     }
   }
   const gananciaTotal = ventasTotales - costoVentas;
@@ -316,6 +323,7 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     socios: resumenSocios,
     saldoEntreSocios,
     consumoCompartido: { botellas: compartidoBotellas, costo: compartidoCosto },
+    regalosClientes: { botellas: regalosBotellas, costo: regalosCosto },
     maaserDebido,
     maaserDado,
     saldoMaaser,

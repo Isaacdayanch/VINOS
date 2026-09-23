@@ -161,6 +161,25 @@ export default async function FinanzasPage() {
         </Link>
       </div>
 
+      {finanzas.regalosClientes.botellas > 0 && (
+        <div className="rounded-lg border border-border bg-surface p-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold">🎁 Regalos a clientes</h2>
+            <p className="text-xs text-muted mt-1">
+              Botellas marcadas como regalo en órdenes — se cuentan como gasto de marketing, ya
+              descontadas de la ganancia total.
+            </p>
+          </div>
+          <div className="text-right whitespace-nowrap">
+            <p className="font-bold text-wine">{formatoMXN(finanzas.regalosClientes.costo)}</p>
+            <p className="text-xs text-muted">
+              {finanzas.regalosClientes.botellas} botella
+              {finanzas.regalosClientes.botellas === 1 ? "" : "s"}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         <div className="p-4">
           <h2 className="font-semibold">Pagos y gastos recientes</h2>

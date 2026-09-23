@@ -79,13 +79,21 @@ export default async function DetalleOrdenPage({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{l.producto.nombre}</p>
+              <p className="font-medium truncate">
+                {l.producto.nombre}
+                {l.esRegalo && (
+                  <span className="ml-2 text-xs font-medium text-wine bg-wine-light rounded-full px-2 py-0.5">
+                    🎁 Regalo
+                  </span>
+                )}
+              </p>
               <p className="text-xs text-muted">
-                {l.cantidadBotellas} botella{l.cantidadBotellas === 1 ? "" : "s"} × {formatoMXN(l.precioUnitario)}
+                {l.cantidadBotellas} botella{l.cantidadBotellas === 1 ? "" : "s"}
+                {!l.esRegalo && ` × ${formatoMXN(l.precioUnitario)}`}
               </p>
             </div>
             <span className="font-semibold whitespace-nowrap">
-              {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
+              {l.esRegalo ? "Sin costo" : formatoMXN(l.cantidadBotellas * l.precioUnitario)}
             </span>
           </div>
         ))}

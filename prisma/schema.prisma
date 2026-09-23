@@ -172,12 +172,13 @@ model Orden {
 }
 
 model OrdenLinea {
-  id               String @id @default(cuid())
+  id               String  @id @default(cuid())
   ordenId          String
   productoId       String
   cantidadBotellas Int
   precioUnitario   Float
   costoUnitario    Float // costo por botella al momento de vender (para calcular margen)
+  esRegalo         Boolean @default(false) // precio $0 a propósito: se cuenta como gasto de marketing, no como venta perdida
 
   orden    Orden    @relation(fields: [ordenId], references: [id])
   producto Producto @relation(fields: [productoId], references: [id])

@@ -15,6 +15,8 @@ type Linea = {
   cantidad: number | "";
   unidad: Unidad;
   precioUnitario: number | "";
+  precioAntesDeRegalo: number | "";
+  esRegalo: boolean;
 };
 
 function lineaVacia(): Linea {
@@ -25,6 +27,8 @@ function lineaVacia(): Linea {
     cantidad: 1,
     unidad: "BOTELLAS",
     precioUnitario: 0,
+    precioAntesDeRegalo: 0,
+    esRegalo: false,
   };
 }
 
@@ -49,7 +53,12 @@ export function OrdenForm({
   stockPorProducto?: Record<string, number>;
   clienteIdInicial?: string;
   fechaInicial?: string;
-  lineasIniciales?: { productoId: string; cantidadBotellas: number; precioUnitario: number }[];
+  lineasIniciales?: {
+    productoId: string;
+    cantidadBotellas: number;
+    precioUnitario: number;
+    esRegalo?: boolean;
+  }[];
   action?: (formData: FormData) => void;
   botonTexto?: string;
 }) {
@@ -65,6 +74,8 @@ export function OrdenForm({
       cantidad: l.cantidadBotellas,
       unidad: "BOTELLAS" as Unidad,
       precioUnitario: l.precioUnitario,
+      precioAntesDeRegalo: l.esRegalo ? 0 : l.precioUnitario,
+      esRegalo: l.esRegalo ?? false,
     }));
   });
   const [agregandoCliente, setAgregandoCliente] = useState(false);
@@ -79,10 +90,22 @@ export function OrdenForm({
       prev.map((l, i) => {
         if (i !== index) return l;
         const nueva = { ...l, ...cambios };
-        if (cambios.productoId !== undefined) {
+        if (cambios.productoId !== undefined && !l.esRegalo) {
           nueva.precioUnitario = precioSugerido(clienteId, cambios.productoId);
         }
         return nueva;
+      }),
+    );
+  }
+
+  function alternarRegalo(index: number) {
+    setLineas((prev) =>
+      prev.map((l, i) => {
+        if (i !== index) return l;
+        if (l.esRegalo) {
+          return { ...l, esRegalo: false, precioUnitario: l.precioAntesDeRegalo };
+        }
+        return { ...l, esRegalo: true, precioAntesDeRegalo: l.precioUnitario, precioUnitario: 0 };
       }),
     );
   }
@@ -138,6 +161,7 @@ export function OrdenForm({
       productoId: l.productoId,
       cantidadBotellas: cantidadBotellas(l),
       precioUnitario: precio(l),
+      esRegalo: l.esRegalo,
     }));
 
   return (
@@ -278,17 +302,26 @@ export function OrdenForm({
                     type="number"
                     min={0}
                     step="0.01"
+                    disabled={l.esRegalo}
                     value={l.precioUnitario}
                     onChange={(e) =>
                       actualizarLinea(i, {
                         precioUnitario: e.target.value === "" ? "" : Number(e.target.value),
                       })
                     }
-                    className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2 text-sm"
+                    className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2 text-sm disabled:opacity-60"
                   />
                 </div>
               </label>
-              {l.productoId && (
+              <label className="flex items-center gap-2 text-xs -mt-1">
+                <input
+                  type="checkbox"
+                  checked={l.esRegalo}
+                  onChange={() => alternarRegalo(i)}
+                />
+                <span>🎁 Es un regalo (precio $0 — se cuenta como gasto de marketing)</span>
+              </label>
+              {l.productoId && !l.esRegalo && (
                 <p className="text-xs text-muted -mt-1">
                   {yaVendido
                     ? "Último precio que le diste a este cliente en este vino."

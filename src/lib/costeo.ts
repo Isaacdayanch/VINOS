@@ -164,6 +164,8 @@ export type ResumenFinanzas = {
   saldoMaaser: number; // positivo = a favor, negativo = debe
   consumoCompartido: { botellas: number; costo: number }; // botellas que Isaac y Beto se repartieron
   regalosClientes: { botellas: number; costo: number }; // botellas regaladas a clientes (marketing)
+  perdidaAjusteInventario: { botellas: number; costo: number }; // faltantes sin dueño (pérdida del negocio)
+  gananciaAjusteInventario: { botellas: number; costo: number }; // sobrantes encontrados (ganancia extra)
 };
 
 const PORCENTAJE_MAASER = 0.1;
@@ -177,7 +179,7 @@ export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: num
  * saldo de Caja/Cuenta, y el saldo entre socios (quién le debe a quién).
  */
 export async function calcularFinanzas(): Promise<ResumenFinanzas> {
-  const [resumenInventario, socios, pagos, cobros, cobrosConsignacion, ordenes, salidasPersonales] =
+  const [resumenInventario, socios, pagos, cobros, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock] =
     await Promise.all([
       calcularResumenInventario(),
       prisma.socio.findMany(),
@@ -186,6 +188,7 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
       prisma.cobroConsignacion.findMany(),
       prisma.orden.findMany({ include: { lineas: true } }),
       prisma.salida.findMany({ where: { motivo: "Consumo personal" } }),
+      prisma.ajusteStock.findMany(),
     ]);
 
   let valorInventario = 0;
@@ -294,6 +297,31 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     }
   }
 
+  // Ajustes de inventario: si un faltante se le carga a un socio (se lo
+  // llevó él), cuenta igual que un consumo personal. Si nadie se lo llevó,
+  // es pérdida del negocio; si sobraron botellas, es ganancia extra.
+  let perdidaAjusteBotellas = 0;
+  let perdidaAjusteCosto = 0;
+  let gananciaAjusteBotellas = 0;
+  let gananciaAjusteCosto = 0;
+  for (const a of ajustesStock) {
+    if (a.botellas < 0) {
+      const botellas = Math.abs(a.botellas);
+      const costoBruto = a.costoUnitario * botellas;
+      if (a.socioId) {
+        consumoPorSocio.set(a.socioId, (consumoPorSocio.get(a.socioId) ?? 0) + costoBruto);
+        botellasPorSocio.set(a.socioId, (botellasPorSocio.get(a.socioId) ?? 0) + botellas);
+        costoBrutoPorSocio.set(a.socioId, (costoBrutoPorSocio.get(a.socioId) ?? 0) + costoBruto);
+      } else {
+        perdidaAjusteBotellas += botellas;
+        perdidaAjusteCosto += costoBruto;
+      }
+    } else if (a.botellas > 0) {
+      gananciaAjusteBotellas += a.botellas;
+      gananciaAjusteCosto += a.botellas * a.costoUnitario;
+    }
+  }
+
   const resumenSocios: ResumenSocio[] = socios.map((s) => {
     const aportado = aportadoPorSocio.get(s.id) ?? 0;
     const consumoPersonal = consumoPorSocio.get(s.id) ?? 0;
@@ -342,6 +370,8 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     saldoEntreSocios,
     consumoCompartido: { botellas: compartidoBotellas, costo: compartidoCosto },
     regalosClientes: { botellas: regalosBotellas, costo: regalosCosto },
+    perdidaAjusteInventario: { botellas: perdidaAjusteBotellas, costo: perdidaAjusteCosto },
+    gananciaAjusteInventario: { botellas: gananciaAjusteBotellas, costo: gananciaAjusteCosto },
     maaserDebido,
     maaserDado,
     saldoMaaser,

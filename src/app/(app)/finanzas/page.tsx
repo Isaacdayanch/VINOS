@@ -180,6 +180,44 @@ export default async function FinanzasPage() {
         </div>
       )}
 
+      {finanzas.perdidaAjusteInventario.botellas > 0 && (
+        <div className="rounded-lg border border-warn/40 bg-warn-bg p-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-warn">📉 Pérdida por ajuste de inventario</h2>
+            <p className="text-xs text-warn/80 mt-1">
+              Botellas que faltaron al ajustar stock y nadie se las llevó — pérdida del negocio,
+              no de ningún socio. No está restada de la ganancia total.
+            </p>
+          </div>
+          <div className="text-right whitespace-nowrap">
+            <p className="font-bold text-warn">{formatoMXN(finanzas.perdidaAjusteInventario.costo)}</p>
+            <p className="text-xs text-warn/80">
+              {finanzas.perdidaAjusteInventario.botellas} botella
+              {finanzas.perdidaAjusteInventario.botellas === 1 ? "" : "s"}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {finanzas.gananciaAjusteInventario.botellas > 0 && (
+        <div className="rounded-lg border border-ok/40 bg-surface p-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-ok">📈 Ganancia extra por ajuste de inventario</h2>
+            <p className="text-xs text-muted mt-1">
+              Botellas que sobraron al ajustar stock (aparecieron de más). No está sumada a la
+              ganancia total.
+            </p>
+          </div>
+          <div className="text-right whitespace-nowrap">
+            <p className="font-bold text-ok">{formatoMXN(finanzas.gananciaAjusteInventario.costo)}</p>
+            <p className="text-xs text-muted">
+              {finanzas.gananciaAjusteInventario.botellas} botella
+              {finanzas.gananciaAjusteInventario.botellas === 1 ? "" : "s"}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         <div className="p-4">
           <h2 className="font-semibold">Pagos y gastos recientes</h2>

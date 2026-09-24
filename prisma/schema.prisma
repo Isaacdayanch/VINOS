@@ -73,9 +73,11 @@ model AjusteStock {
   botellas      Int // positivo = se encontraron de más, negativo = faltan
   costoUnitario Float // costo promedio del producto al momento del ajuste
   motivo        String? // nota libre, ej. "Conteo físico de septiembre"
+  socioId       String? // solo si botellas<0: se le carga a este socio como consumo personal (null = pérdida del negocio)
   createdAt     DateTime @default(now())
 
   producto Producto @relation(fields: [productoId], references: [id])
+  socio    Socio?   @relation(fields: [socioId], references: [id])
 }
 
 model ProductoImagenExtra {
@@ -120,8 +122,9 @@ model Socio {
   id     String @id @default(cuid())
   nombre String
 
-  pagos   Pago[]
-  salidas Salida[]
+  pagos        Pago[]
+  salidas      Salida[]
+  ajustesStock AjusteStock[]
 }
 
 model Pedido {

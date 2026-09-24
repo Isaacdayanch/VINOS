@@ -474,6 +474,90 @@ export async function calcularMovimientosCuenta(
   return { saldo, movimientos };
 }
 
+export type MovimientoFinanzas = MovimientoCuenta & { cuenta: "EFECTIVO" | "CUENTA" };
+
+/** Junta los movimientos de Efectivo y Transferencia en una sola línea de tiempo. */
+export async function calcularMovimientosFinanzas(limite?: number): Promise<MovimientoFinanzas[]> {
+  const [efectivo, cuenta] = await Promise.all([
+    calcularMovimientosCuenta("EFECTIVO"),
+    calcularMovimientosCuenta("CUENTA"),
+  ]);
+
+  const movimientos: MovimientoFinanzas[] = [
+    ...efectivo.movimientos.map((m) => ({ ...m, cuenta: "EFECTIVO" as const })),
+    ...cuenta.movimientos.map((m) => ({ ...m, cuenta: "CUENTA" as const })),
+  ].sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+
+  return limite ? movimientos.slice(0, limite) : movimientos;
+}
+
+export type MovimientoStock = {
+  id: string;
+  fecha: Date;
+  tipo: "entrada" | "salida" | "ajuste";
+  signo: 1 | -1;
+  botellas: number; // siempre positivo, el signo lo da "signo"
+  producto: string;
+  detalle: string;
+  href: string | null;
+};
+
+/** Junta entradas de pedidos, salidas y ajustes de stock en una sola línea de tiempo. */
+export async function calcularMovimientosStock(limite?: number): Promise<MovimientoStock[]> {
+  const [entradas, salidas, ajustes] = await Promise.all([
+    prisma.entradaLinea.findMany({
+      where: { recibida: true },
+      include: { producto: true, pedido: true },
+    }),
+    prisma.salida.findMany({ include: { producto: true } }),
+    prisma.ajusteStock.findMany({ include: { producto: true, socio: true } }),
+  ]);
+
+  const movimientos: MovimientoStock[] = [];
+
+  for (const e of entradas) {
+    movimientos.push({
+      id: `entrada-${e.id}`,
+      fecha: e.fecha,
+      tipo: "entrada",
+      signo: 1,
+      botellas: Math.round(e.cajasRecibidas * e.piezasPorCaja),
+      producto: e.producto.nombre,
+      detalle: `Pedido ${e.pedido.folio}`,
+      href: `/pedidos/${e.pedidoId}`,
+    });
+  }
+
+  for (const s of salidas) {
+    movimientos.push({
+      id: `salida-${s.id}`,
+      fecha: s.fecha,
+      tipo: "salida",
+      signo: -1,
+      botellas: s.botellas,
+      producto: s.producto.nombre,
+      detalle: s.motivo,
+      href: s.ordenId ? `/ordenes/${s.ordenId}` : null,
+    });
+  }
+
+  for (const a of ajustes) {
+    movimientos.push({
+      id: `ajuste-${a.id}`,
+      fecha: a.fecha,
+      tipo: "ajuste",
+      signo: a.botellas >= 0 ? 1 : -1,
+      botellas: Math.abs(a.botellas),
+      producto: a.producto.nombre,
+      detalle: a.motivo || (a.socio ? `Se las llevó ${a.socio.nombre}` : "Ajuste de inventario"),
+      href: `/stock/${a.productoId}/ajustar`,
+    });
+  }
+
+  movimientos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+  return limite ? movimientos.slice(0, limite) : movimientos;
+}
+
 export type MovimientoEstadoCuenta = {
   id: string;
   fecha: Date;

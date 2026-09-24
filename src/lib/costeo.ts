@@ -88,6 +88,24 @@ export async function calcularResumenInventario(): Promise<
     salidas.map((s) => [s.productoId, s._sum.botellas ?? 0]),
   );
 
+  // Ajustes de inventario (conteo físico): positivo suma como si hubiera
+  // entrado, negativo se resta como si hubiera salido — sin tocar el costo
+  // de las botellas que sí quedan.
+  const ajustes = await prisma.ajusteStock.findMany();
+  for (const a of ajustes) {
+    if (a.botellas > 0) {
+      const acc = acumPorProducto.get(a.productoId) ?? { botellas: 0, costoTotalMXN: 0 };
+      acc.botellas += a.botellas;
+      acc.costoTotalMXN += a.botellas * a.costoUnitario;
+      acumPorProducto.set(a.productoId, acc);
+    } else if (a.botellas < 0) {
+      salidasPorProducto.set(
+        a.productoId,
+        (salidasPorProducto.get(a.productoId) ?? 0) + Math.abs(a.botellas),
+      );
+    }
+  }
+
   const resumen = new Map<string, ResumenProducto>();
   for (const [productoId, acc] of acumPorProducto) {
     const botellasSalidas = salidasPorProducto.get(productoId) ?? 0;

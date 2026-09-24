@@ -63,6 +63,19 @@ model Producto {
   preciosCliente         PrecioClienteProducto[]
   notaConsignacionLineas NotaConsignacionLinea[]
   imagenesExtra          ProductoImagenExtra[]
+  ajustesStock           AjusteStock[]
+}
+
+model AjusteStock {
+  id            String   @id @default(cuid())
+  productoId    String
+  fecha         DateTime @default(now())
+  botellas      Int // positivo = se encontraron de más, negativo = faltan
+  costoUnitario Float // costo promedio del producto al momento del ajuste
+  motivo        String? // nota libre, ej. "Conteo físico de septiembre"
+  createdAt     DateTime @default(now())
+
+  producto Producto @relation(fields: [productoId], references: [id])
 }
 
 model ProductoImagenExtra {

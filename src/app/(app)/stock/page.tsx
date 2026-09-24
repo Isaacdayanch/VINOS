@@ -64,32 +64,36 @@ export default async function StockPage() {
           const minimo = p.stockMinimo ?? 8;
           const bajo = stock <= minimo;
           return (
-            <Link
-              key={p.id}
-              href={`/productos/${p.id}/editar`}
-              className="p-4 flex items-center gap-3 hover:bg-wine-light/40"
-            >
-              <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
-                {p.fotoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
-                ) : (
-                  <span className="text-xl">🍷</span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{p.nombre}</p>
-                <p className="text-xs text-muted">
-                  {p.sku} · {formatearCajasYBotellas(stock, p.piezasPorCaja)}
-                </p>
-              </div>
-              <div className="text-right">
+            <div key={p.id} className="p-4 flex items-center gap-3 hover:bg-wine-light/40">
+              <Link href={`/productos/${p.id}/editar`} className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
+                  {p.fotoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
+                  ) : (
+                    <span className="text-xl">🍷</span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{p.nombre}</p>
+                  <p className="text-xs text-muted">
+                    {p.sku} · {formatearCajasYBotellas(stock, p.piezasPorCaja)}
+                  </p>
+                </div>
+              </Link>
+              <div className="text-right shrink-0">
                 <p className={`font-semibold ${bajo ? "text-warn" : ""}`}>
                   {stock} bot.
                 </p>
                 {bajo && <p className="text-xs text-warn">⚠ Reponer</p>}
+                <Link
+                  href={`/stock/${p.id}/ajustar`}
+                  className="text-xs text-wine underline whitespace-nowrap"
+                >
+                  Ajustar
+                </Link>
               </div>
-            </Link>
+            </div>
           );
         })}
         {productos.length === 0 && (

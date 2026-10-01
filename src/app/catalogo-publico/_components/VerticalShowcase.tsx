@@ -11,7 +11,7 @@ export function VerticalShowcase() {
     <div className={styles.showcaseHeading}>
       <span className={styles.eyebrow}>Una selección con carácter</span>
       <h2>Cada botella.<br />Su propio mundo.</h2>
-      <div className={styles.showcaseIntro}><p>Desliza hacia abajo para descubrir.</p><Link href="/catalogo-publico/catalogo" className={styles.textLink}>Ir al catálogo <span aria-hidden="true">↗</span></Link></div>
+      <div className={styles.showcaseIntro}><p>Desliza hacia abajo para descubrir.</p><Link href="/catalogo-publico/catalogo" className={styles.textLink}>Ir al catálogo </Link></div>
     </div>
     {showcaseWines.map((wine, index) => <article key={wine.slug} id={`descubre-${wine.slug}`} className={styles.showcaseScene} aria-labelledby={`titulo-${wine.slug}`}>
       <div className={styles.showcaseImage}>
@@ -22,9 +22,9 @@ export function VerticalShowcase() {
         <h3 id={`titulo-${wine.slug}`}>{wine.name}</h3>
         <p className={styles.showcaseYear}>{wine.year}</p>
         {wine.description && <p className={styles.showcaseDescription}>{wine.description}</p>}
-        {wine.facts && <details className={styles.showcaseFacts}><summary>Conocer este vino</summary><ul>{wine.facts.map(fact => <li key={fact}>{fact}</li>)}</ul>{wine.labelImage && <a href={`/catalogo/${wine.labelImage}`} className={styles.textLink} target="_blank" rel="noopener noreferrer">Ver etiqueta original <span className={styles.srOnly}>(abre otra pestaña)</span><span aria-hidden="true">↗</span></a>}</details>}
-        <div className={styles.showcaseActions}><Link href="/catalogo-publico/catalogo" className={styles.textLink}>Explorar la selección <span aria-hidden="true">↗</span></Link>
-          {index < showcaseWines.length - 1 && <a href={`#descubre-${showcaseWines[index + 1].slug}`} className={styles.nextWine} aria-label={`Siguiente botella: ${showcaseWines[index + 1].producer} ${showcaseWines[index + 1].name}`}><span aria-hidden="true">↓</span></a>}
+        {wine.facts && <details className={styles.showcaseFacts}><summary>Conocer este vino</summary><ul>{wine.facts.map(fact => <li key={fact}>{fact}</li>)}</ul>{wine.labelImage && <a href={`/catalogo/${wine.labelImage}`} className={styles.textLink} target="_blank" rel="noopener noreferrer">Ver etiqueta original <span className={styles.srOnly}>(abre otra pestaña)</span></a>}</details>}
+        <div className={styles.showcaseActions}><Link href="/catalogo-publico/catalogo" className={styles.textLink}>Explorar la selección </Link>
+          {index < showcaseWines.length - 1 && <a href={`#descubre-${showcaseWines[index + 1].slug}`} className={styles.textLink} aria-label={`Siguiente botella: ${showcaseWines[index + 1].producer} ${showcaseWines[index + 1].name}`}>Siguiente botella</a>}
         </div>
       </div>
     </article>)}

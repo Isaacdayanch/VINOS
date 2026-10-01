@@ -57,12 +57,12 @@ export function Collection({ wines, date }: { wines: PublicWine[]; date: string 
       <div className={styles.productGrid}>
         {filtered.map((wine, i) => <WineCard wine={wine} key={wine.id ?? `${wine.nombre}-${i}`} />)}
       </div>
-      {!filtered.length && <div className={styles.empty}><h3>{wines.length ? "Otra búsqueda, otra botella." : "Estamos preparando la selección."}</h3><p>{wines.length ? "Prueba con menos filtros para descubrir más vinos." : "Los vinos aparecerán aquí al publicar el catálogo."}</p>{active && <button className={styles.darkPill} onClick={reset}>Ver todos los vinos →</button>}</div>}
-      <div className={styles.publication}><p>{date ? `Precios publicados el ${date}, en MXN.` : "Precios en MXN."}</p><button type="button" onClick={() => window.print()}>Imprimir selección ↗</button></div>
+      {!filtered.length && <div className={styles.empty}><h3>{wines.length ? "Otra búsqueda, otra botella." : "Estamos preparando la selección."}</h3><p>{wines.length ? "Prueba con menos filtros para descubrir más vinos." : "Los vinos aparecerán aquí al publicar el catálogo."}</p>{active && <button className={styles.darkPill} onClick={reset}>Ver todos los vinos</button>}</div>}
+      <div className={styles.publication}><p>{date ? `Precios publicados el ${date}, en MXN.` : "Precios en MXN."}</p><button type="button" onClick={() => window.print()}>Imprimir selección</button></div>
       <dialog ref={drawer} className={styles.filterDialog} onClick={(e) => { if (e.target === e.currentTarget) drawer.current?.close(); }}>
         <button className={styles.close} aria-label="Cerrar filtros" onClick={() => drawer.current?.close()}>×</button>
         <h2>Encuentra tu vino.</h2>{filters("mobile")}
-        <button className={styles.darkPill} onClick={() => drawer.current?.close()}>Ver {filtered.length} vinos →</button>
+        <button className={styles.darkPill} onClick={() => drawer.current?.close()}>Ver {filtered.length} vinos</button>
         {active && <button className={styles.reset} onClick={reset}>Limpiar filtros</button>}
       </dialog>
     </section>
@@ -71,7 +71,7 @@ export function Collection({ wines, date }: { wines: PublicWine[]; date: string 
 
 function WineCard({ wine }: { wine: PublicWine }) {
   const content = <>
-    <div className={styles.productImage}>{wine.fotoUrl ? <Image src={wine.fotoUrl} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill sizes="(max-width: 700px) 46vw, (max-width: 1100px) 30vw, 23vw" className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}<span className={styles.cardArrow} aria-hidden="true">↗</span></div>
+    <div className={styles.productImage}>{wine.fotoUrl ? <Image src={wine.fotoUrl} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill sizes="(max-width: 700px) 46vw, (max-width: 1100px) 30vw, 23vw" className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}</div>
     <div className={styles.cardDetails}><p className={styles.eyebrow}>{[wine.categoria, wine.anio].filter(Boolean).join(" · ")}</p><h3>{wine.nombre}</h3><p className={styles.cardPrice}>{wine.precioLista !== null ? money.format(wine.precioLista) : "Precio por confirmar"}</p></div>
   </>;
   return <article className={styles.card}>{wine.id ? <Link href={`/catalogo-publico/${wine.id}`} prefetch={false}>{content}</Link> : <div>{content}</div>}</article>;

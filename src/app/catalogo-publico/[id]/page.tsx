@@ -27,7 +27,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
   return <>
     <Header />
     <main id="contenido" className={styles.winePage}>
-      <Link className={styles.back} href="/catalogo-publico/catalogo">← Volver a la selección</Link>
+      <Link className={styles.back} href="/catalogo-publico/catalogo">Volver a la selección</Link>
       <div className={styles.wineTop}>
         <Gallery photos={photos} name={product.nombre} />
         <div className={styles.wineInfo}>
@@ -37,7 +37,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
           <p className={styles.winePrice}>{product.precioLista !== null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(product.precioLista) : "Precio por confirmar"}<span>MXN</span></p>
           <p className={styles.purchaseNote}>{product.activo ? "Los pedidos en línea estarán disponibles próximamente." : "Este vino no está disponible actualmente."}</p>
           <dl className={styles.details}>{details.map(([label, value]) => <div key={String(label)}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
-          <a href="#sobre-el-vino" className={styles.textLink}>Conoce este vino <span aria-hidden="true">↓</span></a>
+          <a href="#sobre-el-vino" className={styles.textLink}>Conoce este vino </a>
         </div>
       </div>
       <section id="sobre-el-vino" className={styles.wineStory}>
@@ -46,7 +46,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
         <div className={styles.storySections}>
           {[["El vino", product.descripcion], ["Notas de cata", product.notas], ["En la mesa", product.maridaje]].filter(([, text]) => Boolean(text)).map(([title, text]) => <section key={title}><h3>{title}</h3><p>{text}</p></section>)}
         </div>
-        <Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Seguir descubriendo <span aria-hidden="true">→</span></Link>
+        <Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Seguir descubriendo </Link>
       </section>
     </main>
   </>;

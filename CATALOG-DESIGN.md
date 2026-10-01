@@ -116,3 +116,17 @@ en el catálogo real ni publicar una ruta temporal de pruebas.
 - Menú y footer comparten las tres rutas. Todos los accesos comerciales del hero, recorrido y fichas llevan al catálogo independiente.
 - La cuadrícula aparece directamente en el catálogo: el bloque anterior de descubrimiento no antecede la búsqueda. Inicio y nosotros pueden prerenderizarse; el catálogo permanece dinámico.
 - No se modifica middleware, rutas administrativas, esquema, consultas existentes ni configuración de producción.
+
+## Refinamiento de navegación
+
+Rayitas del menú sin aro; conservar área táctil de 44 px. Enlaces y CTA sin flechas
+unicode decorativas. Menú y enlaces editoriales usan pastillas discretas que cambian
+a borgoña al tocar/hover, con foco visible y reduced-motion. «Siguiente botella»
+reemplaza el icono para mantener una acción comprensible.
+
+Galerías futuras: trabajar vino por vino a partir de frente y contraetiqueta originales.
+Seis vistas propuestas: frente blanco, reverso blanco, sirviendo, copa con color,
+maridaje recomendado y escena editorial. Validar datos antes de generar, distinguir
+recomendación de maridaje de datos impresos y no representar ambientaciones como
+bodegas reales. No reconstruir texto/sellos ilegibles. Integración exclusivamente
+pública; no escribir imágenes ni datos en CRM sin autorización específica.

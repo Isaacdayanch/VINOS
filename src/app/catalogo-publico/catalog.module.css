@@ -23,13 +23,15 @@
 .headerBrand { font-size: 24px; letter-spacing: .18em; font-weight: 400; }
 .headerHero .headerBrand { font-size: 10px; letter-spacing: .3em; }
 .headerActions { display: flex; gap: 30px; align-items: center; font-size: 12px; }
-.headerActions > a { display: flex; align-items: center; gap: 18px; min-height: 44px; }
-.menuButton { background: none; border: 1px solid currentColor; width: 44px; height: 44px; border-radius: 50%; display: grid; place-content: center; gap: 6px; color: inherit; }
+.headerActions > a { display: flex; align-items: center; min-height: 44px; padding: 10px 18px; border-radius: 50px; transition: color .2s ease, background-color .2s ease; }
+.headerActions > a:is(:hover,:active) { color: var(--cream); background: var(--burgundy); }
+.menuButton { background: none; border: 0; width: 44px; height: 44px; border-radius: 0; display: grid; place-content: center; gap: 6px; color: inherit; }
 .menuButton span { display: block; width: 17px; height: 1px; background: currentColor; }
 .menu { inset: 0 0 0 auto; margin: 0; width: min(560px,100%); height: 100dvh; max-height: 100dvh; max-width: 100%; padding: 100px 40px 40px; border: 0; color: var(--ink); background: var(--cream); }
 .menu::backdrop, .filterDialog::backdrop { background: rgb(22 15 13 / .55); }
-.menu nav { display: grid; margin-top: 36px; }
-.menu nav a { font: 400 clamp(28px,4vw,42px)/1.2 var(--serif); border-bottom: 1px solid var(--line); padding: 24px 0; display: flex; justify-content: space-between; gap: 25px; }
+.menu nav { display: grid; gap: 12px; margin-top: 36px; }
+.menu nav a { font: 400 clamp(28px,4vw,42px)/1.2 var(--serif); border: 1px solid var(--line); border-radius: 50px; padding: 20px 24px; display: flex; align-items: center; min-height: 64px; transition: color .2s ease, background-color .2s ease, border-color .2s ease; }
+.menu nav a:is(:hover,:active,:focus-visible) { background: var(--burgundy); border-color: var(--burgundy); color: var(--cream); }
 .close { position: absolute; top: 20px; right: 22px; border: 0; background: transparent; font-size: 34px !important; width: 44px; height: 44px; color: var(--ink); }
 .hero { position: relative; height: max(780px,100svh); max-height: 1150px; isolation: isolate; overflow: hidden; color: white; background: #57534e; }
 .heroBackground { object-fit: cover; object-position: center; transform: translateY(var(--hero-shift,0px)) scale(1.07); }
@@ -43,7 +45,9 @@
 .pill, .darkPill { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 48px; border-radius: 50px; padding: 14px 26px; font-size: 12px; border: 1px solid transparent; }
 .pill { color: var(--ink) !important; background: var(--cream); margin-top: 28px; }
 .darkPill { background: var(--burgundy); color: white !important; }
-.pill:hover, .darkPill:hover { filter: brightness(.94); }
+.pill, .darkPill { transition: color .2s ease, background-color .2s ease; }
+.pill:is(:hover,:active) { background: var(--burgundy); color: var(--cream) !important; }
+.darkPill:is(:hover,:active) { background: var(--ink); }
 .heroCaption { position: absolute; right: var(--gutter); bottom: 15%; display: flex; flex-direction: column; gap: 5px; writing-mode: vertical-rl; font-size: 10px; letter-spacing: .13em; }
 .scrollHint { position: absolute; bottom: 28px; right: var(--gutter); font-size: 10px; letter-spacing: .08em; display: flex; gap: 18px; align-items: center; min-height: 44px; }
 /* Vertical editorial carousel uses native document scrolling. */
@@ -63,7 +67,6 @@
 .showcaseFacts ul { padding: 0 0 20px 18px; line-height: 2; }
 .showcaseFacts summary:focus-visible { outline: 2px solid var(--burgundy); outline-offset: 4px; }
 .showcaseActions { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 35px; }
-.nextWine { display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; width: 48px; height: 48px; font-size: 24px; }
 @keyframes bottlePassage { from { transform: translateY(45px) rotate(-2deg); } to { transform: translateY(-45px) rotate(2deg); } }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -97,7 +100,6 @@
 .productImage { position: relative; aspect-ratio: 4/5; background: var(--cream); }
 .productImage > img { padding: 24px 16px; transition: transform .5s ease; }
 .card:hover .productImage > img { transform: translateY(-7px); }
-.cardArrow { position: absolute; right: 14px; bottom: 14px; border: 1px solid var(--line); display: grid; place-items: center; border-radius: 50%; width: 36px; height: 36px; }
 .cardDetails { padding-top: 18px; }
 .cardDetails h3 { font: 500 25px/1.08 var(--serif); margin: 9px 0; }
 .cardPrice { font-size: 13px; margin-top: 14px !important; }
@@ -139,7 +141,8 @@
 .details > div { display: flex; justify-content: space-between; gap: 25px; padding: 9px 0; font-size: 12px; }
 .details dt { color: var(--muted); }
 .details dd { margin: 0; text-align: right; }
-.textLink { display: inline-flex; gap: 30px; border-bottom: 1px solid var(--line); min-height: 44px; align-items: center; font-size: 12px; }
+.textLink { display: inline-flex; min-height: 44px; align-items: center; padding: 10px 18px; border: 1px solid var(--line); border-radius: 50px; font-size: 12px; transition: color .2s ease, background-color .2s ease, border-color .2s ease; }
+.textLink:is(:hover,:active) { background: var(--burgundy); border-color: var(--burgundy); color: var(--cream); }
 .wineStory { padding: 110px 0; max-width: 950px; margin: 0 auto; }
 .wineStory h2 { font: 400 clamp(46px,6vw,90px)/.98 var(--serif); margin: 22px 0 55px; }
 .storySections { display: grid; gap: 38px; margin-bottom: 45px; }
@@ -183,7 +186,6 @@
   .desktopFilters { display: none; }
   .productGrid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 35px 14px; }
   .productImage > img { padding: 16px 8px; }
-  .cardArrow { right: 8px; bottom: 8px; height: 30px; width: 30px; }
   .cardDetails h3 { font-size: 23px; }
   .cardDetails .eyebrow { letter-spacing: .08em; font-size: 9px; }
   .cardPrice { font-size: 12px; }
@@ -204,7 +206,7 @@
 }
 @media print {
   .shell { background: white; color: black; }
-  .header, .hero, .showcase, .discovery, .toolbar, .desktopFilters, .reset, .publication button, .footer, .skip, .cardArrow, .back, .textLink, .darkPill { display: none !important; }
+  .header, .hero, .showcase, .discovery, .toolbar, .desktopFilters, .reset, .publication button, .footer, .skip, .back, .textLink, .darkPill { display: none !important; }
   .collection { padding: 0; background: white; }
   .sectionHeading :is(h1,h2) { font-size: 28px; }
   .productGrid { display: block; }

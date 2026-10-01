@@ -27,7 +27,7 @@ export default function AboutPage() {
           <h2 id="about-selection">Distintos orígenes.<br />Un mismo placer.</h2>
           <p>Nos interesa lo que hace especial a cada botella: su productor, su origen, su añada y su propia expresión. Israel ocupa un lugar protagonista, junto a vinos de otros países.</p>
           <p>Queremos que descubrirlos sea tan agradable como abrirlos. Puedes recorrer las botellas en la presentación o ir directamente al catálogo para consultar la selección y sus precios.</p>
-          <Link href="/catalogo-publico/catalogo" className={styles.textLink}>Ver catálogo con precios <span aria-hidden="true">↗</span></Link>
+          <Link href="/catalogo-publico/catalogo" className={styles.textLink}>Ver catálogo con precios </Link>
         </div>
       </section>
       <section className={styles.aboutPrinciples} aria-labelledby="about-philosophy">
@@ -42,7 +42,7 @@ export default function AboutPage() {
       <section className={styles.aboutClosing} aria-labelledby="about-next">
         <p className={styles.eyebrow}>LA PRÓXIMA BOTELLA</p>
         <h2 id="about-next">Encuentra la tuya.</h2>
-        <Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Explorar el catálogo <span aria-hidden="true">→</span></Link>
+        <Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Explorar el catálogo </Link>
       </section>
     </main>
   </>;

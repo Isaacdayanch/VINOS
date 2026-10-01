@@ -1,101 +1,33 @@
-import { prisma } from "@/lib/prisma";
-import { formatoMXN } from "@/lib/costeo";
-import { BotonImprimir } from "@/components/BotonImprimir";
-import Link from "next/link";
 import Image from "next/image";
+import { Header } from "./_components/Header";
+import { Hero } from "./_components/Hero";
+import { Collection } from "./_components/Collection";
+import { getPublication } from "./_lib/catalog";
+import styles from "./catalog.module.css";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Catálogo de Vinos",
-};
-
-type ProductoPublicado = {
-  id?: string;
-  nombre: string;
-  fotoUrl: string | null;
-  categoria: string | null;
-  anio: number | null;
-  precioLista: number | null;
-};
-
-export default async function CatalogoPublicoPage() {
-  const ultimaPublicacion = await prisma.catalogoPublicado.findFirst({
-    orderBy: { fechaPublicado: "desc" },
-  });
-  const productos = (ultimaPublicacion?.productos as unknown as ProductoPublicado[]) ?? [];
-
-  return (
-    <div className="min-h-full bg-background text-foreground">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="flex items-start justify-between gap-3 print:hidden mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-wine">Catálogo de Vinos</h1>
-            <p className="text-muted text-sm">
-              {ultimaPublicacion
-                ? `Precios vigentes al ${new Date(ultimaPublicacion.fechaPublicado).toLocaleDateString("es-MX")}, en pesos mexicanos (MXN).`
-                : "Todavía no hay catálogo publicado."}
-            </p>
-          </div>
-          {productos.length > 0 && <BotonImprimir />}
+export default async function CatalogPage() {
+  const { wines, date } = await getPublication();
+  return <>
+    <Header overHero />
+    <main id="contenido">
+      <Hero />
+      <section id="historia" className={styles.editorial}>
+        <div className={styles.editorialHeading}><h2>Una selección<br />con carácter.</h2><p>Hay una botella para cada mesa.<br />Y algunas que cambian la conversación.</p></div>
+        <div className={styles.editorialRail} aria-label="Botellas de nuestra selección" tabIndex={0}>
+          {[
+            { image: "dadah-original.jpg", name: "Dādāh", note: "Cabernet Sauvignon · Malbec Barbera", year: "2023" },
+            { image: "tanya-original.jpg", name: "Tanya", note: "Enosh · Petit Verdot · Cosecha tardía", year: "2018 / 2021 / 2024" },
+            { image: "rivallon-original.jpg", name: "Château Grand Rivallon", note: "Saint-Émilion Grand Cru", year: "2012" },
+          ].map((item, i) => <figure key={item.image} className={styles.editorialFigure}>
+            <div className={styles.editorialPhoto}><Image src={`/catalogo/${item.image}`} alt={`${item.name}, ${item.note}`} fill sizes="(max-width: 700px) 85vw, 40vw" className={styles.editorialImg} /></div>
+            <figcaption><span className={styles.eyebrow}>0{i + 1} / {item.year}</span><h3>{item.name}</h3><p>{item.note}</p></figcaption>
+          </figure>)}
         </div>
-
-        {/*
-          A propósito NO se usa CSS grid/flex aquí: al imprimir, los navegadores
-          no reparten bien las tarjetas entre hojas dentro de un grid/flex (el
-          bloque entero se brinca de hoja, o se cortan a la mitad aunque tengan
-          break-inside:avoid) — con flujo normal + inline-block sí lo respetan.
-        */}
-        <div>
-          {productos.map((p, i) => {
-            const tarjeta = (
-              <div className="print-item rounded-lg border border-border bg-surface p-3 flex flex-col gap-2 break-inside-avoid">
-                <div className="relative w-full aspect-[3/5] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center p-2">
-                  {p.fotoUrl ? (
-                    <Image
-                      src={p.fotoUrl}
-                      alt={p.nombre}
-                      fill
-                      sizes="(max-width: 640px) 45vw, 30vw"
-                      className="object-contain"
-                    />
-                  ) : (
-                    <span className="text-3xl">🍷</span>
-                  )}
-                </div>
-                <div className="border-t border-border pt-2">
-                  <p className="font-medium text-sm leading-tight">
-                    {p.nombre} {p.anio ? `(${p.anio})` : ""}
-                  </p>
-                  {p.categoria && <p className="text-xs text-muted">{p.categoria}</p>}
-                  {p.precioLista && (
-                    <p className="text-sm font-semibold text-wine mt-1">
-                      {formatoMXN(p.precioLista)}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-            return (
-              <div key={p.id ?? i} className="inline-block align-top w-1/2 sm:w-1/3 p-2">
-                {p.id ? (
-                  <Link href={`/catalogo-publico/${p.id}`} className="block">
-                    {tarjeta}
-                  </Link>
-                ) : (
-                  tarjeta
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {productos.length === 0 && (
-          <p className="text-center text-muted text-sm py-10">
-            Todavía no hay catálogo publicado.
-          </p>
-        )}
-      </div>
-    </div>
-  );
+        <div className={styles.railHint}><span>Descubre las botellas</span><span aria-hidden="true">Desliza ↔</span></div>
+      </section>
+      <Collection wines={wines} date={date?.toLocaleDateString("es-MX", { timeZone: "America/Mexico_City" }) ?? null} />
+    </main>
+  </>;
 }

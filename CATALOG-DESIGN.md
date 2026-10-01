@@ -107,3 +107,12 @@ Revisar desktop y iPhone: hero/copy, imágenes, overflow, filtros, dialog Escape
 galería, estados vacíos, links de publicaciones antiguas y modo reduced-motion.
 Verificar que el diff final solo incluya el alcance autorizado. No usar datos ficticios
 en el catálogo real ni publicar una ruta temporal de pruebas.
+
+## Arquitectura pública: presentación y catálogo separados
+
+- `/catalogo-publico`: hero y recorrido editorial vertical, sin consulta al catálogo ni cuadrícula comercial.
+- `/catalogo-publico/catalogo`: catálogo con precios, búsqueda, filtros y fichas existentes. Conserva `getPublication` y los precios publicados; no añade escrituras, carrito ni checkout.
+- `/catalogo-publico/nosotros`: presentación de la selección kosher de Israel y otros orígenes. No inventar trayectoria, razón social, equipo, domicilio, contacto, logística ni certificaciones. Completar esos detalles cuando Isaac los confirme.
+- Menú y footer comparten las tres rutas. Todos los accesos comerciales del hero, recorrido y fichas llevan al catálogo independiente.
+- La cuadrícula aparece directamente en el catálogo: el bloque anterior de descubrimiento no antecede la búsqueda. Inicio y nosotros pueden prerenderizarse; el catálogo permanece dinámico.
+- No se modifica middleware, rutas administrativas, esquema, consultas existentes ni configuración de producción.

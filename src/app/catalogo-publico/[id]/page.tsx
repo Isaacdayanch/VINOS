@@ -27,7 +27,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
   return <>
     <Header />
     <main id="contenido" className={styles.winePage}>
-      <Link className={styles.back} href="/catalogo-publico#seleccion">← Volver a la selección</Link>
+      <Link className={styles.back} href="/catalogo-publico/catalogo">← Volver a la selección</Link>
       <div className={styles.wineTop}>
         <Gallery photos={photos} name={product.nombre} />
         <div className={styles.wineInfo}>
@@ -46,7 +46,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
         <div className={styles.storySections}>
           {[["El vino", product.descripcion], ["Notas de cata", product.notas], ["En la mesa", product.maridaje]].filter(([, text]) => Boolean(text)).map(([title, text]) => <section key={title}><h3>{title}</h3><p>{text}</p></section>)}
         </div>
-        <Link href="/catalogo-publico#seleccion" className={styles.darkPill}>Seguir descubriendo <span aria-hidden="true">→</span></Link>
+        <Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Seguir descubriendo <span aria-hidden="true">→</span></Link>
       </section>
     </main>
   </>;

@@ -45,16 +45,8 @@ export function Collection({ wines, date }: { wines: PublicWine[]; date: string 
     </div>;
   }
   return <>
-    <section id="descubrir" className={styles.discovery}>
-      <p className={styles.eyebrow}>SIN COMPLICACIONES</p>
-      <h2>¿Qué se te antoja abrir?</h2>
-      <div className={styles.discoveryLinks}>
-        {categories.map((c, i) => <a href="#seleccion" key={c} onClick={() => { reset(); setCategory(c); }}><span className={styles.discoveryNumber}>{String(i + 1).padStart(2, "0")}</span><span>{c}</span><span aria-hidden="true">↗</span></a>)}
-        {!categories.length && <a href="#seleccion">Descubrir la selección <span aria-hidden="true">↗</span></a>}
-      </div>
-    </section>
     <section id="seleccion" className={styles.collection} aria-labelledby="selection-heading">
-      <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>TU PRÓXIMA BOTELLA</p><h2 id="selection-heading">La selección.</h2></div><p aria-live="polite">{filtered.length} vino{filtered.length === 1 ? "" : "s"}</p></div>
+      <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>TU PRÓXIMA BOTELLA</p><h1 id="selection-heading">Catálogo con precios.</h1></div><p aria-live="polite">{filtered.length} vino{filtered.length === 1 ? "" : "s"}</p></div>
       <div className={styles.toolbar}>
         <label className={styles.search}><span className={styles.srOnly}>Buscar vinos</span><input type="search" placeholder="Busca un vino, tipo o añada…" value={query} onChange={(e) => setQuery(e.target.value)} /><span aria-hidden="true">⌕</span></label>
         <button className={styles.filterButton} type="button" onClick={() => drawer.current?.showModal()}>Filtros {active ? "·" : "+"}</button>

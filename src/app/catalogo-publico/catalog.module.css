@@ -79,7 +79,7 @@
 .discoveryLinks a:hover { color: var(--burgundy); }
 .collection { padding: 90px var(--gutter); background: #fcfaf6; }
 .sectionHeading { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 45px; gap: 20px; }
-.sectionHeading h2 { margin-top: 15px; }
+.sectionHeading :is(h1,h2) { margin-top: 15px; font: 400 clamp(42px,5vw,76px)/1.05 var(--serif); }
 .sectionHeading > p { font-size: 12px; color: var(--muted); }
 .toolbar { display: flex; align-items: center; gap: 25px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
 .search { position: relative; flex: 1; }
@@ -174,7 +174,7 @@
   .discoveryLinks a { font-size: 32px; padding: 18px 0; }
   .collection { padding-top: 60px; padding-bottom: 60px; }
   .sectionHeading { margin-bottom: 28px; }
-  .sectionHeading h2 { font-size: 60px; }
+  .sectionHeading :is(h1,h2) { font-size: 60px; }
   .toolbar { flex-wrap: wrap; gap: 8px 18px; margin-bottom: 26px; }
   .search { flex-basis: 100%; }
   .search input { font-size: 16px; }
@@ -206,7 +206,7 @@
   .shell { background: white; color: black; }
   .header, .hero, .showcase, .discovery, .toolbar, .desktopFilters, .reset, .publication button, .footer, .skip, .cardArrow, .back, .textLink, .darkPill { display: none !important; }
   .collection { padding: 0; background: white; }
-  .sectionHeading h2 { font-size: 28px; }
+  .sectionHeading :is(h1,h2) { font-size: 28px; }
   .productGrid { display: block; }
   .card { display: inline-block; vertical-align: top; width: 32%; padding: 10px; break-inside: avoid; page-break-inside: avoid; }
   .productImage { height: 180px; aspect-ratio: auto; }
@@ -214,4 +214,33 @@
   .gallerySlide { aspect-ratio: 4/5; }
   .wineTop { gap: 30px; }
   .wineStory { padding: 30px 0; }
+}
+
+/* Public architecture: presentation, priced catalog, and editorial about page. */
+.footerNav { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 11px; }
+.footerNav a { display: inline-flex; align-items: center; min-height: 44px; }
+.footer a:focus-visible { outline-color: var(--cream); }
+.aboutIntro { padding: 65px var(--gutter) 85px; border-bottom: 1px solid var(--line); }
+.aboutIntro h1 { font: 400 clamp(64px,9vw,140px)/.93 var(--serif); letter-spacing: -.04em; margin: 28px 0 35px; }
+.aboutLead { max-width: 650px; font-size: clamp(16px,1.8vw,21px); line-height: 1.8; color: var(--muted); }
+.aboutFeature { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(30px,6vw,100px); padding: 70px var(--gutter); background: white; }
+.aboutBottle { position: relative; height: min(75svh,800px); min-height: 420px; }
+.aboutFeature h2, .aboutPrinciples h2, .aboutClosing h2 { font: 400 clamp(42px,5vw,76px)/1.02 var(--serif); letter-spacing: -.025em; margin: 24px 0 30px; }
+.aboutFeature p:not(.eyebrow), .aboutGrid p { color: var(--muted); font-size: 14px; line-height: 1.9; max-width: 560px; }
+.aboutFeature p + p { margin-top: 22px; }
+.aboutFeature .textLink { margin-top: 30px; }
+.aboutPrinciples { padding: 100px var(--gutter); }
+.aboutGrid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 45px; margin-top: 55px; }
+.aboutGrid article { border-top: 1px solid var(--line); padding-top: 24px; }
+.aboutGrid h3 { font: 400 34px/1.1 var(--serif); margin: 22px 0 18px; }
+.aboutClosing { padding: 85px var(--gutter); background: var(--paper); text-align: center; }
+@media (max-width: 700px) {
+  .sectionHeading h1 { font-size: clamp(40px,11vw,60px); }
+  .aboutIntro { padding-top: 45px; padding-bottom: 60px; }
+  .aboutIntro h1 { font-size: clamp(55px,15vw,78px); }
+  .aboutFeature { grid-template-columns: 1fr; gap: 25px; padding-top: 35px; padding-bottom: 60px; }
+  .aboutBottle { height: 62svh; min-height: 370px; max-height: 620px; }
+  .aboutPrinciples { padding-top: 65px; padding-bottom: 65px; }
+  .aboutGrid { grid-template-columns: 1fr; gap: 35px; margin-top: 35px; }
+  .aboutClosing { padding-top: 60px; padding-bottom: 60px; }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import styles from "../catalog.module.css";
 
@@ -42,7 +43,7 @@ export function Hero() {
     </div>
     <div className={styles.heroCopy}>
       <h1>El vino que convierte al plato principal en acompañamiento.</h1>
-      <a href="#seleccion" className={styles.pill}>Explorar vinos <span aria-hidden="true">→</span></a>
+      <Link href="/catalogo-publico/catalogo" className={styles.pill}>Explorar vinos <span aria-hidden="true">→</span></Link>
     </div>
     <div className={styles.heroCaption}><span>DĀDĀH</span><span>Special Reserve · 2017</span></div>
     <a href="#historia" className={styles.scrollHint}>Desliza para descubrir <span aria-hidden="true">↓</span></a>

@@ -11,18 +11,18 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
       {overHero ? "SELECCIÓN DE VINOS" : "VINOS"}
     </Link>
     <div className={styles.headerActions}>
-      <Link href="/catalogo-publico#seleccion">Explorar vinos <span aria-hidden="true">↗</span></Link>
+      <Link href="/catalogo-publico/catalogo">Catálogo <span aria-hidden="true">↗</span></Link>
       <button type="button" className={styles.menuButton} aria-label="Abrir navegación" onClick={() => menu.current?.showModal()}>
         <span /><span />
       </button>
     </div>
     <dialog ref={menu} className={styles.menu} onClick={(e) => { if (e.target === e.currentTarget) menu.current?.close(); }}>
       <button type="button" className={styles.close} onClick={() => menu.current?.close()} aria-label="Cerrar navegación">×</button>
-      <p className={styles.eyebrow}>ELIGE TU PRÓXIMA BOTELLA</p>
+      <p className={styles.eyebrow}>DESCUBRE NUESTRA SELECCIÓN</p>
       <nav aria-label="Navegación pública">
-        <Link href="/catalogo-publico#seleccion" onClick={() => menu.current?.close()}>La selección <span>↗</span></Link>
-        <Link href="/catalogo-publico#descubrir" onClick={() => menu.current?.close()}>Encuentra tu vino <span>↗</span></Link>
-        <Link href="/catalogo-publico#historia" onClick={() => menu.current?.close()}>Una selección con carácter <span>↗</span></Link>
+        <Link href="/catalogo-publico" onClick={() => menu.current?.close()}>Inicio <span aria-hidden="true">↗</span></Link>
+        <Link href="/catalogo-publico/catalogo" onClick={() => menu.current?.close()}>Catálogo con precios <span aria-hidden="true">↗</span></Link>
+        <Link href="/catalogo-publico/nosotros" onClick={() => menu.current?.close()}>Acerca de nosotros <span aria-hidden="true">↗</span></Link>
       </nav>
     </dialog>
   </header>;

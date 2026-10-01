@@ -19,7 +19,12 @@ export default function CatalogLayout({ children }: { children: React.ReactNode 
     <footer className={styles.footer}>
       <Link href="/catalogo-publico" className={styles.footerBrand}>VINOS</Link>
       <p>Una selección con carácter.</p>
-      <p>Precios en pesos mexicanos · Venta exclusiva a mayores de edad.</p>
+      <nav className={styles.footerNav} aria-label="Enlaces del pie de página">
+        <Link href="/catalogo-publico">Inicio</Link>
+        <Link href="/catalogo-publico/catalogo">Catálogo con precios</Link>
+        <Link href="/catalogo-publico/nosotros">Acerca de nosotros</Link>
+      </nav>
+      <p>Venta exclusiva a mayores de edad.</p>
     </footer>
   </div>;
 }

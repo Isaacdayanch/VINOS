@@ -130,3 +130,21 @@ maridaje recomendado y escena editorial. Validar datos antes de generar, disting
 recomendación de maridaje de datos impresos y no representar ambientaciones como
 bodegas reales. No reconstruir texto/sellos ilegibles. Integración exclusivamente
 pública; no escribir imágenes ni datos en CRM sin autorización específica.
+
+## Special Reserve 2017: primera galería de seis vistas
+
+Ficha editorial `/catalogo-publico/seleccion/reserve-2017`, enlazada desde su escena
+de inicio. Reutiliza Gallery con captions y fotos ambientales a sangre; las fichas
+dinámicas y fotos del CRM conservan su comportamiento anterior. Fuente de datos
+`_lib/reserve-2017.ts`: frente IMG_0415(1), contraetiqueta IMG_0414(1), historia
+del estuche IMG_0409. No asociar automáticamente por nombres parecidos a un ID del CRM.
+
+Frente blanco existente más cinco imágenes nuevas: reverso, sirviendo, copa,
+maridaje y mesa. Herramienta integrada, referencias originales, estética piedra/lino
+crema/luz mediterránea, botella 2017 y diseño original. WebP 960×1200, quality85;
+cada imagen nueva pesa 52–154 KB. Contraetiqueta original enlazada para lectura.
+Los sellos y letras pequeñas de la recreación pueden variar: no usarlos como fuente.
+La copa representa un color aproximado, no una medición. Maridaje de res/hongos es
+sugerencia editorial explícita, no información del productor. Escena exterior
+generada, no fotografía de la bodega. No añadir stock, precio ni promesas de compra.
+Datos kosher/no mevushal proceden de contraetiqueta 2017; no extrapolar a otros vinos.

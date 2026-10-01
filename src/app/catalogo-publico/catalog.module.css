@@ -246,3 +246,7 @@
   .aboutGrid { grid-template-columns: 1fr; gap: 35px; margin-top: 35px; }
   .aboutClosing { padding-top: 60px; padding-bottom: 60px; }
 }
+
+.galleryEditorial .galleryScroller { background: white; }
+.galleryEditorial .gallerySlide:nth-child(n+3) > img { padding: 0; object-fit: cover; }
+.galleryNote { font-size: 10px; line-height: 1.7; color: var(--muted); margin-top: 20px !important; }

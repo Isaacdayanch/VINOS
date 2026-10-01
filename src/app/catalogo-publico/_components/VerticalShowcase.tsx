@@ -23,6 +23,7 @@ export function VerticalShowcase() {
         <p className={styles.showcaseYear}>{wine.year}</p>
         {wine.description && <p className={styles.showcaseDescription}>{wine.description}</p>}
         {wine.facts && <details className={styles.showcaseFacts}><summary>Conocer este vino</summary><ul>{wine.facts.map(fact => <li key={fact}>{fact}</li>)}</ul>{wine.labelImage && <a href={`/catalogo/${wine.labelImage}`} className={styles.textLink} target="_blank" rel="noopener noreferrer">Ver etiqueta original <span className={styles.srOnly}>(abre otra pestaña)</span></a>}</details>}
+        {wine.editorialHref && <Link href={wine.editorialHref} className={styles.textLink}>Conocer el vino y sus imágenes</Link>}
         <div className={styles.showcaseActions}><Link href="/catalogo-publico/catalogo" className={styles.textLink}>Explorar la selección </Link>
           {index < showcaseWines.length - 1 && <a href={`#descubre-${showcaseWines[index + 1].slug}`} className={styles.textLink} aria-label={`Siguiente botella: ${showcaseWines[index + 1].producer} ${showcaseWines[index + 1].name}`}>Siguiente botella</a>}
         </div>

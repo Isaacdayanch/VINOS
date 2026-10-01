@@ -25,8 +25,9 @@ de Claude y revisar cambios concurrentes en las rutas públicas.
 - Hero compuesto: fondo atmosférico ilustrativo + botella; assets WebP optimizados.
 - Desplazamiento vertical nativo, parallax/leve inclinación limitada al hero visible.
   Sin scroll hijacking. Respeta cambios en `prefers-reduced-motion` en tiempo real.
-- Recorrido editorial horizontal con scroll-snap nativo y fotografías originales
-  aportadas por Isaac. Captions únicamente basados en etiquetas legibles.
+- Recorrido editorial vertical con botellas individuales sobre blanco, scroll nativo
+  y animación CSS ligada al scroll cuando el navegador la soporte. Sin dependencia
+  de JS ni scroll interno. Fallback estático y reduced-motion. Atajo al catálogo.
 - Catálogo con búsqueda, tipo, añada, presupuesto configurable en `Collection.tsx`,
   orden de precio/nombre y filtros mobile en dialog. No inferir país ni uva del nombre.
 - Ficha con galería de fotos real, navegación táctil/teclado, contenido opcional,
@@ -45,6 +46,35 @@ del catálogo congelado. No se modifica el campo `activo` ni su sincronización.
 No se muestra una cantidad de stock sin una consulta pública específica.
 
 ## Fotografías
+
+### Actualización 1 de octubre: selección vertical
+
+Nueve packshots individuales preparados con la herramienta integrada de imágenes,
+en `public/catalogo/*.webp`, 960×1200 (4:5), blanco y sombra suave. Prompt común:
+extraer solo la botella indicada, eliminar mano/fondo/otras botellas, enderezar,
+mantener identidad, etiqueta, añada, cera y cápsula, encuadre completo sobre blanco.
+Los nueve sujetos y fuentes: Dādāh Reserve Cabernet/Petit Verdot Syrah 2019
+(`IMG_0258(1)`); Cabernet/Malbec Barbera 2023 (`IMG_0257(1)`); Enosh 2018
+(`1C73F035`); Tanya Petit Verdot 2021 (`31D6688D`); Tanya cosecha tardía 2024
+(`IMG_0049`); Titora Special 2021 (`IMG_0071(1)`); Titora Grand 2021 (`IMG_0069`).
+Las ediciones generativas pueden variar letras pequeñas y reflejos: requieren
+comparación de etiqueta antes de producción. Nunca extraer datos del packshot generado.
+
+`_lib/showcase.ts` contiene la selección editorial solicitada por Isaac y datos
+legibles de sus etiquetas; no registra productos en el CRM ni presupone publicación,
+stock o precio. El catálogo real y sus fichas mantienen la fuente de datos existente.
+La selección editorial ahora tiene diez escenas; Grand Rivallon conserva su foto
+original y su presencia depende del catálogo publicado, no de esta selección.
+
+Titora: las fuentes son `IMG_0072` (Special) y `IMG_0070` (Grand), disponibles como
+contraetiquetas WebP enlazadas desde «Conocer este vino». Special: 80% Cabernet,
+10% Shiraz, 10% Petit Verdot, Galilea, 18 meses Allier. Grand: dos variedades,
+Cabernet dominante, Alta Galilea, 24 meses en barricas francesas de primer/segundo
+uso; segunda variedad y proporciones no legibles/no indicadas, no completar.
+Ambas 2021, 750 ml, 14.3%, 18–22 °C y kosher para Pésaj según etiqueta.
+No inferir mevushal ni nombres de certificadores a partir de sellos poco legibles.
+Descripciones traducidas de etiquetas, sin maridajes inventados. Fotos de uso y
+maridajes quedan para una etapa posterior. Ninguna escritura en CRM/Supabase.
 
 Las cuatro fotos originales se conservan sin alterar las etiquetas. La imagen
 recortada con IA del hero es una interpretación editorial y necesita validación

@@ -39,7 +39,7 @@ export function Hero() {
     <div className={styles.heroWordmark} aria-hidden="true">VINOS</div>
     <p className={styles.heroOrigin}>ISRAEL Y EL MUNDO</p>
     <div className={styles.heroBottle}>
-      <Image src="/catalogo/reserve-2017.webp" alt="Dādāh Special Reserve 2017, etiqueta de colores" fill priority sizes="(max-width: 700px) 48vw, 40vw" className={styles.bottleImage} />
+      <Image src="/catalogo/reserve-2017-softlight.webp" alt="Dādāh Special Reserve 2017, etiqueta de colores" fill priority sizes="(max-width: 700px) 48vw, 40vw" className={styles.bottleImage} />
     </div>
     <div className={styles.heroCopy}>
       <h1>El vino que convierte al plato principal en acompañamiento.</h1>

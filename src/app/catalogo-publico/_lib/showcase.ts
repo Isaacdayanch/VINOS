@@ -15,7 +15,7 @@ export type ShowcaseWine = {
 };
 
 export const showcaseWines: readonly ShowcaseWine[] = [
-  { slug: "reserve-2017", producer: "Dādāh", name: "Special Reserve", year: 2017, image: "reserve-2017.webp", editorialHref: "/catalogo-publico/seleccion/reserve-2017" },
+  { slug: "reserve-2017", producer: "Dādāh", name: "Special Reserve", year: 2017, image: "reserve-2017-softlight.webp", editorialHref: "/catalogo-publico/seleccion/reserve-2017" },
   { slug: "titora-special-2021", producer: "La Citadelle de Diamant · Titora", name: "Réserve Spéciale", year: 2021, image: "titora-special-2021.webp",
     labelImage: "titora-special-label.webp",
     description: "Un tinto seco de Galilea que combina 80% Cabernet Sauvignon, 10% Shiraz y 10% Petit Verdot. Su cuerpo va de medio a pleno, con una textura suave y aterciopelada y un final largo. Dieciocho meses en barricas de roble francés de Allier aportan intensidad y elegancia.",

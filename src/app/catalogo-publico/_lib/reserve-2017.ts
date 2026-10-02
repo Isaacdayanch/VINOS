@@ -24,7 +24,7 @@ export const reserve2017: EditorialWine = {
     ["Mevushal", "No mevushal"], ["Alérgenos", "Contiene sulfitos"],
   ],
   photos: [
-    "/catalogo/reserve-2017.webp", "/catalogo/reserve-2017-back.webp",
+    "/catalogo/reserve-2017-softlight.webp", "/catalogo/reserve-2017-back.webp",
     "/catalogo/reserve-2017-pour.webp", "/catalogo/reserve-2017-glass.webp",
     "/catalogo/reserve-2017-pairing.webp", "/catalogo/reserve-2017-table.webp",
   ],

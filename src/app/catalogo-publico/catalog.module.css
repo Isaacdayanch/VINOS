@@ -342,3 +342,17 @@
   .shopPage .productImage { height: 180px; aspect-ratio: auto; }
   .shopPage .cardDetails h2 { font-size: 18px; }
 }
+
+.shopIntroAside { display: grid; justify-items: start; gap: 22px; padding-bottom: 8px; }
+.shopIntroAside > p { font-size: 13px; color: var(--muted); line-height: 1.9; }
+.orderPill { display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 16px; padding: 17px 25px; min-height: 54px; border: 1px solid var(--burgundy); border-radius: 50px; background: var(--burgundy); color: #fff; font-size: 12px; transition: background-color .2s ease; }
+.orderPill:hover { background: var(--ink); border-color: var(--ink); }
+.orderSoon { color: #efd9e1; font-size: 11px; }
+.orderDialog { border: 0; border-radius: 8px; background: #fff; color: var(--ink); width: min(520px,calc(100% - 40px)); max-height: 85dvh; padding: 0; margin: auto; }
+.orderDialog::backdrop { background: rgb(22 15 13 / .55); }
+.orderDialogContent { padding: clamp(28px,5vw,50px); }
+.orderDialogContent h2 { font: 400 clamp(44px,5vw,64px)/1 var(--serif); margin: 20px 0; }
+.orderDialogContent > p:not(.eyebrow) { font-size: 14px; line-height: 1.8; color: var(--muted); }
+.orderDialogContent .darkPill { margin-top: 28px; }
+@media (max-width:700px) { .shopIntroAside { margin-top: 22px; gap: 20px; } .shopIntroAside > p { font-size: 12px; } }
+@media print { .orderPill, .orderDialog { display: none !important; } }

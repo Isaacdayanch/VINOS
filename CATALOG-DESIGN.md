@@ -177,3 +177,8 @@ consulta o escritura adicional al backend, precio o disponibilidad inventados.
 - `getShopCollection` reads only descriptive public fields for IDs already in the approved publication. Prices, products and primary images still come from that publication. No price refresh semantics, CRM forms/actions, database schema, private prices or stock logic changed.
 - Generic editorial images are not automatically matched to CRM products by name. This change preserves existing product photography; white is the UI canvas, not an alteration of uploaded photos.
 - Validation: scoped ESLint, Next production compilation, TypeScript, whitespace checks, and focused checks for accents, multi-term search, budget endpoints, facet intersection and missing-price ordering. A real iPhone visual review remains part of Preview feedback.
+
+## Coming-soon order pill
+- The catalog introduction now includes a clickable burgundy pill: “Haz tu pedido aquí”, with “Próximamente” in a lighter, readable rose tone.
+- It opens an accessible native dialog explaining that orders are not yet enabled; Escape, backdrop and the return button close it. No form, payment or order action exists.
+- Short `.vercel.app` alias remains a configuration task: availability must be checked, it must target the approved catalog branch/deployment, and the catalog-only hostname routing must be configured. Existing CRM domain must remain unchanged. A manually assigned alias needs reassignment on subsequent deployments unless branch automation is configured.

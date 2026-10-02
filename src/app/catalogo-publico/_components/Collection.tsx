@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { PublicWine } from "../_lib/catalog";
 import { BUDGETS, FACETS, filterCollection, type FacetKey } from "../_lib/collection-filters";
 import styles from "../catalog.module.css";
+import { OrderNotice } from "./OrderNotice";
 
 const money = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 });
 function CloseIcon() { return <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" /></svg>; }
@@ -47,7 +48,7 @@ export function Collection({ wines, date }: { wines: PublicWine[]; date: string 
   return <section id="seleccion" className={styles.collection} aria-labelledby="selection-heading">
     <div className={styles.shopIntro}>
       <div><p className={styles.eyebrow}>LA SELECCIÓN · CATÁLOGO CON PRECIOS</p><h1 id="selection-heading">Tu próxima<br /><em>gran botella.</em></h1></div>
-      <p>Para compartir, para descubrir,<br />para abrir algo especial.</p>
+      <div className={styles.shopIntroAside}><p>Para compartir, para descubrir,<br />para abrir algo especial.</p><OrderNotice /></div>
     </div>
 
     <div className={styles.shopDiscovery}>

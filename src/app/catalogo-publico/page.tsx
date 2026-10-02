@@ -1,13 +1,16 @@
+import { Suspense } from "react";
 import { Header } from "./_components/Header";
 import { Hero } from "./_components/Hero";
 import { VerticalShowcase } from "./_components/VerticalShowcase";
+
+export const dynamic = "force-dynamic";
 
 export default function PresentationPage() {
   return <>
     <Header overHero />
     <main id="contenido">
       <Hero />
-      <VerticalShowcase />
+      <Suspense fallback={<p role="status">Cargando selección de vinos…</p>}><VerticalShowcase /></Suspense>
     </main>
   </>;
 }

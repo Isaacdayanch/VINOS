@@ -3,9 +3,10 @@ import { Header } from "./Header";
 import { Gallery } from "./Gallery";
 import type { EditorialWine } from "../_lib/editorial-wine";
 import styles from "../catalog.module.css";
+import { OrderNotice } from "./OrderNotice";
 
 /** Shared public presentation; no purchase state or CRM mutations. */
-export function EditorialWinePage({ wine }: { wine: EditorialWine }) {
+export function EditorialWinePage({ wine, commerce }: { wine: EditorialWine; commerce?: { precioLista: number | null; activo: boolean } }) {
   return <>
     <Header />
     <main id="contenido" className={styles.winePage}>
@@ -19,6 +20,10 @@ export function EditorialWinePage({ wine }: { wine: EditorialWine }) {
           <p className={styles.eyebrow}>{wine.producer}</p>
           <h1>{wine.title}<br />{wine.year}</h1>
           <p className={styles.region}>{wine.style}</p>
+          {commerce && <>
+            <p className={styles.winePrice}>{commerce.precioLista !== null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(commerce.precioLista) : "Precio por confirmar"}{commerce.precioLista !== null && <span>MXN</span>}</p>
+            {commerce.activo ? <OrderNotice /> : <p className={styles.purchaseNote}>Este vino no está disponible actualmente.</p>}
+          </>}
           <p className={styles.showcaseDescription}>{wine.description}</p>
           <dl className={styles.details}>{wine.facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           <Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Consultar catálogo con precios</Link>

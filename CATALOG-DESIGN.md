@@ -188,3 +188,19 @@ consulta o escritura adicional al backend, precio o disponibilidad inventados.
 - On the dedicated hostname, `/catalogo/` static editorial assets must pass through before the catch-all homepage rewrite. Rewriting image requests to HTML broke the hero and Next image optimization.
 - The exception is confined to that hostname and asset namespace. CRM routes, APIs and authentication retain their existing behavior.
 - Regression check: `node --import tsx scripts/check-catalog-routing.ts` covers image URLs, public pages, catalog isolation and CRM authentication.
+
+## Grand Rivallon and 2017 lighting — 2026-10-02
+- Home reads the existing publication, sorts its five existing Dādāh entries by published price descending (unknown prices last), then displays Grand Rivallon if ID `cmtugbmde0002ih049z900g5i` and vintage 2012 are published. Remaining editorial entries retain their order. Dynamic rendering and Suspense keep ordering current without blocking the hero.
+- Grand Rivallon uses its existing published product URL, publication gate, live price and availability. Shared EditorialWinePage accepts optional commerce data. No CRM, schema, admin or price writes.
+- Facts transcribed from supplied front/back photographs: Saint-Émilion Grand Cru 2012, 85% Merlot / 10% Cabernet Sauvignon / 5% Cabernet Franc, 13%, 750 ml. Pairing is explicitly an editorial suggestion; no unverified aging or certification claim.
+- Six generated gallery assets: `public/catalogo/grand-rivallon-2012-{front,back,pour,glass,pairing,table}.webp`. Original photographs remain linked as `grand-rivallon-2012-{front,label}-original.jpeg` for accurate label details.
+- Image direction/prompts: preserve reference bottle proportions and label identity; front/back centered on pure white; pour with a rigid straight bottle in a French blue-hour salon, walnut and silver; glass against cool marble and blue-grey walls; braised lamb with rosemary, shallots and carrots without dairy; a French courtyard table for two with limestone and dark blue doors. These are created scenes, not estate photographs.
+- 2017 edit prompt: preserve the transparent silhouette, label and vintage; remove blue fluorescent hotspots and hard reflected shapes, use restrained softbox edge reflections on deep black glass and a satin charcoal capsule. Saved as `public/catalogo/reserve-2017-softlight.webp`, shared by hero, home showcase and 2017 editorial profile; original asset retained.
+
+### Publication checkpoint
+- Remote commit `ed5779afe6558ae47227d2092472568f4895f531` publishes ONLY the 2017 soft-light asset and its three public references.
+- Local commit `0b9a068` retains the complete Grand Rivallon/profile/ordering work. It is NOT deployed: uploading the supplied original back-label JPEG was rejected, and must not be retried without authorization.
+- Before continuing, build on the current remote tree and upload only intended public files; local and remote git histories differ. Do not force-push. Local build was blocked by unavailable Google Fonts network access; TypeScript, scoped ESLint, ordering/publication assertions and routing regression passed. Verify Preview build and rendered assets before declaring completion.
+
+## Protocolo compartido por vino
+El registro y el encargo estándar están en [CATALOG-WINES.md](./CATALOG-WINES.md). La continuación solicitada por Isaac completa Grand Rivallon tras el checkpoint anterior; verificar deployment antes de comunicar terminado.

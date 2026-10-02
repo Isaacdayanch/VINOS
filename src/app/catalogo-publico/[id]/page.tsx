@@ -5,12 +5,16 @@ import { Header } from "../_components/Header";
 import { Gallery } from "../_components/Gallery";
 import { getPublicWine } from "../_lib/catalog";
 import styles from "../catalog.module.css";
+import { grandRivallon, grandRivallonId } from "../_lib/grand-rivallon";
+import { EditorialWinePage } from "../_components/EditorialWinePage";
+import { editorialMetadata } from "../_lib/editorial-wine";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps<"/catalogo-publico/[id]">): Promise<Metadata> {
   const product = await getPublicWine((await params).id);
   if (!product) return { title: "Vino no encontrado", robots: { index: false } };
+  if (product.id === grandRivallonId && product.anio === 2012) return editorialMetadata(grandRivallon);
   const title = `${product.nombre}${product.anio ? ` · ${product.anio}` : ""}`;
   const description = product.descripcion?.slice(0, 180) ?? `${title}. Descubre la ficha y las fotografías de este vino.`;
   return { title, description, openGraph: { title, description, type: "website", images: product.fotoUrl ? [{ url: product.fotoUrl, alt: title }] : [] } };
@@ -19,6 +23,7 @@ export async function generateMetadata({ params }: PageProps<"/catalogo-publico/
 export default async function WinePage({ params }: PageProps<"/catalogo-publico/[id]">) {
   const product = await getPublicWine((await params).id);
   if (!product) notFound();
+  if (product.id === grandRivallonId && product.anio === 2012) return <EditorialWinePage wine={grandRivallon} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
   const photos = [product.fotoUrl, ...product.imagenesExtra.map((p) => p.url)].filter((p): p is string => Boolean(p));
   const details = [
     ["Añada", product.anio], ["Región", product.region], ["Uva", product.varietal],

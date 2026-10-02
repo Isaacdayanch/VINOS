@@ -1,12 +1,15 @@
+import { getPublication } from "../_lib/catalog";
 import Image from "next/image";
 import Link from "next/link";
-import { showcaseWines } from "../_lib/showcase";
+import { orderShowcase } from "../_lib/showcase";
 import styles from "../catalog.module.css";
 
 /** Native vertical page scrolling: no wheel handlers or nested scroll container.
  * All wines remain visible without JS and with reduced motion enabled.
  */
-export function VerticalShowcase() {
+export async function VerticalShowcase() {
+  const { wines } = await getPublication();
+  const showcaseWines = orderShowcase(wines);
   return <section id="historia" className={styles.showcase} aria-label="Descubre nuestras botellas">
     <div className={styles.showcaseHeading}>
       <span className={styles.eyebrow}>Una selección con carácter</span>
@@ -15,6 +18,7 @@ export function VerticalShowcase() {
     </div>
     {showcaseWines.map((wine, index) => <article key={wine.slug} id={`descubre-${wine.slug}`} className={styles.showcaseScene} aria-labelledby={`titulo-${wine.slug}`}>
       <div className={styles.showcaseImage}>
+        {wine.editorialHref && <Link href={wine.editorialHref} className={styles.showcaseBottleLink} aria-label={`Conocer ${wine.producer} ${wine.name} ${wine.year}`} />}
         <Image src={`/catalogo/${wine.image}`} alt={`${wine.producer} ${wine.name} ${wine.year}, botella completa`} fill sizes="(max-width: 700px) 90vw, 48vw" className={styles.showcaseBottle} />
       </div>
       <div className={styles.showcaseCopy}>

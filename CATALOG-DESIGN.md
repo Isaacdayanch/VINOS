@@ -182,3 +182,9 @@ consulta o escritura adicional al backend, precio o disponibilidad inventados.
 - The catalog introduction now includes a clickable burgundy pill: “Haz tu pedido aquí”, with “Próximamente” in a lighter, readable rose tone.
 - It opens an accessible native dialog explaining that orders are not yet enabled; Escape, backdrop and the return button close it. No form, payment or order action exists.
 - Short `.vercel.app` alias remains a configuration task: availability must be checked, it must target the approved catalog branch/deployment, and the catalog-only hostname routing must be configured. Existing CRM domain must remain unchanged. A manually assigned alias needs reassignment on subsequent deployments unless branch automation is configured.
+
+## Dedicated catalog domain: image routing fix
+- `vinos-catalogo.vercel.app` targets Preview branch `catalog-redesign`; its `DOMINIO_CATALOGO_PUBLICO` variable is branch-scoped. The CRM production domain is unchanged.
+- On the dedicated hostname, `/catalogo/` static editorial assets must pass through before the catch-all homepage rewrite. Rewriting image requests to HTML broke the hero and Next image optimization.
+- The exception is confined to that hostname and asset namespace. CRM routes, APIs and authentication retain their existing behavior.
+- Regression check: `node --import tsx scripts/check-catalog-routing.ts` covers image URLs, public pages, catalog isolation and CRM authentication.

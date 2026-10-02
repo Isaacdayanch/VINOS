@@ -1,0 +1,361 @@
+.shell {
+  --cream: #f6f2eb; --paper: #ede7de; --ink: #272521; --burgundy: #651b32;
+  --line: #d6cec3; --muted: #655e55; --gutter: clamp(22px, 4vw, 72px);
+  --serif: var(--catalog-serif), Georgia, serif; --sans: var(--catalog-sans), Arial, sans-serif;
+  color-scheme: light; background: var(--cream); color: var(--ink); font-family: var(--sans);
+  overflow-x: clip; line-height: 1.5; min-height: 100vh;
+}
+.shell * { box-sizing: border-box; }
+.shell a { color: inherit; text-decoration: none; }
+.shell button, .shell input, .shell select { font: inherit; }
+.shell button, .shell select { cursor: pointer; }
+.shell :is(a, button, input, select, [tabindex]):focus-visible { outline: 2px solid var(--burgundy); outline-offset: 5px; }
+.shell :is(h1,h2,h3,p,figure) { margin: 0; }
+.shell :is(h1,h2,h3) { font-weight: 400; }
+.shell section[id] { scroll-margin-top: 30px; }
+.skip { position: absolute; z-index: 100; top: 12px; left: 12px; padding: 12px 20px; background: var(--cream); transform: translateY(-180%); }
+.skip:focus { transform: translateY(0); }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.eyebrow { font-size: 10px; font-weight: 500; letter-spacing: .19em; text-transform: uppercase; min-height: 15px; }
+.header { height: 96px; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); gap: 20px; position: relative; z-index: 10; }
+.headerHero { position: absolute; inset: 0 0 auto; color: white; }
+.headerHero :is(a,button):focus-visible { outline-color: white; }
+.headerBrand { font-size: 24px; letter-spacing: .18em; font-weight: 400; }
+.headerHero .headerBrand { font-size: 10px; letter-spacing: .3em; }
+.headerActions { display: flex; gap: 30px; align-items: center; font-size: 12px; }
+.headerActions > a { display: flex; align-items: center; min-height: 44px; padding: 10px 18px; border-radius: 50px; transition: color .2s ease, background-color .2s ease; }
+.headerActions > a:is(:hover,:active) { color: var(--cream); background: var(--burgundy); }
+.menuButton { background: none; border: 0; width: 44px; height: 44px; border-radius: 0; display: grid; place-content: center; gap: 6px; color: inherit; }
+.menuButton span { display: block; width: 17px; height: 1px; background: currentColor; }
+.menu { inset: 0 0 0 auto; margin: 0; width: min(560px,100%); height: 100dvh; max-height: 100dvh; max-width: 100%; padding: 100px 40px 40px; border: 0; color: var(--ink); background: var(--cream); }
+.menu::backdrop, .filterDialog::backdrop { background: rgb(22 15 13 / .55); }
+.menu nav { display: grid; gap: 12px; margin-top: 36px; }
+.menu nav a { font: 400 clamp(28px,4vw,42px)/1.2 var(--serif); border: 1px solid var(--line); border-radius: 50px; padding: 20px 24px; display: flex; align-items: center; min-height: 64px; transition: color .2s ease, background-color .2s ease, border-color .2s ease; }
+.menu nav a:is(:hover,:active,:focus-visible) { background: var(--burgundy); border-color: var(--burgundy); color: var(--cream); }
+.close { position: absolute; top: 20px; right: 22px; border: 0; background: transparent; font-size: 34px !important; width: 44px; height: 44px; color: var(--ink); }
+.hero { position: relative; height: max(780px,100svh); max-height: 1150px; isolation: isolate; overflow: hidden; color: white; background: #57534e; }
+.heroBackground { object-fit: cover; object-position: center; transform: translateY(var(--hero-shift,0px)) scale(1.07); }
+.heroShade { position: absolute; inset: 0; background: linear-gradient(90deg,rgb(0 0 0 / .32),transparent 65%),linear-gradient(0deg,rgb(0 0 0 / .44),transparent 50%,rgb(0 0 0 / .14)); }
+.heroWordmark { position: absolute; top: 9%; left: 1.5%; right: 1.5%; text-align: center; font: 400 clamp(110px,23vw,400px)/.85 var(--serif); letter-spacing: .035em; }
+.heroOrigin { position: absolute; top: 38%; left: var(--gutter); font-size: 11px; letter-spacing: .38em; }
+.heroBottle { position: absolute; width: 40%; height: 86%; bottom: 4%; right: 12%; transform: translateY(var(--hero-shift,0px)) rotate(var(--bottle-angle,0deg)); transform-origin: 50% 90%; filter: drop-shadow(20px 25px 18px rgb(0 0 0 / .26)); }
+.bottleImage { object-fit: contain; }
+.heroCopy { position: absolute; left: var(--gutter); bottom: 12%; width: 34%; max-width: 510px; }
+.heroCopy h1 { font: 400 clamp(32px,3.25vw,55px)/1.05 var(--serif); text-wrap: balance; text-shadow: 0 2px 18px rgb(0 0 0 / .2); }
+.pill, .darkPill { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 48px; border-radius: 50px; padding: 14px 26px; font-size: 12px; border: 1px solid transparent; }
+.pill { color: var(--ink) !important; background: var(--cream); margin-top: 28px; }
+.darkPill { background: var(--burgundy); color: white !important; }
+.pill, .darkPill { transition: color .2s ease, background-color .2s ease; }
+.pill:is(:hover,:active) { background: var(--burgundy); color: var(--cream) !important; }
+.darkPill:is(:hover,:active) { background: var(--ink); }
+.heroCaption { position: absolute; right: var(--gutter); bottom: 15%; display: flex; flex-direction: column; gap: 5px; writing-mode: vertical-rl; font-size: 10px; letter-spacing: .13em; }
+.scrollHint { position: absolute; bottom: 28px; right: var(--gutter); font-size: 10px; letter-spacing: .08em; display: flex; gap: 18px; align-items: center; min-height: 44px; }
+/* Vertical editorial carousel uses native document scrolling. */
+.showcase { background: white; }
+.showcaseHeading { padding: 100px var(--gutter) 65px; border-bottom: 1px solid var(--line); }
+.showcaseHeading h2 { font: 400 clamp(58px,8vw,120px)/.93 var(--serif); letter-spacing: -.04em; margin-top: 24px; }
+.showcaseIntro { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 35px; font-size: 12px; color: var(--muted); }
+.showcaseScene { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px,6vw,100px); align-items: center; min-height: 100svh; padding: 70px var(--gutter); border-bottom: 1px solid var(--line); }
+.showcaseImage { position: relative; height: min(82svh,900px); min-height: 460px; background: white; }
+.showcaseBottle { object-fit: contain; transform-origin: center bottom; }
+.showcaseCopy { padding: 35px 0; max-width: 570px; }
+.showcaseCopy h3 { font: 400 clamp(48px,5vw,82px)/.98 var(--serif); letter-spacing: -.035em; margin-top: 24px; text-wrap: balance; }
+.showcaseYear { font: 400 44px/1.1 var(--serif); color: var(--burgundy); margin-top: 20px !important; }
+.showcaseDescription { font-size: 14px; line-height: 1.85; color: var(--muted); margin-top: 28px !important; }
+.showcaseFacts { margin-top: 24px; font-size: 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.showcaseFacts summary { cursor: pointer; padding: 16px 0; min-height: 48px; }
+.showcaseFacts ul { padding: 0 0 20px 18px; line-height: 2; }
+.showcaseFacts summary:focus-visible { outline: 2px solid var(--burgundy); outline-offset: 4px; }
+.showcaseActions { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 35px; }
+@keyframes bottlePassage { from { transform: translateY(45px) rotate(-2deg); } to { transform: translateY(-45px) rotate(2deg); } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .showcaseBottle { animation: bottlePassage linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
+  }
+}
+.discovery { padding: 100px var(--gutter); border-top: 1px solid var(--line); margin-top: 40px; }
+.discovery h2 { font: 400 clamp(40px,5vw,76px)/1.05 var(--serif); margin: 18px 0 38px; }
+.discoveryLinks { display: grid; grid-template-columns: repeat(2,1fr); column-gap: 70px; }
+.discoveryLinks a { display: flex; align-items: center; gap: 25px; border-top: 1px solid var(--line); padding: 22px 0; font: 400 38px/1.2 var(--serif); min-height: 80px; }
+.discoveryLinks a > span:last-child { margin-left: auto; font-size: 25px; }
+.discoveryNumber { font: 400 10px/1 var(--sans); color: var(--muted); }
+.discoveryLinks a:hover { color: var(--burgundy); }
+.collection { padding: 90px var(--gutter); background: #fcfaf6; }
+.sectionHeading { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 45px; gap: 20px; }
+.sectionHeading :is(h1,h2) { margin-top: 15px; font: 400 clamp(42px,5vw,76px)/1.05 var(--serif); }
+.sectionHeading > p { font-size: 12px; color: var(--muted); }
+.toolbar { display: flex; align-items: center; gap: 25px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+.search { position: relative; flex: 1; }
+.search input { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: transparent; border-radius: 0; padding: 14px 32px 14px 0; color: var(--ink); font-size: 14px; min-height: 48px; }
+.search > span:last-child { position: absolute; right: 8px; top: 5px; font-size: 28px; }
+.sort select { border: 0; background: transparent; padding: 12px 0; font-size: 12px; color: var(--ink); max-width: 180px; min-height: 44px; }
+.filters { display: flex; gap: 30px; margin: 22px 0 35px; }
+.filters label { display: flex; flex-direction: column; gap: 8px; flex: 1; color: var(--muted); font-size: 11px; }
+.filters select { width: 100%; min-height: 44px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); font-size: 13px; padding: 8px 24px 8px 0; }
+.filterButton { display: none; min-height: 44px; border: 0; background: none; color: var(--ink); }
+.reset { background: none; border: 0; border-bottom: 1px solid var(--line); font-size: 12px; padding: 12px 0; margin-bottom: 24px; min-height: 44px; color: var(--burgundy); }
+.productGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 48px 28px; }
+.card { min-width: 0; }
+.card > a { display: block; }
+.productImage { position: relative; aspect-ratio: 4/5; background: var(--cream); }
+.productImage > img { padding: 24px 16px; transition: transform .5s ease; }
+.card:hover .productImage > img { transform: translateY(-7px); }
+.cardDetails { padding-top: 18px; }
+.cardDetails h3 { font: 500 25px/1.08 var(--serif); margin: 9px 0; }
+.cardPrice { font-size: 13px; margin-top: 14px !important; }
+.noImage { display: grid; place-items: center; height: 100%; font-size: 11px; color: var(--muted); padding: 20px; text-align: center; }
+.publication { border-top: 1px solid var(--line); margin-top: 60px; padding-top: 20px; display: flex; justify-content: space-between; gap: 20px; font-size: 11px; color: var(--muted); }
+.publication button { background: none; border: 0; min-height: 44px; }
+.filterDialog { inset: auto 0 0; margin: 0 auto; border: 0; border-radius: 20px 20px 0 0; width: 100%; max-width: 620px; max-height: 90dvh; background: var(--cream); color: var(--ink); padding: 50px 26px 30px; }
+.filterDialog h2 { font: 400 42px/1.1 var(--serif); }
+.filterDialog .filters { flex-direction: column; gap: 20px; }
+.filterDialog .darkPill { width: 100%; }
+.empty { padding: 100px var(--gutter); text-align: center; min-height: 40vh; }
+.empty :is(h1,h3) { font: 400 clamp(35px,4vw,60px)/1.1 var(--serif); }
+.empty p { font-size: 14px; margin: 20px 0 30px; }
+.empty .darkPill { margin-top: 20px; }
+.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 30px; padding: 55px var(--gutter); background: var(--ink); color: var(--cream); }
+.footerBrand { font: 400 50px/1 var(--serif); letter-spacing: .12em; }
+.footer p { font-size: 11px; }
+.winePage { padding: 12px var(--gutter) 0; }
+.back { display: inline-flex; align-items: center; min-height: 44px; font-size: 11px; margin-bottom: 24px; }
+.wineTop { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(35px,6vw,100px); align-items: start; }
+.gallery { position: relative; min-width: 0; }
+.galleryScroller { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--paper); }
+.galleryScroller::-webkit-scrollbar { display: none; }
+.gallerySlide { position: relative; flex: 0 0 100%; aspect-ratio: 4/5; scroll-snap-align: center; }
+.gallerySlide > img { padding: 24px; }
+.galleryCount { font-size: 10px; text-align: center; margin: 14px 0 !important; }
+.thumbnails { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.thumbnails button { position: relative; width: 64px; height: 78px; background: var(--paper); border: 1px solid transparent; }
+.thumbnails button[aria-pressed="true"] { border-color: var(--burgundy); }
+.thumbnails img { padding: 5px; }
+.galleryEmpty { aspect-ratio: 4/5; background: var(--paper); display: grid; place-items: center; font-size: 12px; }
+.wineInfo { padding-top: 35px; }
+.wineInfo h1 { font: 400 clamp(44px,5vw,76px)/.95 var(--serif); margin: 22px 0; letter-spacing: -.025em; }
+.region { color: var(--muted); font-size: 13px; }
+.winePrice { font-size: 24px; margin: 35px 0 25px !important; }
+.winePrice span { margin-left: 12px; font-size: 11px; color: var(--muted); }
+.purchaseNote { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 22px 0; font-size: 12px; color: var(--muted); }
+.details { margin: 28px 0; }
+.details > div { display: flex; justify-content: space-between; gap: 25px; padding: 9px 0; font-size: 12px; }
+.details dt { color: var(--muted); }
+.details dd { margin: 0; text-align: right; }
+.textLink { display: inline-flex; min-height: 44px; align-items: center; padding: 10px 18px; border: 1px solid var(--line); border-radius: 50px; font-size: 12px; transition: color .2s ease, background-color .2s ease, border-color .2s ease; }
+.textLink:is(:hover,:active) { background: var(--burgundy); border-color: var(--burgundy); color: var(--cream); }
+.wineStory { padding: 110px 0; max-width: 950px; margin: 0 auto; }
+.wineStory h2 { font: 400 clamp(46px,6vw,90px)/.98 var(--serif); margin: 22px 0 55px; }
+.storySections { display: grid; gap: 38px; margin-bottom: 45px; }
+.storySections section { display: grid; grid-template-columns: 1fr 2fr; border-top: 1px solid var(--line); padding-top: 24px; gap: 30px; }
+.storySections h3 { font: 400 30px/1.1 var(--serif); }
+.storySections p { white-space: pre-line; font-size: 14px; line-height: 1.9; color: var(--muted); }
+@media (max-width: 1100px) { .productGrid { grid-template-columns: repeat(3,minmax(0,1fr)); } .heroCopy { width: 40%; } .heroBottle { right: 7%; } .heroCaption { display: none; } }
+@media (max-width: 700px) {
+  .header { height: 76px; } .headerActions { gap: 12px; } .headerActions > a { font-size: 10px; gap: 8px; } .headerHero .headerBrand { max-width: 110px; font-size: 8px; line-height: 1.8; }
+  .hero { height: max(730px,100svh); max-height: 1000px; }
+  .heroBackground { object-position: 58% center; }
+  .heroWordmark { top: 15%; font-size: 25vw; left: 0; right: 0; letter-spacing: .015em; }
+  .heroOrigin { top: 30%; left: 24px; font-size: 8px; letter-spacing: .26em; }
+  .heroBottle { right: -2%; bottom: 15%; height: 59%; width: 61%; }
+  .heroCopy { left: 24px; bottom: 8%; width: 57%; z-index: 2; }
+  .heroCopy h1 { font-size: clamp(29px,8.2vw,40px); line-height: 1.02; }
+  .heroShade { background: linear-gradient(0deg,rgb(0 0 0 / .68),transparent 75%),linear-gradient(90deg,rgb(0 0 0 / .18),transparent); }
+  .pill { margin-top: 20px; padding: 13px 20px; gap: 20px; font-size: 11px; }
+  .scrollHint { right: 22px; bottom: 8px; font-size: 8px; }
+  .showcaseHeading { padding-top: 65px; padding-bottom: 45px; }
+  .showcaseHeading h2 { font-size: clamp(52px,14vw,70px); }
+  .showcaseIntro { align-items: flex-start; flex-direction: column; margin-top: 25px; }
+  .showcaseScene { grid-template-columns: 1fr; gap: 0; padding-top: 30px; padding-bottom: 55px; min-height: 100svh; }
+  .showcaseImage { height: 62svh; min-height: 370px; max-height: 620px; }
+  .showcaseCopy { padding-top: 15px; padding-bottom: 0; }
+  .showcaseCopy h3 { font-size: clamp(40px,11vw,56px); margin-top: 18px; }
+  .showcaseYear { font-size: 34px; margin-top: 12px !important; }
+  .showcaseDescription { font-size: 13px; margin-top: 20px !important; }
+  .showcaseActions { margin-top: 24px; }
+  .discovery { padding-top: 65px; padding-bottom: 65px; margin-top: 0; }
+  .discoveryLinks { grid-template-columns: 1fr; }
+  .discoveryLinks a { font-size: 32px; padding: 18px 0; }
+  .collection { padding-top: 60px; padding-bottom: 60px; }
+  .sectionHeading { margin-bottom: 28px; }
+  .sectionHeading :is(h1,h2) { font-size: 60px; }
+  .toolbar { flex-wrap: wrap; gap: 8px 18px; margin-bottom: 26px; }
+  .search { flex-basis: 100%; }
+  .search input { font-size: 16px; }
+  .sort { margin-left: auto; }
+  .filterButton { display: inline-block; font-size: 12px; }
+  .desktopFilters { display: none; }
+  .productGrid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 35px 14px; }
+  .productImage > img { padding: 16px 8px; }
+  .cardDetails h3 { font-size: 23px; }
+  .cardDetails .eyebrow { letter-spacing: .08em; font-size: 9px; }
+  .cardPrice { font-size: 12px; }
+  .publication { flex-direction: column; gap: 8px; }
+  .publication button { text-align: left; }
+  .footer { flex-direction: column; align-items: flex-start; padding-top: 40px; padding-bottom: 40px; }
+  .winePage { padding-top: 0; }
+  .wineTop { grid-template-columns: 1fr; gap: 20px; }
+  .wineInfo { padding-top: 20px; }
+  .wineInfo h1 { font-size: 52px; }
+  .winePrice { margin-top: 25px !important; }
+  .wineStory { padding: 75px 0; }
+  .storySections section { grid-template-columns: 1fr; gap: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell *, .shell *::before, .shell *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .heroBottle, .heroBackground { transform: none; }
+}
+@media print {
+  .shell { background: white; color: black; }
+  .header, .hero, .showcase, .discovery, .toolbar, .desktopFilters, .reset, .publication button, .footer, .skip, .back, .textLink, .darkPill { display: none !important; }
+  .collection { padding: 0; background: white; }
+  .sectionHeading :is(h1,h2) { font-size: 28px; }
+  .productGrid { display: block; }
+  .card { display: inline-block; vertical-align: top; width: 32%; padding: 10px; break-inside: avoid; page-break-inside: avoid; }
+  .productImage { height: 180px; aspect-ratio: auto; }
+  .cardDetails h3 { font-size: 18px; }
+  .gallerySlide { aspect-ratio: 4/5; }
+  .wineTop { gap: 30px; }
+  .wineStory { padding: 30px 0; }
+}
+
+/* Public architecture: presentation, priced catalog, and editorial about page. */
+.footerNav { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 11px; }
+.footerNav a { display: inline-flex; align-items: center; min-height: 44px; }
+.footer a:focus-visible { outline-color: var(--cream); }
+.aboutIntro { padding: 65px var(--gutter) 85px; border-bottom: 1px solid var(--line); }
+.aboutIntro h1 { font: 400 clamp(64px,9vw,140px)/.93 var(--serif); letter-spacing: -.04em; margin: 28px 0 35px; }
+.aboutLead { max-width: 650px; font-size: clamp(16px,1.8vw,21px); line-height: 1.8; color: var(--muted); }
+.aboutFeature { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(30px,6vw,100px); padding: 70px var(--gutter); background: white; }
+.aboutBottle { position: relative; height: min(75svh,800px); min-height: 420px; }
+.aboutFeature h2, .aboutPrinciples h2, .aboutClosing h2 { font: 400 clamp(42px,5vw,76px)/1.02 var(--serif); letter-spacing: -.025em; margin: 24px 0 30px; }
+.aboutFeature p:not(.eyebrow), .aboutGrid p { color: var(--muted); font-size: 14px; line-height: 1.9; max-width: 560px; }
+.aboutFeature p + p { margin-top: 22px; }
+.aboutFeature .textLink { margin-top: 30px; }
+.aboutPrinciples { padding: 100px var(--gutter); }
+.aboutGrid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 45px; margin-top: 55px; }
+.aboutGrid article { border-top: 1px solid var(--line); padding-top: 24px; }
+.aboutGrid h3 { font: 400 34px/1.1 var(--serif); margin: 22px 0 18px; }
+.aboutClosing { padding: 85px var(--gutter); background: var(--paper); text-align: center; }
+@media (max-width: 700px) {
+  .sectionHeading h1 { font-size: clamp(40px,11vw,60px); }
+  .aboutIntro { padding-top: 45px; padding-bottom: 60px; }
+  .aboutIntro h1 { font-size: clamp(55px,15vw,78px); }
+  .aboutFeature { grid-template-columns: 1fr; gap: 25px; padding-top: 35px; padding-bottom: 60px; }
+  .aboutBottle { height: 62svh; min-height: 370px; max-height: 620px; }
+  .aboutPrinciples { padding-top: 65px; padding-bottom: 65px; }
+  .aboutGrid { grid-template-columns: 1fr; gap: 35px; margin-top: 35px; }
+  .aboutClosing { padding-top: 60px; padding-bottom: 60px; }
+}
+
+.galleryEditorial .galleryScroller { background: white; }
+.galleryEditorial .gallerySlide:nth-child(n+3) > img { padding: 0; object-fit: cover; }
+.galleryNote { font-size: 10px; line-height: 1.7; color: var(--muted); margin-top: 20px !important; }
+
+.sourceLinks { display: flex; flex-wrap: wrap; gap: 16px; }
+
+/* Priced catalog: the same white bottle canvas as the home showcase.
+ * Scoped to the shop so administrative screens and editorial scenes are unaffected. */
+.shopPage { --cream: #fff; --paper: #fff; --line: #e5e3df; --muted: #62615c; background: #fff; }
+.shopPage .header { border-bottom: 1px solid var(--line); }
+.shopPage .collection { background: #fff; padding-top: 65px; }
+.shopIntro { display: flex; justify-content: space-between; align-items: flex-end; gap: 35px; padding-bottom: 55px; }
+.shopIntro h1 { font: 400 clamp(64px,7.5vw,112px)/.93 var(--serif); letter-spacing: -.035em; margin-top: 25px; }
+.shopIntro h1 em { font-weight: 400; }
+.shopIntro > p { padding-bottom: 8px; font-size: 13px; color: var(--muted); line-height: 1.9; }
+.shopDiscovery { background: #fff; }
+.categoryRail { display: flex; gap: 10px; overflow-x: auto; padding: 6px 2px 24px; scrollbar-width: thin; }
+.categoryRail button { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 50px; background: white; color: var(--ink); padding: 11px 22px; min-height: 44px; font-size: 12px; transition: background-color .2s, color .2s; }
+.categoryRail button:is(:hover,[aria-pressed="true"]) { color: white; background: var(--burgundy); border-color: var(--burgundy); }
+.shopPage .toolbar { gap: 28px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.shopPage .search { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.shopPage .search > svg { flex-shrink: 0; color: var(--muted); }
+.shopPage .search input { border: 0; padding: 12px 8px 12px 0; font-size: 14px; min-width: 0; }
+.shopPage .filterButton { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 10px 20px; border: 1px solid var(--line); border-radius: 50px; font-size: 12px; min-height: 46px; }
+.shopPage .filterButton:hover { border-color: var(--burgundy); color: var(--burgundy); }
+.filterCount { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--burgundy); color: white; font-size: 10px; }
+.shopPage .sort { display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--muted); }
+.shopPage .sort select { max-width: 145px; }
+.activeFilters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+.activeFilters button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 50px; padding: 10px 14px; font-size: 11px; max-width: 100%; overflow-wrap: anywhere; }
+.activeFilters button:hover { border-color: var(--burgundy); color: var(--burgundy); }
+.activeFilters .clearAll { border-color: transparent; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+.resultSummary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 25px 0 10px; color: var(--muted); font-size: 11px; }
+.shopPage .productGrid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 52px 35px; }
+.shopPage .card { position: relative; border-bottom: 1px solid transparent; }
+.shopPage .card > a { padding: 14px 8px 26px; height: 100%; }
+.shopPage .card > a:hover { border-bottom: 1px solid var(--line); margin-bottom: -1px; }
+.shopPage .productImage { background: #fff; aspect-ratio: 3/4; }
+.shopPage .productImage > img { padding: 16px; transition: transform .5s ease; }
+.shopPage .card:hover .productImage > img { transform: translateY(-8px) scale(1.025); }
+.shopPage .cardDetails { padding-top: 25px; text-align: center; }
+.shopPage .cardDetails h2 { font: 400 clamp(23px,2.2vw,32px)/1.1 var(--serif); margin: 12px auto; max-width: 320px; text-wrap: balance; }
+.cardRegion { font-size: 11px; line-height: 1.6; color: var(--muted); }
+.shopPage .cardPrice { font-size: 14px; margin-top: 15px !important; }
+.shopPage .empty h2 { font: 400 clamp(36px,4vw,62px)/1 var(--serif); }
+.shopPage .publication { margin-top: 65px; }
+.shopFilterDialog { inset: 0 0 0 auto; margin: 0; width: min(500px,100%); max-width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; padding: 0; background: #fff; }
+.shopFilterDialog[open] { display: flex; flex-direction: column; }
+.filterPanelHeading { flex: 0 0 auto; position: relative; padding: 42px 32px 28px; border-bottom: 1px solid var(--line); }
+.filterPanelHeading h2 { margin-top: 20px; font: 400 54px/.96 var(--serif); }
+.filterPanelHeading .close { display: grid; place-items: center; top: 23px; right: 22px; }
+.filterPanelHeading .close svg { width: 22px; height: 22px; }
+.filterPanelBody { overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 0 32px; flex: 1; }
+.shopFilterDialog .filters { gap: 25px; margin: 28px 0; }
+.shopFilterDialog .filters label { font-size: 12px; }
+.shopFilterDialog .filters select { font-size: 15px; }
+.filterPanelFooter { flex: 0 0 auto; padding: 22px 32px max(22px,env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: white; text-align: center; }
+.filterPanelFooter .darkPill { justify-content: center; min-height: 50px; }
+.filterPanelFooter .reset { margin: 8px 0 0; border: 0; }
+@media (max-width: 700px) {
+  .shopPage .collection { padding-top: 38px; }
+  .shopIntro { display: block; padding-bottom: 32px; }
+  .shopIntro h1 { font-size: clamp(55px,15vw,78px); margin-top: 22px; }
+  .shopIntro > p { margin-top: 22px; font-size: 12px; }
+  .categoryRail { margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter); gap: 8px; padding-bottom: 20px; }
+  .categoryRail button { padding: 10px 17px; font-size: 11px; }
+  .shopPage .toolbar { gap: 12px 16px; margin-bottom: 0; padding: 12px 0; }
+  .shopPage .search { flex-basis: 100%; }
+  .shopPage .search input { font-size: 16px; }
+  .shopPage .sort { margin-left: auto; gap: 6px; }
+  .shopPage .sort select { font-size: 12px; }
+  .shopPage .filterButton { min-height: 44px; padding: 9px 16px; }
+  .resultSummary { padding: 24px 0 10px; font-size: 10px; }
+  .shopPage .productGrid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 32px 14px; }
+  .shopPage .card > a { padding: 8px 0 18px; }
+  .shopPage .productImage { aspect-ratio: 2/3; }
+  .shopPage .productImage > img { padding: 10px 2px; }
+  .shopPage .cardDetails { padding-top: 18px; }
+  .shopPage .cardDetails h2 { font-size: 24px; }
+  .shopPage .cardPrice { font-size: 13px; }
+  .shopFilterDialog { inset: auto 0 0; margin: 0 auto; width: 100%; height: auto; max-height: 90dvh; border-radius: 18px 18px 0 0; }
+  .filterPanelHeading { padding: 26px 24px 22px; }
+  .filterPanelHeading h2 { font-size: 42px; margin-top: 14px; }
+  .filterPanelHeading h2 br { display: none; }
+  .filterPanelBody { padding: 0 24px; }
+  .filterPanelFooter { padding-left: 24px; padding-right: 24px; }
+}
+@media print {
+  .shopIntro { padding: 0 0 20px; }
+  .shopIntro h1 { font-size: 36px; }
+  .shopIntro > p, .shopDiscovery, .activeFilters, .resultSummary, .shopFilterDialog { display: none !important; }
+  .shopPage .productGrid { display: block; }
+  .shopPage .productImage { height: 180px; aspect-ratio: auto; }
+  .shopPage .cardDetails h2 { font-size: 18px; }
+}
+
+.shopIntroAside { display: grid; justify-items: start; gap: 22px; padding-bottom: 8px; }
+.shopIntroAside > p { font-size: 13px; color: var(--muted); line-height: 1.9; }
+.orderPill { display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 16px; padding: 17px 25px; min-height: 54px; border: 1px solid var(--burgundy); border-radius: 50px; background: var(--burgundy); color: #fff; font-size: 12px; transition: background-color .2s ease; }
+.orderPill:hover { background: var(--ink); border-color: var(--ink); }
+.orderSoon { color: #efd9e1; font-size: 11px; }
+.orderDialog { border: 0; border-radius: 8px; background: #fff; color: var(--ink); width: min(520px,calc(100% - 40px)); max-height: 85dvh; padding: 0; margin: auto; }
+.orderDialog::backdrop { background: rgb(22 15 13 / .55); }
+.orderDialogContent { padding: clamp(28px,5vw,50px); }
+.orderDialogContent h2 { font: 400 clamp(44px,5vw,64px)/1 var(--serif); margin: 20px 0; }
+.orderDialogContent > p:not(.eyebrow) { font-size: 14px; line-height: 1.8; color: var(--muted); }
+.orderDialogContent .darkPill { margin-top: 28px; }
+@media (max-width:700px) { .shopIntroAside { margin-top: 22px; gap: 20px; } .shopIntroAside > p { font-size: 12px; } }
+@media print { .orderPill, .orderDialog { display: none !important; } }
+
+.showcaseBottleLink { position: absolute; inset: 0; z-index: 2; }
+.showcaseBottleLink:focus-visible { outline: 2px solid var(--wine, #602e3b); outline-offset: -6px; }

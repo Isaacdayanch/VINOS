@@ -24,6 +24,12 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (DOMINIO_CATALOGO_PUBLICO && host === DOMINIO_CATALOGO_PUBLICO) {
+    // Las fotos editoriales son archivos públicos, no páginas del CRM.
+    // Reescribirlas al inicio devuelve HTML y rompe también next/image.
+    if (pathname.startsWith("/catalogo/")) {
+      return NextResponse.next();
+    }
+
     // En el dominio del catálogo, cualquier ruta que no sea el catálogo se
     // manda ahí — en este dominio no existe forma de llegar al resto del
     // sistema, ni siquiera quitando parte del link.

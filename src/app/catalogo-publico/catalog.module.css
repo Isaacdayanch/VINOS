@@ -252,3 +252,93 @@
 .galleryNote { font-size: 10px; line-height: 1.7; color: var(--muted); margin-top: 20px !important; }
 
 .sourceLinks { display: flex; flex-wrap: wrap; gap: 16px; }
+
+/* Priced catalog: the same white bottle canvas as the home showcase.
+ * Scoped to the shop so administrative screens and editorial scenes are unaffected. */
+.shopPage { --cream: #fff; --paper: #fff; --line: #e5e3df; --muted: #62615c; background: #fff; }
+.shopPage .header { border-bottom: 1px solid var(--line); }
+.shopPage .collection { background: #fff; padding-top: 65px; }
+.shopIntro { display: flex; justify-content: space-between; align-items: flex-end; gap: 35px; padding-bottom: 55px; }
+.shopIntro h1 { font: 400 clamp(64px,7.5vw,112px)/.93 var(--serif); letter-spacing: -.035em; margin-top: 25px; }
+.shopIntro h1 em { font-weight: 400; }
+.shopIntro > p { padding-bottom: 8px; font-size: 13px; color: var(--muted); line-height: 1.9; }
+.shopDiscovery { background: #fff; }
+.categoryRail { display: flex; gap: 10px; overflow-x: auto; padding: 6px 2px 24px; scrollbar-width: thin; }
+.categoryRail button { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 50px; background: white; color: var(--ink); padding: 11px 22px; min-height: 44px; font-size: 12px; transition: background-color .2s, color .2s; }
+.categoryRail button:is(:hover,[aria-pressed="true"]) { color: white; background: var(--burgundy); border-color: var(--burgundy); }
+.shopPage .toolbar { gap: 28px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.shopPage .search { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.shopPage .search > svg { flex-shrink: 0; color: var(--muted); }
+.shopPage .search input { border: 0; padding: 12px 8px 12px 0; font-size: 14px; min-width: 0; }
+.shopPage .filterButton { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 10px 20px; border: 1px solid var(--line); border-radius: 50px; font-size: 12px; min-height: 46px; }
+.shopPage .filterButton:hover { border-color: var(--burgundy); color: var(--burgundy); }
+.filterCount { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--burgundy); color: white; font-size: 10px; }
+.shopPage .sort { display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--muted); }
+.shopPage .sort select { max-width: 145px; }
+.activeFilters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+.activeFilters button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 50px; padding: 10px 14px; font-size: 11px; max-width: 100%; overflow-wrap: anywhere; }
+.activeFilters button:hover { border-color: var(--burgundy); color: var(--burgundy); }
+.activeFilters .clearAll { border-color: transparent; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+.resultSummary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 25px 0 10px; color: var(--muted); font-size: 11px; }
+.shopPage .productGrid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 52px 35px; }
+.shopPage .card { position: relative; border-bottom: 1px solid transparent; }
+.shopPage .card > a { padding: 14px 8px 26px; height: 100%; }
+.shopPage .card > a:hover { border-bottom: 1px solid var(--line); margin-bottom: -1px; }
+.shopPage .productImage { background: #fff; aspect-ratio: 3/4; }
+.shopPage .productImage > img { padding: 16px; transition: transform .5s ease; }
+.shopPage .card:hover .productImage > img { transform: translateY(-8px) scale(1.025); }
+.shopPage .cardDetails { padding-top: 25px; text-align: center; }
+.shopPage .cardDetails h2 { font: 400 clamp(23px,2.2vw,32px)/1.1 var(--serif); margin: 12px auto; max-width: 320px; text-wrap: balance; }
+.cardRegion { font-size: 11px; line-height: 1.6; color: var(--muted); }
+.shopPage .cardPrice { font-size: 14px; margin-top: 15px !important; }
+.shopPage .empty h2 { font: 400 clamp(36px,4vw,62px)/1 var(--serif); }
+.shopPage .publication { margin-top: 65px; }
+.shopFilterDialog { inset: 0 0 0 auto; margin: 0; width: min(500px,100%); max-width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; padding: 0; background: #fff; }
+.shopFilterDialog[open] { display: flex; flex-direction: column; }
+.filterPanelHeading { flex: 0 0 auto; position: relative; padding: 42px 32px 28px; border-bottom: 1px solid var(--line); }
+.filterPanelHeading h2 { margin-top: 20px; font: 400 54px/.96 var(--serif); }
+.filterPanelHeading .close { display: grid; place-items: center; top: 23px; right: 22px; }
+.filterPanelHeading .close svg { width: 22px; height: 22px; }
+.filterPanelBody { overflow-y: auto; overscroll-behavior: contain; min-height: 0; padding: 0 32px; flex: 1; }
+.shopFilterDialog .filters { gap: 25px; margin: 28px 0; }
+.shopFilterDialog .filters label { font-size: 12px; }
+.shopFilterDialog .filters select { font-size: 15px; }
+.filterPanelFooter { flex: 0 0 auto; padding: 22px 32px max(22px,env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: white; text-align: center; }
+.filterPanelFooter .darkPill { justify-content: center; min-height: 50px; }
+.filterPanelFooter .reset { margin: 8px 0 0; border: 0; }
+@media (max-width: 700px) {
+  .shopPage .collection { padding-top: 38px; }
+  .shopIntro { display: block; padding-bottom: 32px; }
+  .shopIntro h1 { font-size: clamp(55px,15vw,78px); margin-top: 22px; }
+  .shopIntro > p { margin-top: 22px; font-size: 12px; }
+  .categoryRail { margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter); gap: 8px; padding-bottom: 20px; }
+  .categoryRail button { padding: 10px 17px; font-size: 11px; }
+  .shopPage .toolbar { gap: 12px 16px; margin-bottom: 0; padding: 12px 0; }
+  .shopPage .search { flex-basis: 100%; }
+  .shopPage .search input { font-size: 16px; }
+  .shopPage .sort { margin-left: auto; gap: 6px; }
+  .shopPage .sort select { font-size: 12px; }
+  .shopPage .filterButton { min-height: 44px; padding: 9px 16px; }
+  .resultSummary { padding: 24px 0 10px; font-size: 10px; }
+  .shopPage .productGrid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 32px 14px; }
+  .shopPage .card > a { padding: 8px 0 18px; }
+  .shopPage .productImage { aspect-ratio: 2/3; }
+  .shopPage .productImage > img { padding: 10px 2px; }
+  .shopPage .cardDetails { padding-top: 18px; }
+  .shopPage .cardDetails h2 { font-size: 24px; }
+  .shopPage .cardPrice { font-size: 13px; }
+  .shopFilterDialog { inset: auto 0 0; margin: 0 auto; width: 100%; height: auto; max-height: 90dvh; border-radius: 18px 18px 0 0; }
+  .filterPanelHeading { padding: 26px 24px 22px; }
+  .filterPanelHeading h2 { font-size: 42px; margin-top: 14px; }
+  .filterPanelHeading h2 br { display: none; }
+  .filterPanelBody { padding: 0 24px; }
+  .filterPanelFooter { padding-left: 24px; padding-right: 24px; }
+}
+@media print {
+  .shopIntro { padding: 0 0 20px; }
+  .shopIntro h1 { font-size: 36px; }
+  .shopIntro > p, .shopDiscovery, .activeFilters, .resultSummary, .shopFilterDialog { display: none !important; }
+  .shopPage .productGrid { display: block; }
+  .shopPage .productImage { height: 180px; aspect-ratio: auto; }
+  .shopPage .cardDetails h2 { font-size: 18px; }
+}

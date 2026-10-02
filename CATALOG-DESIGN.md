@@ -168,3 +168,12 @@ Frente y contraetiqueta originales enlazados. Res/verduras es maridaje sugerido.
 `editorialMetadata` resuelve OG con dominio de Vercel cuando existe. No cambiar
 fichas dinámicas del CRM, ni asignar a un ID por heurística de nombre. Ninguna
 consulta o escritura adicional al backend, precio o disponibilidad inventados.
+
+## Catálogo blanco y descubrimiento (octubre 2026)
+- `/catalogo-publico/catalogo` uses a scoped `shopPage` canvas: pure white header, body, product images and filter sheet, matching the home bottle showcase. The dark shared footer remains. No beige hover surfaces are introduced.
+- Editorial heading and short introduction lead into a horizontal category selector, search, filter control, sort and result count. Three columns on desktop, two on mobile; the entire product card remains a link to its published product ID.
+- One native filter dialog adapts from a desktop side panel to a mobile bottom sheet. It has a scrollable field area and persistent apply button, keyboard Escape/focus restoration, page-scroll locking, and safe-area padding. Active filter chips can be removed individually.
+- Available facets: type, vintage, budget, grape, region, body and alcohol. Empty metadata facets are not shown. Search also includes pairing, ignores accents, and supports multiple terms. Unknown prices always sort last; budget boundaries do not overlap.
+- `getShopCollection` reads only descriptive public fields for IDs already in the approved publication. Prices, products and primary images still come from that publication. No price refresh semantics, CRM forms/actions, database schema, private prices or stock logic changed.
+- Generic editorial images are not automatically matched to CRM products by name. This change preserves existing product photography; white is the UI canvas, not an alteration of uploaded photos.
+- Validation: scoped ESLint, Next production compilation, TypeScript, whitespace checks, and focused checks for accents, multi-term search, budget endpoints, facet intersection and missing-price ordering. A real iPhone visual review remains part of Preview feedback.

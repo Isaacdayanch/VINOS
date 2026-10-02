@@ -9,6 +9,11 @@ export type PublicWine = {
   categoria: string | null;
   anio: number | null;
   precioLista: number | null;
+  varietal?: string | null;
+  region?: string | null;
+  cuerpo?: string | null;
+  alcohol?: number | null;
+  maridaje?: string | null;
 };
 
 // Legacy publications may not have IDs. Never expose private product fields.
@@ -30,6 +35,21 @@ export function parsePublication(value: unknown): PublicWine[] {
 export const getPublication = cache(async () => {
   const publication = await prisma.catalogoPublicado.findFirst({ orderBy: { fechaPublicado: "desc" } });
   return { date: publication?.fechaPublicado ?? null, wines: parsePublication(publication?.productos) };
+});
+
+// Read only public descriptive fields, and only for products already published.
+// The approved publication remains authoritative for price, membership and image.
+export const getShopCollection = cache(async () => {
+  const publication = await getPublication();
+  const ids = publication.wines.flatMap(wine => wine.id ? [wine.id] : []);
+  const products = ids.length ? await prisma.producto.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, varietal: true, region: true, cuerpo: true, alcohol: true, maridaje: true },
+  }) : [];
+  const metadata = new Map(products.map(product => [product.id, product]));
+  return { ...publication, wines: publication.wines.map(wine => ({
+    ...wine, ...(wine.id ? metadata.get(wine.id) : {}),
+  })) };
 });
 
 export const getPublicWine = cache(async (id: string) => {

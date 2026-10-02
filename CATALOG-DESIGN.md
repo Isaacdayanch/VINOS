@@ -148,3 +148,23 @@ La copa representa un color aproximado, no una medición. Maridaje de res/hongos
 sugerencia editorial explícita, no información del productor. Escena exterior
 generada, no fotografía de la bodega. No añadir stock, precio ni promesas de compra.
 Datos kosher/no mevushal proceden de contraetiqueta 2017; no extrapolar a otros vinos.
+
+## Cabernet Sauvignon Reserve 2019: segunda galería
+
+Ruta `/catalogo-publico/seleccion/dadah-cabernet-reserve-2019`. Fuentes originales
+IMG_0417 (frente, Single Vineyard Golan Heights) e IMG_0419 (reverso). 100% Cabernet,
+20 meses roble francés,14%,750ml,no mevushal,kosher para Pésaj. Servicio60–70°F,
+aproximadamente16–21°C: no heredar el rango60–65°F de2017. Historia de la misma
+bodega tomada del estuche2017, señalada como tal; no es procedencia de las uvas.
+
+Frente blanco existente más cinco imágenes: reverso,sirviendo,copa,parrilla,mesa.
+WebP960×1200quality85,55–189KB por imagen nueva. Referencias originales y prompts
+con identidad2019/etiquetaamarilla,ambiente piedra/lino/luz cálida,no overlays.
+La variante de mesa en collage se descartó; otra se corrigió para que dijera
+Golan Heights. Texto fino y sellos generados requieren revisión antes de producción.
+Frente y contraetiqueta originales enlazados. Res/verduras es maridaje sugerido.
+
+`EditorialWinePage` comparte presentación2017/2019; `EditorialWine` define datos,
+`editorialMetadata` resuelve OG con dominio de Vercel cuando existe. No cambiar
+fichas dinámicas del CRM, ni asignar a un ID por heurística de nombre. Ninguna
+consulta o escritura adicional al backend, precio o disponibilidad inventados.

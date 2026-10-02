@@ -250,3 +250,5 @@
 .galleryEditorial .galleryScroller { background: white; }
 .galleryEditorial .gallerySlide:nth-child(n+3) > img { padding: 0; object-fit: cover; }
 .galleryNote { font-size: 10px; line-height: 1.7; color: var(--muted); margin-top: 20px !important; }
+
+.sourceLinks { display: flex; flex-wrap: wrap; gap: 16px; }

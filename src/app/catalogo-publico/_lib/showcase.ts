@@ -24,7 +24,7 @@ export const showcaseWines: readonly ShowcaseWine[] = [
     labelImage: "titora-grand-label.webp",
     description: "Una selección de la añada 2021 con Cabernet Sauvignon dominante, procedente de Alta Galilea. La etiqueta describe fruta roja, pimienta inglesa y notas tostadas. Su crianza de veinticuatro meses en barricas francesas de primer y segundo uso desarrolla matices de cacao y café, con estructura tánica y un color rojo intenso.",
     facts: ["Alta Galilea · Israel", "24 meses en roble francés", "750 ml · 14.3% alc.", "Servir a 18–22 °C", "Kosher para Pésaj, según etiqueta"] },
-  { slug: "dadah-cabernet-reserve-2019", producer: "Dādāh", name: "Cabernet Sauvignon Reserve", year: 2019, image: "dadah-cabernet-reserve-2019.webp" },
+  { slug: "dadah-cabernet-reserve-2019", producer: "Dādāh", name: "Cabernet Sauvignon Reserve", year: 2019, image: "dadah-cabernet-reserve-2019.webp", editorialHref: "/catalogo-publico/seleccion/dadah-cabernet-reserve-2019" },
   { slug: "dadah-petit-syrah-reserve-2019", producer: "Dādāh", name: "Petit Verdot Syrah Reserve", year: 2019, image: "dadah-petit-syrah-reserve-2019.webp" },
   { slug: "dadah-cabernet-2023", producer: "Dādāh", name: "Cabernet Sauvignon", year: 2023, image: "dadah-cabernet-2023.webp" },
   { slug: "dadah-malbec-barbera-2023", producer: "Dādāh", name: "Malbec Barbera", year: 2023, image: "dadah-malbec-barbera-2023.webp" },

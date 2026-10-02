@@ -1,5 +1,15 @@
 /** Original labels IMG_0414(1)/IMG_0415(1). Editorial only; no CRM writes. */
-export const reserve2017 = {
+import { dadahStory, type EditorialWine } from "./editorial-wine";
+
+export const reserve2017: EditorialWine = {
+  slug: "reserve-2017",
+  title: "Special Reserve",
+  year: 2017,
+  producer: "DĀDĀH WINERY · ISRAEL",
+  style: "Cabernet Sauvignon · Tinto seco",
+  storyHeading: "Treinta meses.",
+  wineryStory: dadahStory,
+  labelImage: "/catalogo/reserve-2017-label-original.webp",
   name: "Dādāh Special Reserve 2017",
   description: "Un Cabernet Sauvignon de cuerpo pleno y color rojo profundo. La etiqueta describe moras silvestres, especias terrosas, hojas de tabaco y vainilla. Sus taninos marcados y su final largo acompañan una crianza de treinta meses en barricas de roble francés.",
   pairing: "Como sugerencia de maridaje, prueba carne de res braseada con hongos y hierbas. Es una recomendación para explorar este estilo de vino; no forma parte del texto de la etiqueta.",

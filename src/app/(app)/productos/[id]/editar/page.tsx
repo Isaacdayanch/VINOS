@@ -2,6 +2,7 @@ import { actualizarProducto } from "@/app/(app)/productos/actions";
 import { ProductoForm } from "@/components/ProductoForm";
 import { GaleriaFotosExtra } from "@/components/GaleriaFotosExtra";
 import { prisma } from "@/lib/prisma";
+import { urlCatalogoPublico } from "@/lib/catalogoPublico";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -29,7 +30,7 @@ export default async function EditarProductoPage({
         </Link>
         <h1 className="text-2xl font-bold text-wine mt-2">Editar {producto.nombre}</h1>
         <Link
-          href={`/catalogo-publico/${producto.id}`}
+          href={urlCatalogoPublico(`/catalogo-publico/${producto.id}`)}
           target="_blank"
           className="text-xs text-wine underline whitespace-nowrap"
         >

@@ -23,6 +23,26 @@ async function main() {
   const publicPage = await middleware(request("crm.test", "/catalogo-publico"));
   assert.equal(publicPage.headers.get("x-middleware-next"), "1");
   console.log("Catalog assets, public pages, catalog isolation and CRM authentication: passed");
+
+  // Con URL_CATALOGO_PUBLICO puesta, el CRM (cualquier host que no sea el
+  // del catálogo) redirige /catalogo-publico al dominio real, conservando
+  // ruta y parámetros; el dominio del catálogo nunca redirige (sin bucle).
+  process.env.URL_CATALOGO_PUBLICO = "https://catalog.test";
+  const redirige = await middleware(request("crm.test", "/catalogo-publico/abc123"));
+  assert.equal(redirige.headers.get("location"), "https://catalog.test/catalogo-publico/abc123");
+
+  const conQuery = await middleware(
+    new NextRequest("https://crm.test/catalogo-publico/catalogo?tipo=tinto", { headers: { host: "crm.test" } }),
+  );
+  const destino = new URL(conQuery.headers.get("location")!);
+  assert.equal(destino.origin + destino.pathname, "https://catalog.test/catalogo-publico/catalogo");
+  assert.equal(destino.searchParams.get("tipo"), "tinto");
+
+  const sinBucle = await middleware(request("catalog.test", "/catalogo-publico"));
+  assert.equal(sinBucle.headers.get("x-middleware-next"), "1");
+  assert.equal(sinBucle.headers.get("location"), null);
+
+  console.log("Catalog domain redirect (Snowy -> catalog domain, with query, no loop): passed");
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; });

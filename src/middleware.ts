@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { COOKIE_ACCESO, tokenEsperado } from "@/lib/auth";
+import { hostCatalogoPublico, urlCatalogoPublico } from "@/lib/catalogoPublico";
 
 // Dominio del catálogo público (ej. "catalogo-dadah.vercel.app"), configurado
 // en Vercel como variable de entorno una vez que Isaac agregue ese dominio
@@ -39,6 +40,22 @@ export async function middleware(request: NextRequest) {
       return NextResponse.rewrite(url);
     }
     return NextResponse.next();
+  }
+
+  // El catálogo público ya no vive en este dominio (el del CRM) — manda a
+  // quien entre aquí al dominio real del catálogo, conservando ruta y
+  // parámetros. Como esto corre DESPUÉS del bloque de arriba, en el propio
+  // dominio del catálogo nunca se ejecuta: no hay riesgo de bucle.
+  if (
+    (pathname === "/catalogo-publico" || pathname.startsWith("/catalogo-publico/")) &&
+    host !== hostCatalogoPublico()
+  ) {
+    const destino = urlCatalogoPublico(pathname);
+    if (destino !== pathname) {
+      const url = new URL(destino);
+      url.search = request.nextUrl.search;
+      return NextResponse.redirect(url);
+    }
   }
 
   if (esRutaPublica(pathname)) {

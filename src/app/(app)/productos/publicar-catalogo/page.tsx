@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import { BotonPublicarCatalogo } from "@/components/BotonPublicarCatalogo";
+import { urlCatalogoPublico } from "@/lib/catalogoPublico";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +57,7 @@ export default async function PublicarCatalogoPage() {
           <BotonPublicarCatalogo />
           {ultimaPublicacion && (
             <Link
-              href="/catalogo-publico"
+              href={urlCatalogoPublico()}
               target="_blank"
               className="text-sm text-wine underline whitespace-nowrap"
             >

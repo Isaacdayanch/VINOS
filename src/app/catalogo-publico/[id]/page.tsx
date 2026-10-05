@@ -8,6 +8,7 @@ import styles from "../catalog.module.css";
 import { grandRivallon, grandRivallonId } from "../_lib/grand-rivallon";
 import { EditorialWinePage } from "../_components/EditorialWinePage";
 import { editorialMetadata } from "../_lib/editorial-wine";
+import { publicPhotograph } from "../_lib/public-photography";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
   const product = await getPublicWine((await params).id);
   if (!product) notFound();
   if (product.id === grandRivallonId && product.anio === 2012) return <EditorialWinePage wine={grandRivallon} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
-  const photos = [product.fotoUrl, ...product.imagenesExtra.map((p) => p.url)].filter((p): p is string => Boolean(p));
+  const photos = [publicPhotograph(product.id, product.fotoUrl), ...product.imagenesExtra.map((p) => p.url)].filter((p): p is string => Boolean(p));
   const details = [
     ["Añada", product.anio], ["Región", product.region], ["Uva", product.varietal],
     ["Cuerpo", product.cuerpo], ["Alcohol", product.alcohol != null ? `${product.alcohol}%` : null],

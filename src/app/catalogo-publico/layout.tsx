@@ -8,7 +8,7 @@ const sans = Manrope({ subsets: ["latin"], variable: "--catalog-sans" });
 
 export const metadata: Metadata = {
   title: { default: "Vinos | Una selección con carácter", template: "%s | Vinos" },
-  description: "El vino que convierte al plato principal en acompañamiento. Descubre nuestra selección de vinos.",
+  description: "El vino que puede convertir al plato principal en un acompañamiento. Descubre nuestra selección de vinos.",
   robots: process.env.VERCEL_ENV === "preview" ? { index: false, follow: false } : { index: true, follow: true },
 };
 

@@ -34,7 +34,7 @@ export function Hero() {
   }, []);
 
   return <section ref={hero} className={styles.hero} aria-label="Bienvenida">
-    <Image src="/catalogo/terrace.webp" alt="" fill priority sizes="100vw" className={styles.heroBackground} />
+    <Image src="/catalogo/terrace-deep-garnet.webp" alt="" fill priority sizes="100vw" className={styles.heroBackground} />
     <div className={styles.heroShade} />
     <div className={styles.heroWordmark} aria-hidden="true">VINOS</div>
     <p className={styles.heroOrigin}>ISRAEL Y EL MUNDO</p>
@@ -42,7 +42,7 @@ export function Hero() {
       <Image src="/catalogo/reserve-2017-softlight.webp" alt="Dādāh Special Reserve 2017, etiqueta de colores" fill priority sizes="(max-width: 700px) 48vw, 40vw" className={styles.bottleImage} />
     </div>
     <div className={styles.heroCopy}>
-      <h1>El vino que convierte al plato principal en acompañamiento.</h1>
+      <h1>El vino que puede convertir al plato principal en un acompañamiento.</h1>
       <Link href="/catalogo-publico/catalogo" className={styles.pill}>Explorar vinos </Link>
     </div>
     <div className={styles.heroCaption}><span>DĀDĀH</span><span>Special Reserve · 2017</span></div>

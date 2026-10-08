@@ -179,12 +179,13 @@ export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: num
  * saldo de Caja/Cuenta, y el saldo entre socios (quién le debe a quién).
  */
 export async function calcularFinanzas(): Promise<ResumenFinanzas> {
-  const [resumenInventario, socios, pagos, cobros, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock] =
+  const [resumenInventario, socios, pagos, cobros, abonosCliente, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock] =
     await Promise.all([
       calcularResumenInventario(),
       prisma.socio.findMany(),
       prisma.pago.findMany(),
       prisma.cobro.findMany(),
+      prisma.abonoCliente.findMany(),
       prisma.cobroConsignacion.findMany(),
       prisma.orden.findMany({ include: { lineas: true } }),
       prisma.salida.findMany({ where: { motivo: "Consumo personal" } }),
@@ -214,7 +215,9 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   }
   const gananciaTotal = ventasTotales - costoVentas;
 
-  const totalCobrado = cobros.reduce((acc, c) => acc + c.monto, 0);
+  const totalCobrado =
+    cobros.reduce((acc, c) => acc + c.monto, 0) +
+    abonosCliente.reduce((acc, a) => acc + a.monto, 0);
   const totalPendiente = ventasTotales - totalCobrado;
 
   let inversionTotal = 0;
@@ -261,6 +264,12 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   for (const c of cobros) {
     const montoNeto = c.monto * (1 - c.comisionPct / 100);
     if (c.cuenta === "EFECTIVO") saldoCaja += montoNeto;
+    else saldoCuenta += montoNeto;
+  }
+
+  for (const a of abonosCliente) {
+    const montoNeto = a.monto * (1 - a.comisionPct / 100);
+    if (a.cuenta === "EFECTIVO") saldoCaja += montoNeto;
     else saldoCuenta += montoNeto;
   }
 
@@ -397,10 +406,14 @@ export type MovimientoCuenta = {
 export async function calcularMovimientosCuenta(
   cuenta: "EFECTIVO" | "CUENTA",
 ): Promise<{ saldo: number; movimientos: MovimientoCuenta[] }> {
-  const [cobros, cobrosConsignacion, pagos, salidasRepuesto] = await Promise.all([
+  const [cobros, abonosCliente, cobrosConsignacion, pagos, salidasRepuesto] = await Promise.all([
     prisma.cobro.findMany({
       where: { cuenta },
       include: { orden: { include: { cliente: true } } },
+    }),
+    prisma.abonoCliente.findMany({
+      where: { cuenta },
+      include: { cliente: true },
     }),
     prisma.cobroConsignacion.findMany({
       where: { cuenta },
@@ -426,6 +439,18 @@ export async function calcularMovimientosCuenta(
       concepto: `Cobro — ${c.orden.cliente.nombre.replace("Cliente Especial - ", "")}`,
       detalle: c.orden.folio,
       href: `/ordenes/${c.orden.id}`,
+    });
+  }
+
+  for (const a of abonosCliente) {
+    movimientos.push({
+      id: `abonocliente-${a.id}`,
+      fecha: a.fecha,
+      tipo: "entrada",
+      monto: a.monto * (1 - a.comisionPct / 100),
+      concepto: `Abono — ${a.cliente.nombre.replace("Cliente Especial - ", "")}`,
+      detalle: "Abono a cuenta",
+      href: `/clientes/${a.cliente.id}`,
     });
   }
 
@@ -565,22 +590,26 @@ export type MovimientoEstadoCuenta = {
   cargo: number; // > 0 si es una orden (aumenta lo que debe)
   abono: number; // > 0 si es un pago (disminuye lo que debe)
   saldo: number; // acumulado hasta este movimiento
-  ordenId: string;
+  ordenId?: string;
 };
 
 /**
- * Estado de cuenta de un cliente: junta todas sus órdenes (cargo) y los
- * cobros de cada una (abono) en orden cronológico, con saldo acumulado.
- * Se calcula siempre en vivo a partir de Orden/Cobro — si Isaac edita una
- * orden ya pagada, el estado de cuenta refleja el cambio automáticamente,
- * no hay nada que "actualizar" a mano.
+ * Estado de cuenta de un cliente: junta todas sus órdenes (cargo), los
+ * cobros de cada una y los abonos a cuenta general (abono) en orden
+ * cronológico, con saldo acumulado. Se calcula siempre en vivo a partir de
+ * Orden/Cobro/AbonoCliente — si Isaac edita una orden ya pagada, el estado
+ * de cuenta refleja el cambio automáticamente, no hay nada que "actualizar"
+ * a mano.
  */
 export async function calcularEstadoCuentaCliente(clienteId: string) {
-  const ordenes = await prisma.orden.findMany({
-    where: { clienteId },
-    include: { lineas: true, cobros: true },
-    orderBy: { fecha: "asc" },
-  });
+  const [ordenes, abonos] = await Promise.all([
+    prisma.orden.findMany({
+      where: { clienteId },
+      include: { lineas: true, cobros: true },
+      orderBy: { fecha: "asc" },
+    }),
+    prisma.abonoCliente.findMany({ where: { clienteId }, orderBy: { fecha: "asc" } }),
+  ]);
 
   const crudos: Omit<MovimientoEstadoCuenta, "saldo">[] = [];
 
@@ -605,6 +634,17 @@ export async function calcularEstadoCuentaCliente(clienteId: string) {
         ordenId: o.id,
       });
     }
+  }
+
+  for (const a of abonos) {
+    const cuentaTexto = a.cuenta === "EFECTIVO" ? "Efectivo" : "Transferencia";
+    crudos.push({
+      id: `abono-${a.id}`,
+      fecha: a.fecha,
+      concepto: `Abono a cuenta — ${cuentaTexto}${a.metodoPago ? ` (${a.metodoPago})` : ""}`,
+      cargo: 0,
+      abono: a.monto,
+    });
   }
 
   crudos.sort((a, b) => a.fecha.getTime() - b.fecha.getTime());

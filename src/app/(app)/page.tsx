@@ -16,11 +16,12 @@ const ETIQUETA_TIPO_STOCK: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const [resumen, productos, cobros, ordenes, movimientosStock, movimientosFinanzas] =
+  const [resumen, productos, cobros, abonosCliente, ordenes, movimientosStock, movimientosFinanzas] =
     await Promise.all([
       calcularResumenInventario(),
       prisma.producto.findMany(),
       prisma.cobro.findMany(),
+      prisma.abonoCliente.findMany(),
       prisma.orden.findMany({
         include: { lineas: true, cliente: true },
         orderBy: { fecha: "desc" },
@@ -54,7 +55,9 @@ export default async function DashboardPage() {
   }
   const gananciaTotal = ventasTotales - costoTotal;
 
-  const totalCobrado = cobros.reduce((acc, c) => acc + c.monto, 0);
+  const totalCobrado =
+    cobros.reduce((acc, c) => acc + c.monto, 0) +
+    abonosCliente.reduce((acc, a) => acc + a.monto, 0);
   const totalPendiente = ventasTotales - totalCobrado;
 
   const topProductos = [...productos]

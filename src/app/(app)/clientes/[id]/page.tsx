@@ -1,10 +1,12 @@
 import { PreciosClienteTabla } from "@/components/PreciosClienteTabla";
-import { formatoMXN } from "@/lib/costeo";
+import { DateField } from "@/components/DateField";
+import { calcularEstadoCuentaCliente, formatoMXN } from "@/lib/costeo";
 import { asegurarCodigoCliente } from "@/lib/clienteCodigo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
+import { registrarAbono } from "@/app/(app)/clientes/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,7 @@ export default async function DetalleClientePage({
 }: PageProps<"/clientes/[id]">) {
   const { id } = await params;
 
-  const [cliente, ordenes, productos, preciosGuardados] = await Promise.all([
+  const [cliente, ordenes, productos, preciosGuardados, abonos, estadoCuenta] = await Promise.all([
     prisma.cliente.findUnique({ where: { id } }),
     prisma.orden.findMany({
       where: { clienteId: id },
@@ -28,9 +30,13 @@ export default async function DetalleClientePage({
     }),
     prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
     prisma.precioClienteProducto.findMany({ where: { clienteId: id } }),
+    prisma.abonoCliente.findMany({ where: { clienteId: id }, orderBy: { fecha: "desc" } }),
+    calcularEstadoCuentaCliente(id),
   ]);
   if (!cliente) notFound();
   const codigo = await asegurarCodigoCliente(cliente);
+  const hoy = new Date().toISOString().slice(0, 10);
+  const accionAbono = registrarAbono.bind(null, cliente.id);
 
   const lineasPendientes = ordenes.flatMap((o) =>
     o.lineas
@@ -47,13 +53,7 @@ export default async function DetalleClientePage({
     esPersonalizado: precioPorProducto.has(p.id),
   }));
 
-  let totalFacturado = 0;
-  let totalCobrado = 0;
-  for (const o of ordenes) {
-    totalFacturado += o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
-    totalCobrado += o.cobros.reduce((acc, c) => acc + c.monto, 0);
-  }
-  const totalPendiente = totalFacturado - totalCobrado;
+  const { totalFacturado, totalCobrado, totalPendiente } = estadoCuenta;
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -97,6 +97,88 @@ export default async function DetalleClientePage({
         >
           Ver / mandar estado de cuenta →
         </Link>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <h2 className="font-semibold">Abonos a cuenta</h2>
+        <p className="text-xs text-muted -mt-1">
+          Dinero que te manda el cliente sin ser para una orden específica — se descuenta del
+          total que te debe en general, no de una orden en particular.
+        </p>
+        {abonos.length > 0 && (
+          <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
+            {abonos.map((a) => (
+              <div key={a.id} className="p-3 flex items-center justify-between text-sm">
+                <div>
+                  <p>{new Date(a.fecha).toLocaleDateString("es-MX")}</p>
+                  <p className="text-xs text-muted">
+                    {a.cuenta === "EFECTIVO" ? "Efectivo" : "Transferencia"}
+                    {a.cuenta === "CUENTA" && a.comisionPct > 0 ? ` (comisión ${a.comisionPct}%)` : ""}
+                    {a.metodoPago ? ` · ${a.metodoPago}` : ""}
+                  </p>
+                </div>
+                <span className="font-medium">{formatoMXN(a.monto)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <details className="rounded-lg border border-border bg-surface">
+          <summary className="p-4 cursor-pointer text-sm font-medium">+ Registrar abono</summary>
+          <form action={accionAbono} className="p-4 pt-0 flex flex-col gap-4">
+            <DateField name="fecha" label="Fecha" defaultValue={hoy} />
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Monto (MXN)</span>
+              <input
+                name="monto"
+                type="number"
+                step="0.01"
+                min="0"
+                className="rounded-md border border-border bg-surface px-3 py-2"
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">¿Dónde te llegó el dinero?</span>
+              <select
+                name="cuenta"
+                defaultValue="EFECTIVO"
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              >
+                <option value="EFECTIVO">Efectivo (a Caja)</option>
+                <option value="CUENTA">Transferencia</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Comisión % (solo si fue por Transferencia)</span>
+              <input
+                name="comisionPct"
+                type="number"
+                step="0.1"
+                min="0"
+                defaultValue={0.6}
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Método de pago (opcional)</span>
+              <input
+                name="metodoPago"
+                placeholder="Ej. Transferencia, tarjeta, efectivo"
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Notas (opcional)</span>
+              <input
+                name="notas"
+                className="rounded-md border border-border bg-surface px-3 py-2"
+              />
+            </label>
+            <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
+              Registrar abono
+            </button>
+          </form>
+        </details>
       </div>
 
       {lineasPendientes.length > 0 && (

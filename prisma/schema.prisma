@@ -102,8 +102,25 @@ model Cliente {
 
   ordenes         Orden[]
   preciosProducto PrecioClienteProducto[]
+  abonos          AbonoCliente[]
 }
 
+// Pago del cliente a cuenta general, sin ligarlo a una orden específica
+// (ej. te manda dinero y luego se va descontando de lo que deba). Se suma
+// junto con los Cobro de cada orden para sacar el saldo del cliente.
+model AbonoCliente {
+  id          String   @id @default(cuid())
+  clienteId   String
+  fecha       DateTime
+  monto       Float
+  cuenta      Cuenta   @default(EFECTIVO)
+  comisionPct Float    @default(0) // % que se descuenta si cuenta = CUENTA (ej. comisión de tarjeta)
+  metodoPago  String?
+  notas       String?
+  createdAt   DateTime @default(now())
+
+  cliente Cliente @relation(fields: [clienteId], references: [id])
+}
 
 model PrecioClienteProducto {
   id         String   @id @default(cuid())

@@ -63,3 +63,26 @@ export async function actualizarPrecioCliente(
   revalidatePath(`/clientes/${clienteId}`);
   revalidatePath("/ordenes/nueva");
 }
+
+export async function registrarAbono(clienteId: string, formData: FormData) {
+  const fecha = String(formData.get("fecha") ?? "");
+  const monto = Number(formData.get("monto"));
+  const cuenta = String(formData.get("cuenta") ?? "EFECTIVO") as "EFECTIVO" | "CUENTA";
+  const comisionPct = cuenta === "CUENTA" ? Number(formData.get("comisionPct") ?? 0) : 0;
+  const metodoPago = String(formData.get("metodoPago") ?? "").trim() || null;
+  const notas = String(formData.get("notas") ?? "").trim() || null;
+
+  if (!fecha || !monto) {
+    throw new Error("Faltan datos del abono");
+  }
+
+  await prisma.abonoCliente.create({
+    data: { clienteId, fecha: new Date(fecha), monto, cuenta, comisionPct, metodoPago, notas },
+  });
+
+  revalidatePath(`/clientes/${clienteId}`);
+  revalidatePath(`/clientes/${clienteId}/estado-cuenta`);
+  revalidatePath("/clientes");
+  revalidatePath("/finanzas");
+  revalidatePath("/");
+}

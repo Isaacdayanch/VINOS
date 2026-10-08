@@ -57,6 +57,10 @@ export async function actualizarPedido(pedidoId: string, formData: FormData) {
   const logisticaUSD = numeroOpcional(formData.get("logisticaUSD"));
   const logisticaMXN = numeroOpcional(formData.get("logisticaMXN"));
   const descuentoPct = numeroOpcional(formData.get("descuentoPct"));
+  const fechaVencimientoCreditoStr = String(formData.get("fechaVencimientoCredito") ?? "").trim();
+  const fechaVencimientoCredito = fechaVencimientoCreditoStr
+    ? new Date(fechaVencimientoCreditoStr)
+    : null;
 
   await prisma.pedido.update({
     where: { id: pedidoId },
@@ -66,6 +70,7 @@ export async function actualizarPedido(pedidoId: string, formData: FormData) {
       logisticaUSD,
       logisticaMXN,
       descuentoPct,
+      fechaVencimientoCredito,
     },
   });
 

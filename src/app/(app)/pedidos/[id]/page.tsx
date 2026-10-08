@@ -64,6 +64,26 @@ export default async function DetallePedidoPage({
 
   const lineasSinRecibir = pedido.entradas.filter((l) => !l.recibida);
 
+  let avisoCredito: { texto: string; vencido: boolean } | null = null;
+  if (pedido.fechaVencimientoCredito && pendienteUSD > 0.5) {
+    const hoyMedianoche = new Date();
+    hoyMedianoche.setHours(0, 0, 0, 0);
+    const diffDias = Math.round(
+      (pedido.fechaVencimientoCredito.getTime() - hoyMedianoche.getTime()) / 86400000,
+    );
+    if (diffDias < 0) {
+      avisoCredito = {
+        texto: `Se venció hace ${Math.abs(diffDias)} día${Math.abs(diffDias) === 1 ? "" : "s"} — todavía debes $${pendienteUSD.toLocaleString("es-MX")} USD`,
+        vencido: true,
+      };
+    } else if (diffDias <= 7) {
+      avisoCredito = {
+        texto: `Vence en ${diffDias} día${diffDias === 1 ? "" : "s"} (${pedido.fechaVencimientoCredito.toLocaleDateString("es-MX")}) — debes $${pendienteUSD.toLocaleString("es-MX")} USD`,
+        vencido: false,
+      };
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 max-w-lg">
       <div>
@@ -81,6 +101,19 @@ export default async function DetallePedidoPage({
           {pedido.proveedor ? ` · ${pedido.proveedor}` : ""}
         </p>
       </div>
+
+      {avisoCredito && (
+        <div
+          className={`rounded-lg border p-4 text-sm flex flex-col gap-1 ${
+            avisoCredito.vencido ? "border-warn bg-warn-bg" : "border-wine bg-wine-light/40"
+          }`}
+        >
+          <p className={`font-semibold ${avisoCredito.vencido ? "text-warn" : "text-wine"}`}>
+            {avisoCredito.vencido ? "⚠️ Crédito vencido" : "📅 Tu crédito está por vencer"}
+          </p>
+          <p className="text-muted">{avisoCredito.texto}</p>
+        </div>
+      )}
 
       {lineasSinRecibir.length > 0 && (
         <div className="rounded-lg border border-warn bg-warn-bg p-4 text-sm flex flex-col gap-1">
@@ -142,6 +175,7 @@ export default async function DetallePedidoPage({
           logisticaUSD={pedido.logisticaUSD}
           logisticaMXN={pedido.logisticaMXN}
           descuentoPct={pedido.descuentoPct}
+          fechaVencimientoCredito={pedido.fechaVencimientoCredito?.toISOString().slice(0, 10)}
           costoMercanciaBrutoUSD={costoMercanciaBrutoUSD}
         />
       </details>

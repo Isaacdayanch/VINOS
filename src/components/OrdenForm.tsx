@@ -4,9 +4,10 @@ import { useMemo, useState } from "react";
 import { crearOrden } from "@/app/(app)/ordenes/actions";
 import { crearClienteRapido } from "@/app/(app)/clientes/actions";
 import { ProductoPicker } from "@/components/ProductoPicker";
+import { ClientePicker } from "@/components/ClientePicker";
 import { DateField } from "@/components/DateField";
 
-type Cliente = { id: string; nombre: string };
+type Cliente = { id: string; nombre: string; codigo?: string | null };
 type Producto = { id: string; nombre: string; fotoUrl: string | null; piezasPorCaja: number };
 type Unidad = "BOTELLAS" | "CAJAS";
 type Linea = {
@@ -185,21 +186,16 @@ export function OrdenForm({
       <input type="hidden" name="lineas" value={JSON.stringify(lineasParaEnviar)} />
 
       <div className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">Cliente</span>
         {clientes.length > 0 && (
-          <select
+          <ClientePicker
             name="clienteId"
+            clientes={clientes.map((c) => ({
+              ...c,
+              categoriaPrecio: categoriaPorCliente[c.id],
+            }))}
             value={clienteId}
-            onChange={(e) => cambiarCliente(e.target.value)}
-            className="rounded-md border border-border bg-surface px-3 py-2"
-            required
-          >
-            {clientes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre.replace("Cliente Especial - ", "")}
-              </option>
-            ))}
-          </select>
+            onChange={cambiarCliente}
+          />
         )}
         {clienteId && categoriaPorCliente[clienteId] && (
           <p className="text-xs text-muted">

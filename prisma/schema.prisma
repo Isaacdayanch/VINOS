@@ -153,6 +153,7 @@ model Pedido {
   logisticaUSD Float? // envío del proveedor en EE.UU. (dólares)
   logisticaMXN Float? // envío y aduana en México + maniobras (pesos)
   descuentoPct Float? // % de descuento del proveedor sobre el costo de la mercancía
+  fechaVencimientoCredito DateTime? // si el proveedor te dio crédito: para cuándo hay que acabar de pagarle
   notas        String?
   createdAt    DateTime @default(now())
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DateField } from "@/components/DateField";
 
 export function CostosPedidoForm({
   action,
@@ -9,6 +10,7 @@ export function CostosPedidoForm({
   logisticaUSD,
   logisticaMXN,
   descuentoPct,
+  fechaVencimientoCredito,
   costoMercanciaBrutoUSD,
 }: {
   action: (formData: FormData) => void;
@@ -17,6 +19,7 @@ export function CostosPedidoForm({
   logisticaUSD?: number | null;
   logisticaMXN?: number | null;
   descuentoPct?: number | null;
+  fechaVencimientoCredito?: string | null;
   costoMercanciaBrutoUSD: number;
 }) {
   const [descuento, setDescuento] = useState<number | "">(descuentoPct ?? "");
@@ -86,6 +89,12 @@ export function CostosPedidoForm({
           className="rounded-md border border-border bg-surface px-3 py-2"
         />
       </label>
+
+      <DateField
+        name="fechaVencimientoCredito"
+        label="¿Tienes crédito? Fecha límite para acabar de pagarle (opcional)"
+        defaultValue={fechaVencimientoCredito ?? undefined}
+      />
 
       {costoMercanciaBrutoUSD > 0 && (
         <div className="rounded-md border border-border bg-wine-light/30 p-3 flex flex-col gap-1 text-sm">

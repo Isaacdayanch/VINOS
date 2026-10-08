@@ -25,6 +25,8 @@ const selection: readonly ShowcaseWine[] = [
     facts: ["Galilea · Israel", "18 meses en roble francés", "750 ml · 14.3% alc.", "Servir a 18–22 °C", "Kosher para Pésaj, según etiqueta"] },
   { slug: "titora-grand-2023", producer: "La Citadelle de Diamant · Givat Titora", name: "Grande Réserve", year: 2023, image: "titora-grand-2023-front.webp", editorialHref: "/catalogo-publico/seleccion/titora-grand-2023",
     description: "Próxima llegada: añada 2023. Descubre su presentación visual y nuestras propuestas de maridaje. Ficha técnica pendiente de confirmar con la nueva etiqueta." },
+  { slug: "titora-reserve-2023", producer: "La Citadelle de Diamant · Givat Titora", name: "Cabernet Sauvignon Reserve", year: 2023, image: "titora-reserve-2023-front.webp", editorialHref: "/catalogo-publico/seleccion/titora-reserve-2023",
+    description: "95% Cabernet Sauvignon y 5% Petit Verdot de Galilea. Frutos del bosque, cuerpo de medio a pleno y doce meses en roble francés, según su etiqueta." },
   { slug: "dadah-cabernet-reserve-2019", productId: "cmtssyq4b0004l4044dcpucfr", producer: "Dādāh", name: "Cabernet Sauvignon Reserve", year: 2019, image: "dadah-cabernet-reserve-2019.webp", editorialHref: "/catalogo-publico/seleccion/dadah-cabernet-reserve-2019" },
   { slug: "dadah-petit-syrah-reserve-2019", productId: "cmtssyq420003l4047ct1g5wa", producer: "Dādāh", name: "Petit Verdot Syrah Reserve", year: 2019, image: "dadah-petit-syrah-reserve-2019.webp" },
   { slug: "dadah-cabernet-2023", productId: "cmtssyq350000l404mdg2nzou", producer: "Dādāh", name: "Cabernet Sauvignon", year: 2023, image: "dadah-cabernet-2023.webp" },

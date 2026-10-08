@@ -62,6 +62,8 @@ export default async function DetallePedidoPage({
   const costoTotalUSD = costoMercanciaUSD + (pedido.logisticaUSD ?? 0);
   const pendienteUSD = costoTotalUSD - totalAbonadoUSD;
 
+  const lineasSinRecibir = pedido.entradas.filter((l) => !l.recibida);
+
   return (
     <div className="flex flex-col gap-6 max-w-lg">
       <div>
@@ -79,6 +81,20 @@ export default async function DetallePedidoPage({
           {pedido.proveedor ? ` · ${pedido.proveedor}` : ""}
         </p>
       </div>
+
+      {lineasSinRecibir.length > 0 && (
+        <div className="rounded-lg border border-warn bg-warn-bg p-4 text-sm flex flex-col gap-1">
+          <p className="font-semibold text-warn">
+            ⚠️ {lineasSinRecibir.length} producto{lineasSinRecibir.length === 1 ? "" : "s"} sin
+            marcar como recibido
+          </p>
+          <p className="text-muted">
+            Mientras no le des &quot;Marcar recibido&quot; a cada línea de abajo, esas botellas
+            NO cuentan en tu Stock, ni su costo se reparte, ni se ven en Finanzas ni en la Hoja de
+            precios — aunque ya hayas puesto los costos de flete y aduana aquí arriba.
+          </p>
+        </div>
+      )}
 
       {costoTotalUSD > 0 && (
         <div className="rounded-lg border border-border bg-wine-light/40 p-4 flex flex-col gap-1 text-sm">

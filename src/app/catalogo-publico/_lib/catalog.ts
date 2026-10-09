@@ -38,13 +38,14 @@ export const getPublication = cache(async () => {
 });
 
 // Read only public descriptive fields, and only for products already published.
-// The approved publication remains authoritative for price, membership and image.
+// The approved publication remains authoritative for price and membership.
+// Public bottle names, years and photos follow the same live content as details.
 export const getShopCollection = cache(async () => {
   const publication = await getPublication();
   const ids = publication.wines.flatMap(wine => wine.id ? [wine.id] : []);
   const products = ids.length ? await prisma.producto.findMany({
     where: { id: { in: ids } },
-    select: { id: true, varietal: true, region: true, cuerpo: true, alcohol: true, maridaje: true },
+    select: { id: true, nombre: true, anio: true, fotoUrl: true, varietal: true, region: true, cuerpo: true, alcohol: true, maridaje: true },
   }) : [];
   const metadata = new Map(products.map(product => [product.id, product]));
   return { ...publication, wines: publication.wines.map(wine => ({

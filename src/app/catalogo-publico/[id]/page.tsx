@@ -40,9 +40,19 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
     if (product.id === "cmtssyq4u0006l404sytto49b" && ambient.length === 4) ambient.unshift(ambient.pop()!);
     const front = publicPhotograph(product.id, product.fotoUrl);
     const tanya = product.id === "cmtssyq4u0006l404sytto49b" && product.anio === 2021;
+    const enosh = product.id === "cmtssyq4l0005l4047nx3t1lc" && product.anio === 2018;
+    if (enosh) {
+      ["Una mesa al anochecer", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: res braseada con hongos"].forEach((caption, index) => {
+        if (ambient[index]) ambient[index].caption = caption;
+      });
+      if (ambient[4]) {
+        ambient[4].caption = "La contraetiqueta original";
+        ambient[4].ambient = false;
+      }
+    }
     return <WineDetailPage wine={{
-      name: product.nombre, title: tanya ? "Eliyah" : product.nombre,
-      eyebrow: tanya ? "TANYA · ISRAEL · 2021" : [product.categoria, product.anio].filter(Boolean).join(" · "),
+      name: product.nombre, title: tanya ? "Eliyah" : enosh ? "Enosh" : product.nombre,
+      eyebrow: tanya ? "TANYA · ISRAEL · 2021" : enosh ? "BY TANYA · ISRAEL · 2018" : [product.categoria, product.anio].filter(Boolean).join(" · "),
       style: tanya ? "Cabernet Sauvignon · Reserve" : product.varietal ?? undefined,
       description: product.descripcion,
       commerce: { precioLista: product.precioLista, activo: product.activo },

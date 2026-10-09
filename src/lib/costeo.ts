@@ -38,13 +38,14 @@ export async function calcularCostosPedido(pedidoId: string) {
   const factorDescuento = 1 - (pedido.descuentoPct ?? 0) / 100;
 
   const lineas = pedido.entradas.map((e) => {
-    // Las botellas extra (sueltas, de más) no tienen costo de mercancía
-    // propio — vinieron "de regalo" — pero sí les toca su parte del flete y
-    // la aduana, como a cualquier otra botella del pedido.
+    // botellasExtra es un ajuste con signo: positivo si llegaron botellas
+    // sueltas de más (se las paga al proveedor, al mismo precio por botella
+    // que el resto), negativo si llegaron de menos (se le descuentan).
     const botellas = e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra;
+    const costoPorBotellaUSD = e.piezasPorCaja > 0 ? e.costoPorCaja / e.piezasPorCaja : 0;
     // El descuento del proveedor es sobre el costo de la mercancía; el
     // envío/aduana no se descuenta.
-    const costoMercanciaMXN = e.cajasRecibidas * e.costoPorCaja * tipoCambio * factorDescuento;
+    const costoMercanciaMXN = botellas * costoPorBotellaUSD * tipoCambio * factorDescuento;
     return { entrada: e, botellas, costoMercanciaMXN };
   });
 

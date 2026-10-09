@@ -45,7 +45,7 @@ export function LineaPedidoRow({
   const numCostoBotella = costoBotella === "" ? 0 : costoBotella;
   const costoPorCaja = numCostoBotella * piezas;
   const totalBotellas = numCajas * piezas + numBotellasExtra;
-  const totalLinea = numCajas * costoPorCaja;
+  const totalLinea = totalBotellas * numCostoBotella;
 
   if (editando) {
     return (
@@ -106,20 +106,20 @@ export function LineaPedidoRow({
             </label>
           </div>
           <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Botellas extra (sueltas, de más)</span>
+            <span className="font-medium">Botellas de más (+) o de menos (−)</span>
             <input
               name="botellasExtra"
               type="number"
               step="1"
-              min="0"
               value={botellasExtra}
               onChange={(e) => setBotellasExtra(e.target.value === "" ? "" : Number(e.target.value))}
               className="rounded-md border border-border bg-surface px-3 py-2"
               placeholder="0"
             />
             <span className="text-xs text-muted">
-              Si llegaron botellas sueltas de más, fuera de las cajas completas — no les mete
-              costo de mercancía propio, pero sí les toca su parte del flete y la aduana.
+              Si llegaron botellas sueltas de más o faltaron, fuera de las cajas completas. Se le
+              pagan (o descuentan) al proveedor al mismo precio por botella de esta línea, y les
+              toca su parte del flete y la aduana igual que al resto.
             </span>
           </label>
           <p className="text-xs text-muted -mt-1">
@@ -157,7 +157,8 @@ export function LineaPedidoRow({
         <p className="font-medium truncate">{producto.nombre}</p>
         <p className="text-xs text-muted">
           {cajasInicial} caja{cajasInicial === 1 ? "" : "s"} × {piezasInicial}
-          {botellasExtraInicial > 0 ? ` + ${botellasExtraInicial} sueltas` : ""} ={" "}
+          {botellasExtraInicial > 0 ? ` + ${botellasExtraInicial} de más` : ""}
+          {botellasExtraInicial < 0 ? ` − ${Math.abs(botellasExtraInicial)} de menos` : ""} ={" "}
           {cajasInicial * piezasInicial + botellasExtraInicial} botellas
         </p>
         <p className="text-xs text-muted">

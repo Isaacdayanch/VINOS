@@ -160,7 +160,7 @@ export async function actualizarLineaPedido(
   const cajasRecibidas = Number(formData.get("cajasRecibidas"));
   const piezasPorCaja = Number(formData.get("piezasPorCaja"));
   const costoPorCaja = Number(formData.get("costoPorCaja"));
-  const botellasExtra = Math.max(0, Number(formData.get("botellasExtra") ?? 0));
+  const botellasExtra = Math.trunc(Number(formData.get("botellasExtra") ?? 0));
 
   if (!fecha || !cajasRecibidas || !piezasPorCaja || !costoPorCaja) {
     throw new Error("Faltan datos para editar el producto del pedido");

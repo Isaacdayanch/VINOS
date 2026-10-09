@@ -22,10 +22,10 @@ export default async function ImprimirPedidoPage({
   ]);
   if (!pedido) notFound();
 
-  const costoMercanciaBrutoUSD = pedido.entradas.reduce(
-    (acc, l) => acc + l.cajasRecibidas * l.costoPorCaja,
-    0,
-  );
+  const costoMercanciaBrutoUSD = pedido.entradas.reduce((acc, l) => {
+    const costoPorBotella = l.piezasPorCaja > 0 ? l.costoPorCaja / l.piezasPorCaja : 0;
+    return acc + (l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra) * costoPorBotella;
+  }, 0);
   const descuentoUSD = (costoMercanciaBrutoUSD * (pedido.descuentoPct ?? 0)) / 100;
   const costoMercanciaUSD = costoMercanciaBrutoUSD - descuentoUSD;
   const costoTotalUSD = costoMercanciaUSD + (pedido.logisticaUSD ?? 0);
@@ -103,7 +103,7 @@ export default async function ImprimirPedidoPage({
             <col />
             <col className="w-12" />
             <col className="w-14" />
-            {completa && <col className="w-14" />}
+            <col className="w-20" />
             <col className="w-16" />
             <col className="w-16" />
             {completa && <col className="w-20" />}
@@ -114,9 +114,7 @@ export default async function ImprimirPedidoPage({
               <th className="pb-1.5 px-2 font-medium">Item</th>
               <th className="pb-1.5 px-2 font-medium text-right">Cases</th>
               <th className="pb-1.5 px-2 font-medium text-right">Btl/Case</th>
-              {completa && (
-                <th className="pb-1.5 px-2 font-medium text-right">Total botellas</th>
-              )}
+              <th className="pb-1.5 px-2 font-medium text-right">Total Btl</th>
               <th className="pb-1.5 px-2 font-medium text-right">Price/Case</th>
               <th className="pb-1.5 pl-2 font-medium text-right">Total</th>
               {completa && (
@@ -148,17 +146,21 @@ export default async function ImprimirPedidoPage({
                 <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
                   {l.piezasPorCaja}
                 </td>
-                {completa && (
-                  <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
-                    {l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra}
-                    {l.botellasExtra > 0 ? ` (+${l.botellasExtra})` : ""}
-                  </td>
-                )}
+                <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
+                  {l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra}
+                  {l.botellasExtra !== 0
+                    ? ` (${l.botellasExtra > 0 ? "+" : ""}${l.botellasExtra})`
+                    : ""}
+                </td>
                 <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
                   ${l.costoPorCaja.toFixed(2)}
                 </td>
                 <td className="py-1.5 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
-                  ${(l.cajasRecibidas * l.costoPorCaja).toLocaleString("en-US")}
+                  $
+                  {(
+                    (l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra) *
+                    (l.piezasPorCaja > 0 ? l.costoPorCaja / l.piezasPorCaja : 0)
+                  ).toLocaleString("en-US", { maximumFractionDigits: 2 })}
                 </td>
                 {completa && (
                   <td className="py-1.5 pl-2 text-right tabular-nums font-semibold text-wine whitespace-nowrap">
@@ -169,7 +171,7 @@ export default async function ImprimirPedidoPage({
             ))}
             {pedido.entradas.length === 0 && (
               <tr>
-                <td colSpan={completa ? 8 : 6} className="py-6 text-center text-muted">
+                <td colSpan={completa ? 8 : 7} className="py-6 text-center text-muted">
                   No items yet
                 </td>
               </tr>

@@ -71,10 +71,12 @@ export default async function DetallePedidoPage({
     .filter((p) => p.moneda === "USD")
     .reduce((acc, p) => acc + p.monto, 0);
 
-  const costoMercanciaBrutoUSD = pedido.entradas.reduce(
-    (acc, l) => acc + l.cajasRecibidas * l.costoPorCaja,
-    0,
-  );
+  // Las botellas de más se le pagan al proveedor (y las de menos se
+  // descuentan) al mismo precio por botella que el resto de la línea.
+  const costoMercanciaBrutoUSD = pedido.entradas.reduce((acc, l) => {
+    const costoPorBotella = l.piezasPorCaja > 0 ? l.costoPorCaja / l.piezasPorCaja : 0;
+    return acc + (l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra) * costoPorBotella;
+  }, 0);
   const factorDescuento = 1 - (pedido.descuentoPct ?? 0) / 100;
   const costoMercanciaUSD = costoMercanciaBrutoUSD * factorDescuento;
   const costoTotalUSD = costoMercanciaUSD + (pedido.logisticaUSD ?? 0);

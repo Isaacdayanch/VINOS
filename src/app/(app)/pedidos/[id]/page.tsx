@@ -11,7 +11,7 @@ import { AgregarLineaPedidoForm } from "@/components/AgregarLineaPedidoForm";
 import { CostosPedidoForm } from "@/components/CostosPedidoForm";
 import { DateField } from "@/components/DateField";
 import { LineaPedidoRow } from "@/components/LineaPedidoRow";
-import { calcularCostosPedido, montoEnMXN, formatoMXN } from "@/lib/costeo";
+import { calcularCostosPedido, montoEnMXN, formatoMXN, tipoCambioEstimadoDePagos } from "@/lib/costeo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -40,10 +40,15 @@ export default async function DetallePedidoPage({
   ]);
   if (!pedido) notFound();
 
-  // Sin tipo de cambio no se puede pasar el costo en USD a pesos — mostrar un
-  // número de todos modos saldría mal (muy chico y sin sentido), así que
-  // mejor no mostrar nada hasta que lo pongan.
-  const faltaTipoCambio = !pedido.tipoCambio || pedido.tipoCambio <= 0;
+  // Sin tipo de cambio no se puede pasar el costo en USD a pesos. Si Isaac no
+  // puso uno fijo a mano, se usa el promedio de lo que ya ha pagado en
+  // dólares a este pedido como estimado — y ese estimado se "reajusta" solo
+  // según vaya registrando más pagos reales, hasta quedar exacto el día que
+  // le termine de pagar al proveedor.
+  const tipoCambioEstimado = tipoCambioEstimadoDePagos(pagos);
+  const tipoCambioEfectivo = pedido.tipoCambio || tipoCambioEstimado;
+  const tipoCambioEsEstimado = !pedido.tipoCambio && tipoCambioEstimado != null;
+  const faltaTipoCambio = !tipoCambioEfectivo;
   const costosPorEntrada = faltaTipoCambio
     ? new Map<string, number>()
     : new Map((await calcularCostosPedido(pedido.id)).map((c) => [c.entradaId, c.costoPorBotella]));
@@ -166,8 +171,23 @@ export default async function DetallePedidoPage({
           <p className="font-semibold text-warn">⚠️ Falta el tipo de cambio</p>
           <p className="text-muted">
             Sin eso no se puede pasar a pesos lo que pagaste en dólares, así que todavía no te
-            puedo mostrar el costo final por botella. Ponlo en &quot;Proveedor y costos de
-            importación&quot; aquí abajo.
+            puedo mostrar el costo final por botella. Ponlo tú en &quot;Proveedor y costos de
+            importación&quot; aquí abajo, o abónale al proveedor con su tipo de cambio y lo tomo
+            de ahí solo.
+          </p>
+        </div>
+      )}
+
+      {tipoCambioEsEstimado && (
+        <div className="rounded-lg border border-wine/30 bg-wine-light/30 p-4 text-sm flex flex-col gap-1">
+          <p className="font-semibold text-wine">
+            💱 Usando tipo de cambio estimado: ${tipoCambioEstimado!.toFixed(2)}
+          </p>
+          <p className="text-muted">
+            Es el promedio de lo que ya le has pagado en dólares a este pedido. En cuanto
+            registres más pagos, se va ajustando solo — y va a quedar exacto el día que termines
+            de pagarle al proveedor. Si prefieres fijar tú un tipo de cambio en vez de este
+            estimado, ponlo en &quot;Proveedor y costos de importación&quot; aquí abajo.
           </p>
         </div>
       )}

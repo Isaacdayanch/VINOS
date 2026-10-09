@@ -1,6 +1,25 @@
 import { prisma } from "@/lib/prisma";
 
 /**
+ * Isaac a veces compra a crédito y no sabe el tipo de cambio final hasta que
+ * termina de pagarle al proveedor (puede tardar semanas). Mientras tanto,
+ * usa el promedio ponderado de lo que ya ha pagado en dólares como estimado
+ * — y ese estimado se va "reajustando" solo, sin que nadie tenga que hacer
+ * nada: según va registrando más pagos reales, el promedio se acerca más a
+ * lo que de verdad le costó, hasta quedar exacto el día que le termine de
+ * pagar.
+ */
+export function tipoCambioEstimadoDePagos(
+  pagos: { moneda: "MXN" | "USD"; monto: number; tipoCambio: number | null }[],
+): number | null {
+  const pagosUSD = pagos.filter((p) => p.moneda === "USD" && p.tipoCambio);
+  const totalUSD = pagosUSD.reduce((acc, p) => acc + p.monto, 0);
+  if (totalUSD <= 0) return null;
+  const sumaPonderada = pagosUSD.reduce((acc, p) => acc + p.monto * (p.tipoCambio ?? 0), 0);
+  return sumaPonderada / totalUSD;
+}
+
+/**
  * Reparte la logística de un pedido (flete+seguro en USD, aduana+maniobras en MXN)
  * entre todas las botellas del pedido, y calcula el costo por botella de cada
  * línea de entrada. Replica la lógica del Sheet original de Isaac.
@@ -8,10 +27,12 @@ import { prisma } from "@/lib/prisma";
 export async function calcularCostosPedido(pedidoId: string) {
   const pedido = await prisma.pedido.findUniqueOrThrow({
     where: { id: pedidoId },
-    include: { entradas: { where: { recibida: true } } },
+    include: { entradas: { where: { recibida: true } }, pagos: true },
   });
 
-  const tipoCambio = pedido.tipoCambio ?? 0;
+  // Si Isaac no puso un tipo de cambio fijo a mano, se usa el estimado de
+  // sus pagos reales a este pedido (ver tipoCambioEstimadoDePagos arriba).
+  const tipoCambio = pedido.tipoCambio ?? tipoCambioEstimadoDePagos(pedido.pagos) ?? 0;
   const logisticaTotalMXN =
     (pedido.logisticaUSD ?? 0) * tipoCambio + (pedido.logisticaMXN ?? 0);
   const factorDescuento = 1 - (pedido.descuentoPct ?? 0) / 100;

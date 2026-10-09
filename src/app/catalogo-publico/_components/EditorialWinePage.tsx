@@ -37,10 +37,6 @@ export function EditorialWinePage({ wine, commerce }: { wine: EditorialWine; com
           <section><h3>En la mesa</h3><p>{wine.pairing}</p></section>
           {wine.wineryStory && <section><h3>La bodega</h3><p>{wine.wineryStory}</p></section>}
         </div>
-        <div className={styles.sourceLinks}>
-          <a href={wine.labelImage} target="_blank" rel="noopener noreferrer" className={styles.textLink}>Ver contraetiqueta original<span className={styles.srOnly}> (abre otra pestaña)</span></a>
-          {wine.originalFront && <a href={wine.originalFront} target="_blank" rel="noopener noreferrer" className={styles.textLink}>Ver frente original<span className={styles.srOnly}> (abre otra pestaña)</span></a>}
-        </div>
       </section>
     </main>
   </>;

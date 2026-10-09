@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DateField } from "@/components/DateField";
+import { formatoMXN } from "@/lib/costeo";
 
 export function LineaPedidoRow({
   producto,
@@ -10,6 +11,7 @@ export function LineaPedidoRow({
   cajasRecibidas: cajasInicial,
   costoPorCaja: costoInicial,
   recibida,
+  costoPorBotellaMXN,
   actualizarAction,
   marcarRecibidaAction,
   desmarcarAction,
@@ -21,6 +23,7 @@ export function LineaPedidoRow({
   cajasRecibidas: number;
   costoPorCaja: number;
   recibida: boolean;
+  costoPorBotellaMXN?: number;
   actualizarAction: (formData: FormData) => Promise<void>;
   marcarRecibidaAction: (formData: FormData) => void;
   desmarcarAction: (formData: FormData) => void;
@@ -139,6 +142,11 @@ export function LineaPedidoRow({
           ${(costoInicial / piezasInicial).toFixed(2)} USD/botella · Total: $
           {(cajasInicial * costoInicial).toLocaleString("es-MX")} USD
         </p>
+        {recibida && costoPorBotellaMXN != null && (
+          <p className="text-xs font-semibold text-wine mt-0.5">
+            = {formatoMXN(costoPorBotellaMXN)} MXN/botella, con flete y aduana ya repartidos
+          </p>
+        )}
       </div>
       <div className="flex flex-col items-end gap-1">
         {recibida ? (

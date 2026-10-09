@@ -11,7 +11,7 @@ import { AgregarLineaPedidoForm } from "@/components/AgregarLineaPedidoForm";
 import { CostosPedidoForm } from "@/components/CostosPedidoForm";
 import { DateField } from "@/components/DateField";
 import { LineaPedidoRow } from "@/components/LineaPedidoRow";
-import { montoEnMXN, formatoMXN } from "@/lib/costeo";
+import { calcularCostosPedido, montoEnMXN, formatoMXN } from "@/lib/costeo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -39,6 +39,14 @@ export default async function DetallePedidoPage({
     }),
   ]);
   if (!pedido) notFound();
+
+  const costosPorEntrada = new Map(
+    (await calcularCostosPedido(pedido.id)).map((c) => [c.entradaId, c.costoPorBotella]),
+  );
+  const totalBotellasPedido = pedido.entradas.reduce(
+    (acc, l) => acc + l.cajasRecibidas * l.piezasPorCaja,
+    0,
+  );
 
   const hoy = new Date().toISOString().slice(0, 10);
   const guardarPedido = actualizarPedido.bind(null, pedido.id);
@@ -99,6 +107,7 @@ export default async function DetallePedidoPage({
         <p className="text-muted text-sm">
           {new Date(pedido.fecha).toLocaleDateString("es-MX")}
           {pedido.proveedor ? ` · ${pedido.proveedor}` : ""}
+          {totalBotellasPedido > 0 ? ` · 📦 ${totalBotellasPedido} botellas en total` : ""}
         </p>
       </div>
 
@@ -195,6 +204,7 @@ export default async function DetallePedidoPage({
               cajasRecibidas={l.cajasRecibidas}
               costoPorCaja={l.costoPorCaja}
               recibida={l.recibida}
+              costoPorBotellaMXN={costosPorEntrada.get(l.id)}
               actualizarAction={actualizar}
               marcarRecibidaAction={marcarRecibida}
               desmarcarAction={desmarcar}

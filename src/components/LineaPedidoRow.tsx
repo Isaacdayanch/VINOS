@@ -142,13 +142,16 @@ export function LineaPedidoRow({
           ${(costoInicial / piezasInicial).toFixed(2)} USD/botella · Total: $
           {(cajasInicial * costoInicial).toLocaleString("es-MX")} USD
         </p>
-        {recibida && costoPorBotellaMXN != null && (
-          <p className="text-xs font-semibold text-wine mt-0.5">
-            = {formatoMXN(costoPorBotellaMXN)} MXN/botella, con flete y aduana ya repartidos
-          </p>
-        )}
       </div>
       <div className="flex flex-col items-end gap-1">
+        {recibida && costoPorBotellaMXN != null && (
+          <span
+            className="rounded-full bg-wine-light/60 text-wine text-xs font-medium px-2.5 py-1 whitespace-nowrap"
+            title="Costo final por botella, con flete y aduana ya repartidos"
+          >
+            {formatoMXN(costoPorBotellaMXN)}/botella
+          </span>
+        )}
         {recibida ? (
           <>
             <span className="text-xs font-medium text-wine">✓ Recibido</span>

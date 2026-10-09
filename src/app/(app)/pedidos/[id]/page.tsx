@@ -40,9 +40,13 @@ export default async function DetallePedidoPage({
   ]);
   if (!pedido) notFound();
 
-  const costosPorEntrada = new Map(
-    (await calcularCostosPedido(pedido.id)).map((c) => [c.entradaId, c.costoPorBotella]),
-  );
+  // Sin tipo de cambio no se puede pasar el costo en USD a pesos — mostrar un
+  // número de todos modos saldría mal (muy chico y sin sentido), así que
+  // mejor no mostrar nada hasta que lo pongan.
+  const faltaTipoCambio = !pedido.tipoCambio || pedido.tipoCambio <= 0;
+  const costosPorEntrada = faltaTipoCambio
+    ? new Map<string, number>()
+    : new Map((await calcularCostosPedido(pedido.id)).map((c) => [c.entradaId, c.costoPorBotella]));
   const totalBotellasPedido = pedido.entradas.reduce(
     (acc, l) => acc + l.cajasRecibidas * l.piezasPorCaja,
     0,
@@ -153,6 +157,17 @@ export default async function DetallePedidoPage({
             Mientras no le des &quot;Marcar recibido&quot; a cada línea de abajo, esas botellas
             NO cuentan en tu Stock, ni su costo se reparte, ni se ven en Finanzas ni en la Hoja de
             precios — aunque ya hayas puesto los costos de flete y aduana aquí arriba.
+          </p>
+        </div>
+      )}
+
+      {faltaTipoCambio && pedido.entradas.some((l) => l.recibida) && (
+        <div className="rounded-lg border border-warn bg-warn-bg p-4 text-sm flex flex-col gap-1">
+          <p className="font-semibold text-warn">⚠️ Falta el tipo de cambio</p>
+          <p className="text-muted">
+            Sin eso no se puede pasar a pesos lo que pagaste en dólares, así que todavía no te
+            puedo mostrar el costo final por botella. Ponlo en &quot;Proveedor y costos de
+            importación&quot; aquí abajo.
           </p>
         </div>
       )}

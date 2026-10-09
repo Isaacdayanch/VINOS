@@ -5,7 +5,8 @@ import { Header } from "../_components/Header";
 import { Gallery } from "../_components/Gallery";
 import { getPublicWine } from "../_lib/catalog";
 import styles from "../catalog.module.css";
-import { grandRivallon, grandRivallonId } from "../_lib/grand-rivallon";
+import { wineProfile, additionalWineFacts } from "../_lib/wine-profiles";
+import { WineDetailPage } from "../_components/WineDetailPage";
 import { EditorialWinePage } from "../_components/EditorialWinePage";
 import { editorialMetadata } from "../_lib/editorial-wine";
 import { publicPhotograph } from "../_lib/public-photography";
@@ -15,7 +16,8 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: PageProps<"/catalogo-publico/[id]">): Promise<Metadata> {
   const product = await getPublicWine((await params).id);
   if (!product) return { title: "Vino no encontrado", robots: { index: false } };
-  if (product.id === grandRivallonId && product.anio === 2012) return editorialMetadata(grandRivallon);
+  const profile = wineProfile(product.id, product.anio);
+  if (profile) return editorialMetadata(profile);
   const title = `${product.nombre}${product.anio ? ` · ${product.anio}` : ""}`;
   const description = product.descripcion?.slice(0, 180) ?? `${title}. Descubre la ficha y las fotografías de este vino.`;
   return { title, description, openGraph: { title, description, type: "website", images: product.fotoUrl ? [{ url: product.fotoUrl, alt: title }] : [] } };
@@ -24,12 +26,31 @@ export async function generateMetadata({ params }: PageProps<"/catalogo-publico/
 export default async function WinePage({ params }: PageProps<"/catalogo-publico/[id]">) {
   const product = await getPublicWine((await params).id);
   if (!product) notFound();
-  if (product.id === grandRivallonId && product.anio === 2012) return <EditorialWinePage wine={grandRivallon} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
+  const profile = wineProfile(product.id, product.anio);
+  if (profile) return <EditorialWinePage wine={profile} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
   const photos = [publicPhotograph(product.id, product.fotoUrl), ...product.imagenesExtra.map((p) => p.url)].filter((p): p is string => Boolean(p));
   const details = [
     ["Añada", product.anio], ["Región", product.region], ["Uva", product.varietal],
     ["Cuerpo", product.cuerpo], ["Alcohol", product.alcohol != null ? `${product.alcohol}%` : null],
   ].filter(([, value]) => value != null && value !== "");
+  if (product.imagenesExtra.length) {
+    // Extra images are the ambient gallery; the catalog packshot comes last.
+    const ambient = product.imagenesExtra.map((photo, index) => ({ url: photo.url, caption: `Ambientación ${index + 1}`, ambient: true }));
+    // Approved Tanya opening scene: the sunset table is its last uploaded image.
+    if (product.id === "cmtssyq4u0006l404sytto49b" && ambient.length === 4) ambient.unshift(ambient.pop()!);
+    const front = publicPhotograph(product.id, product.fotoUrl);
+    const tanya = product.id === "cmtssyq4u0006l404sytto49b" && product.anio === 2021;
+    return <WineDetailPage wine={{
+      name: product.nombre, title: tanya ? "Eliyah" : product.nombre,
+      eyebrow: tanya ? "TANYA · ISRAEL · 2021" : [product.categoria, product.anio].filter(Boolean).join(" · "),
+      style: tanya ? "Cabernet Sauvignon · Reserve" : product.varietal ?? undefined,
+      description: product.descripcion,
+      commerce: { precioLista: product.precioLista, activo: product.activo },
+      facts: [...additionalWineFacts(product.id, product.anio), ...details.map(([label, value]) => [String(label), String(value)])],
+      photos: [...ambient, ...(front ? [{ url: front, caption: "La botella", ambient: false }] : [])],
+      stories: [["En la copa", product.notas], ["En la mesa", product.maridaje]].flatMap(([title, text]) => text ? [{ title: title!, text }] : []),
+    }} />;
+  }
   return <>
     <Header />
     <main id="contenido" className={styles.winePage}>

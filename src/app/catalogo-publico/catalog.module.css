@@ -40,6 +40,51 @@
 .heroOrigin { position: absolute; top: 38%; left: var(--gutter); font-size: 11px; letter-spacing: .38em; }
 .heroBottle { position: absolute; width: 40%; height: 86%; bottom: 4%; right: 12%; transform: translateY(var(--hero-shift,0px)) rotate(var(--bottle-angle,0deg)); transform-origin: 50% 90%; filter: drop-shadow(20px 25px 18px rgb(0 0 0 / .26)); }
 .bottleImage { object-fit: contain; }
+
+/* Public wine details: ambient-first photography dissolves into the page. */
+.immersivePage { padding-bottom: 70px; }
+.immersiveBack { display: inline-block; margin: 0 var(--gutter) 22px; font-size: 11px; }
+.immersiveHero { display: grid; grid-template-columns: 57% 43%; align-items: center; }
+.immersivePhoto { position: relative; min-width: 0; aspect-ratio: 2/3; }
+.immersivePhoto > img { object-fit: cover; }
+.immersiveBottle > img { object-fit: contain; padding: 40px; }
+.photoDissolve { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to right, transparent 68%, var(--cream) 100%), linear-gradient(to bottom, transparent 72%, var(--cream) 100%); }
+.immersiveIntro { position: relative; padding: 45px var(--gutter) 55px 0; min-width: 0; }
+.immersiveIntro h1 { font: 400 clamp(42px, 5.8vw, 90px)/1.03 var(--serif); letter-spacing: -.025em; margin: 20px 0; overflow-wrap: anywhere; }
+.immersiveStyle { font: 400 clamp(22px, 2.6vw, 32px)/1.4 var(--serif); color: var(--muted); }
+.immersiveRule { display: block; width: 42px; height: 1px; background: var(--muted); margin: 30px 0; }
+.immersiveDescription { font-size: 14px; line-height: 1.9; white-space: pre-line; max-width: 440px; }
+.immersiveIntro .winePrice { margin: 28px 0 20px !important; }
+.immersiveLink { display: inline-block; font-size: 12px; margin-top: 26px; padding-bottom: 8px; border-bottom: 1px solid var(--muted); }
+.immersiveGallery { display: flex; flex-wrap: wrap; gap: 22px; align-items: center; padding: 0 var(--gutter) 45px; position: relative; }
+.immersiveThumbnails { display: flex; flex-wrap: wrap; gap: 12px; }
+.immersiveThumbnails button { padding: 4px; border: 1px solid transparent; background: transparent; }
+.immersiveThumbnails button[aria-pressed="true"] { border-color: var(--muted); }
+.immersiveThumbnails img { display: block; width: 48px; height: 64px; object-fit: cover; }
+.immersiveGallery > p { font-size: 11px; color: var(--muted); }
+.technicalSection { display: grid; grid-template-columns: 28% 72%; padding: 60px var(--gutter) 70px; border-top: 1px solid var(--line); }
+.technicalSection h2 { font: 400 clamp(36px, 4vw, 54px)/1.1 var(--serif); margin: 18px 0; }
+.technicalFacts { margin: 0; padding-left: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 35px; align-content: start; }
+.technicalFacts > div { padding: 18px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.technicalFacts dt { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.technicalFacts dd { font-size: 16px; line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+.immersiveStories { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 45px 70px; margin: 0 var(--gutter); padding: 60px 0; border-top: 1px solid var(--line); }
+.immersiveStories h2 { font: 400 36px/1.15 var(--serif); margin-bottom: 22px; }
+.immersiveStories p { font-size: 14px; line-height: 1.9; white-space: pre-line; max-width: 540px; }
+.immersiveContinue { padding: 0 var(--gutter); }
+@media (min-width: 1500px) { .immersiveHero, .immersiveGallery, .technicalSection, .immersiveStories { max-width: 1500px; margin-left: auto; margin-right: auto; } }
+@media (max-width: 700px) {
+  .immersiveHero { display: block; }
+  .photoDissolve { background: linear-gradient(to bottom, transparent 70%, var(--cream) 100%); }
+  .immersiveIntro { padding: 0 var(--gutter) 45px; margin-top: -22px; }
+  .immersiveIntro h1 { font-size: clamp(42px,12vw,68px); }
+  .immersiveGallery { padding-bottom: 35px; gap: 15px; }
+  .technicalSection { display: block; padding-top: 40px; padding-bottom: 45px; }
+  .technicalFacts { padding: 12px 0 0; gap: 0 22px; }
+  .technicalFacts dd { font-size: 15px; }
+  .immersiveStories { grid-template-columns: 1fr; gap: 35px; padding: 40px 0; }
+}
+@media (max-width: 380px) { .technicalFacts { grid-template-columns: 1fr; } }
 .heroCopy { position: absolute; left: var(--gutter); bottom: 12%; width: 34%; max-width: 510px; }
 .heroCopy h1 { font: 400 clamp(32px,3.25vw,55px)/1.05 var(--serif); text-wrap: balance; text-shadow: 0 2px 18px rgb(0 0 0 / .2); }
 .pill, .darkPill { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 48px; border-radius: 50px; padding: 14px 26px; font-size: 12px; border: 1px solid transparent; }

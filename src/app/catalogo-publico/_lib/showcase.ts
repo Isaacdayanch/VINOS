@@ -33,13 +33,19 @@ const selection: readonly ShowcaseWine[] = [
   { slug: "dadah-malbec-barbera-2023", productId: "cmtssyq3k0001l404n0341dmg", producer: "Dādāh", name: "Malbec Barbera", year: 2023, image: "dadah-malbec-barbera-2023.webp" },
   { slug: "tanya-enosh-2018", producer: "Enosh by Tanya", name: "Cabernet Sauvignon", year: 2018, image: "tanya-enosh-2018.webp" },
   { slug: "tanya-petit-verdot-2021", producer: "Tanya", name: "Petit Verdot · Tchelet", year: 2021, image: "tanya-petit-verdot-2021.webp" },
-  { slug: "tanya-late-harvest-2024", producer: "Tanya", name: "Cosecha tardía", year: 2024, image: "tanya-late-harvest-2024.webp" },
 ];
+
+// Vino destacado a pedido de Isaac: la botella con el sello de cera, arriba
+// en el inicio en vez de hasta abajo. Tanya Cosecha tardía se quitó del
+// inicio — sigue disponible en el catálogo con precios normal.
+const SLUG_DESTACADO = "titora-special-2021";
 
 // Explicit IDs verified against the public catalog; never match commercial data by name.
 export function orderShowcase(wines: readonly PublicWine[]): ShowcaseWine[] {
   const prices = new Map(wines.flatMap(w => w.id && w.precioLista !== null ? [[w.id, w.precioLista] as const] : []));
   const dadah = selection.filter(w => w.producer === "Dādāh").sort((a, b) => (prices.get(b.productId ?? "") ?? -1) - (prices.get(a.productId ?? "") ?? -1));
   const rivallon = selection.filter(w => w.slug === "grand-rivallon-2012" && wines.some(p => p.id === w.productId && p.anio === w.year));
-  return [...dadah, ...rivallon, ...selection.filter(w => w.producer !== "Dādāh" && w.slug !== "grand-rivallon-2012")];
+  const destacado = selection.filter(w => w.slug === SLUG_DESTACADO);
+  const resto = selection.filter(w => w.producer !== "Dādāh" && w.slug !== "grand-rivallon-2012" && w.slug !== SLUG_DESTACADO);
+  return [...dadah, ...rivallon, ...destacado, ...resto];
 }

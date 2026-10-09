@@ -21,7 +21,7 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
       <p className={styles.eyebrow}>DESCUBRE NUESTRA SELECCIÓN</p>
       <nav aria-label="Navegación pública">
         <Link href="/catalogo-publico" onClick={() => menu.current?.close()}>Inicio </Link>
-        <Link href="/catalogo-publico/catalogo" onClick={() => menu.current?.close()}>Catálogo con precios </Link>
+        <Link href="/catalogo-publico/catalogo" onClick={() => menu.current?.close()}>Catálogo </Link>
         <Link href="/catalogo-publico/nosotros" onClick={() => menu.current?.close()}>Acerca de nosotros </Link>
       </nav>
     </dialog>

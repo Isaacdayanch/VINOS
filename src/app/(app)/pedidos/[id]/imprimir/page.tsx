@@ -99,14 +99,13 @@ export default async function ImprimirPedidoPage({
 
         <table className="w-full border-separate border-spacing-0">
           <colgroup>
-            <col className="w-12" />
+            <col className="w-10" />
             <col />
+            <col className="w-10" />
             <col className="w-12" />
+            <col className="w-16" />
             <col className="w-14" />
-            <col className="w-20" />
             <col className="w-16" />
-            <col className="w-16" />
-            {completa && <col className="w-20" />}
           </colgroup>
           <thead>
             <tr className="text-left text-muted border-b border-border print-no-break">
@@ -117,9 +116,6 @@ export default async function ImprimirPedidoPage({
               <th className="pb-1.5 px-2 font-medium text-right">Total Btl</th>
               <th className="pb-1.5 px-2 font-medium text-right">Price/Case</th>
               <th className="pb-1.5 pl-2 font-medium text-right">Total</th>
-              {completa && (
-                <th className="pb-1.5 pl-2 font-medium text-right">$/botella MXN</th>
-              )}
             </tr>
           </thead>
           <tbody>
@@ -156,22 +152,24 @@ export default async function ImprimirPedidoPage({
                   ${l.costoPorCaja.toFixed(2)}
                 </td>
                 <td className="py-1.5 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
-                  $
-                  {(
-                    (l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra) *
-                    (l.piezasPorCaja > 0 ? l.costoPorCaja / l.piezasPorCaja : 0)
-                  ).toLocaleString("en-US", { maximumFractionDigits: 2 })}
+                  <span>
+                    $
+                    {(
+                      (l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra) *
+                      (l.piezasPorCaja > 0 ? l.costoPorCaja / l.piezasPorCaja : 0)
+                    ).toLocaleString("en-US", { maximumFractionDigits: 2 })}
+                  </span>
+                  {completa && costosPorEntrada.has(l.id) && (
+                    <span className="block text-[10px] font-normal text-wine">
+                      {formatoMXN(costosPorEntrada.get(l.id)!)}/botella
+                    </span>
+                  )}
                 </td>
-                {completa && (
-                  <td className="py-1.5 pl-2 text-right tabular-nums font-semibold text-wine whitespace-nowrap">
-                    {costosPorEntrada.has(l.id) ? formatoMXN(costosPorEntrada.get(l.id)!) : "—"}
-                  </td>
-                )}
               </tr>
             ))}
             {pedido.entradas.length === 0 && (
               <tr>
-                <td colSpan={completa ? 8 : 7} className="py-6 text-center text-muted">
+                <td colSpan={7} className="py-6 text-center text-muted">
                   No items yet
                 </td>
               </tr>

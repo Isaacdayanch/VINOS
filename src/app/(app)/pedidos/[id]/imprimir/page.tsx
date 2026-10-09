@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { BotonImprimir } from "@/components/BotonImprimir";
+import { calcularCostosPedido, formatoMXN, tipoCambioEstimadoDePagos } from "@/lib/costeo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -7,8 +8,11 @@ export const dynamic = "force-dynamic";
 
 export default async function ImprimirPedidoPage({
   params,
+  searchParams,
 }: PageProps<"/pedidos/[id]/imprimir">) {
   const { id } = await params;
+  const sp = await searchParams;
+  const completa = sp.vista === "completa";
   const [pedido, pagos] = await Promise.all([
     prisma.pedido.findUnique({
       where: { id },
@@ -30,13 +34,37 @@ export default async function ImprimirPedidoPage({
     .reduce((acc, p) => acc + p.monto, 0);
   const saldoUSD = costoTotalUSD - abonadoUSD;
 
+  // Datos internos (solo en la vista completa) — al proveedor no le interesa
+  // el tipo de cambio ni lo que pagas de aduana en México.
+  const tipoCambioEstimado = tipoCambioEstimadoDePagos(pagos);
+  const tipoCambioEfectivo = pedido.tipoCambio || tipoCambioEstimado;
+  const tipoCambioEsEstimado = !pedido.tipoCambio && tipoCambioEstimado != null;
+  const costosPorEntrada =
+    completa && tipoCambioEfectivo
+      ? new Map((await calcularCostosPedido(pedido.id)).map((c) => [c.entradaId, c.costoPorBotella]))
+      : new Map<string, number>();
+  const totalBotellas = pedido.entradas.reduce(
+    (acc, l) => acc + l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra,
+    0,
+  );
+  const totalCajas = pedido.entradas.reduce((acc, l) => acc + l.cajasRecibidas, 0);
+  const totalBotellasExtra = pedido.entradas.reduce((acc, l) => acc + l.botellasExtra, 0);
+
   return (
     <div className="flex flex-col gap-6 bg-background print:bg-background">
       <div className="flex items-center justify-between print:hidden">
         <Link href={`/pedidos/${pedido.id}`} className="text-sm text-wine underline">
           ← Volver al pedido
         </Link>
-        <BotonImprimir />
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/pedidos/${pedido.id}/imprimir${completa ? "" : "?vista=completa"}`}
+            className="text-xs text-wine underline whitespace-nowrap"
+          >
+            {completa ? "Ver versión para el proveedor →" : "Ver versión completa (para ti) →"}
+          </Link>
+          <BotonImprimir />
+        </div>
       </div>
 
       <div className="max-w-2xl mx-auto w-full bg-background print:p-5 p-5 flex flex-col gap-4 text-[13px] leading-snug">
@@ -75,8 +103,10 @@ export default async function ImprimirPedidoPage({
             <col />
             <col className="w-12" />
             <col className="w-14" />
+            {completa && <col className="w-14" />}
             <col className="w-16" />
             <col className="w-16" />
+            {completa && <col className="w-20" />}
           </colgroup>
           <thead>
             <tr className="text-left text-muted border-b border-border print-no-break">
@@ -84,8 +114,14 @@ export default async function ImprimirPedidoPage({
               <th className="pb-1.5 px-2 font-medium">Item</th>
               <th className="pb-1.5 px-2 font-medium text-right">Cases</th>
               <th className="pb-1.5 px-2 font-medium text-right">Btl/Case</th>
+              {completa && (
+                <th className="pb-1.5 px-2 font-medium text-right">Total botellas</th>
+              )}
               <th className="pb-1.5 px-2 font-medium text-right">Price/Case</th>
               <th className="pb-1.5 pl-2 font-medium text-right">Total</th>
+              {completa && (
+                <th className="pb-1.5 pl-2 font-medium text-right">$/botella MXN</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -112,17 +148,28 @@ export default async function ImprimirPedidoPage({
                 <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
                   {l.piezasPorCaja}
                 </td>
+                {completa && (
+                  <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
+                    {l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra}
+                    {l.botellasExtra > 0 ? ` (+${l.botellasExtra})` : ""}
+                  </td>
+                )}
                 <td className="py-1.5 px-2 text-right tabular-nums whitespace-nowrap">
                   ${l.costoPorCaja.toFixed(2)}
                 </td>
                 <td className="py-1.5 pl-2 text-right tabular-nums font-medium whitespace-nowrap">
                   ${(l.cajasRecibidas * l.costoPorCaja).toLocaleString("en-US")}
                 </td>
+                {completa && (
+                  <td className="py-1.5 pl-2 text-right tabular-nums font-semibold text-wine whitespace-nowrap">
+                    {costosPorEntrada.has(l.id) ? formatoMXN(costosPorEntrada.get(l.id)!) : "—"}
+                  </td>
+                )}
               </tr>
             ))}
             {pedido.entradas.length === 0 && (
               <tr>
-                <td colSpan={6} className="py-6 text-center text-muted">
+                <td colSpan={completa ? 8 : 6} className="py-6 text-center text-muted">
                   No items yet
                 </td>
               </tr>
@@ -168,6 +215,43 @@ export default async function ImprimirPedidoPage({
             </>
           )}
         </div>
+
+        {completa && (
+          <div className="print-no-break rounded-md border border-wine/30 bg-wine-light/30 p-3 flex flex-col gap-1 text-[12px]">
+            <p className="font-semibold text-wine mb-0.5">
+              Datos internos — no se manda al proveedor
+            </p>
+            <div className="flex justify-between">
+              <span className="text-muted">Total de botellas</span>
+              <span className="tabular-nums font-medium">
+                {totalBotellas} ({totalCajas} cajas
+                {totalBotellasExtra > 0 ? ` + ${totalBotellasExtra} sueltas` : ""})
+              </span>
+            </div>
+            {pedido.logisticaMXN ? (
+              <div className="flex justify-between">
+                <span className="text-muted">Envío y aduana en México</span>
+                <span className="tabular-nums font-medium">{formatoMXN(pedido.logisticaMXN)}</span>
+              </div>
+            ) : null}
+            {tipoCambioEfectivo ? (
+              <div className="flex justify-between">
+                <span className="text-muted">
+                  Tipo de cambio{tipoCambioEsEstimado ? " (estimado)" : ""}
+                </span>
+                <span className="tabular-nums font-medium">${tipoCambioEfectivo.toFixed(2)}</span>
+              </div>
+            ) : null}
+            {pedido.fechaVencimientoCredito ? (
+              <div className="flex justify-between">
+                <span className="text-muted">Fecha límite de crédito</span>
+                <span className="tabular-nums font-medium">
+                  {pedido.fechaVencimientoCredito.toLocaleDateString("es-MX")}
+                </span>
+              </div>
+            ) : null}
+          </div>
+        )}
 
         <p className="print-no-break text-center text-[11px] text-muted border-t border-border pt-2">
           Thank you for your business.

@@ -53,7 +53,7 @@ export default async function DetallePedidoPage({
     ? new Map<string, number>()
     : new Map((await calcularCostosPedido(pedido.id)).map((c) => [c.entradaId, c.costoPorBotella]));
   const totalBotellasPedido = pedido.entradas.reduce(
-    (acc, l) => acc + l.cajasRecibidas * l.piezasPorCaja,
+    (acc, l) => acc + l.cajasRecibidas * l.piezasPorCaja + l.botellasExtra,
     0,
   );
   const totalCajasPedido = pedido.entradas.reduce((acc, l) => acc + l.cajasRecibidas, 0);
@@ -256,6 +256,7 @@ export default async function DetallePedidoPage({
               fecha={l.fecha.toISOString().slice(0, 10)}
               piezasPorCaja={l.piezasPorCaja}
               cajasRecibidas={l.cajasRecibidas}
+              botellasExtra={l.botellasExtra}
               costoPorCaja={l.costoPorCaja}
               recibida={l.recibida}
               costoPorBotellaMXN={costosPorEntrada.get(l.id)}

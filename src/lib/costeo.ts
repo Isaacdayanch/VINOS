@@ -38,7 +38,10 @@ export async function calcularCostosPedido(pedidoId: string) {
   const factorDescuento = 1 - (pedido.descuentoPct ?? 0) / 100;
 
   const lineas = pedido.entradas.map((e) => {
-    const botellas = e.cajasRecibidas * e.piezasPorCaja;
+    // Las botellas extra (sueltas, de más) no tienen costo de mercancía
+    // propio — vinieron "de regalo" — pero sí les toca su parte del flete y
+    // la aduana, como a cualquier otra botella del pedido.
+    const botellas = e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra;
     // El descuento del proveedor es sobre el costo de la mercancía; el
     // envío/aduana no se descuenta.
     const costoMercanciaMXN = e.cajasRecibidas * e.costoPorCaja * tipoCambio * factorDescuento;
@@ -567,7 +570,7 @@ export async function calcularMovimientosStock(limite?: number): Promise<Movimie
       fecha: e.fecha,
       tipo: "entrada",
       signo: 1,
-      botellas: Math.round(e.cajasRecibidas * e.piezasPorCaja),
+      botellas: Math.round(e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra),
       producto: e.producto.nombre,
       detalle: `Pedido ${e.pedido.folio}`,
       href: `/pedidos/${e.pedidoId}`,

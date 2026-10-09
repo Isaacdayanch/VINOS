@@ -160,6 +160,7 @@ export async function actualizarLineaPedido(
   const cajasRecibidas = Number(formData.get("cajasRecibidas"));
   const piezasPorCaja = Number(formData.get("piezasPorCaja"));
   const costoPorCaja = Number(formData.get("costoPorCaja"));
+  const botellasExtra = Math.max(0, Number(formData.get("botellasExtra") ?? 0));
 
   if (!fecha || !cajasRecibidas || !piezasPorCaja || !costoPorCaja) {
     throw new Error("Faltan datos para editar el producto del pedido");
@@ -167,7 +168,7 @@ export async function actualizarLineaPedido(
 
   const linea = await prisma.entradaLinea.update({
     where: { id: entradaLineaId },
-    data: { fecha: new Date(fecha), cajasRecibidas, piezasPorCaja, costoPorCaja },
+    data: { fecha: new Date(fecha), cajasRecibidas, piezasPorCaja, costoPorCaja, botellasExtra },
   });
   await sincronizarActivoPorStock(linea.productoId);
 

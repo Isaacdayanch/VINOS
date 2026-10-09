@@ -168,6 +168,7 @@ model EntradaLinea {
   fecha          DateTime
   cajasRecibidas Float
   piezasPorCaja  Int
+  botellasExtra  Int      @default(0) // botellas sueltas que llegaron de más, fuera de cajas completas
   costoPorCaja   Float // dólares
   recibida       Boolean  @default(false) // false = apartado con el proveedor, aún no llega físicamente
   createdAt      DateTime @default(now())

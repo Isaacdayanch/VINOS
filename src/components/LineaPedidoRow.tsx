@@ -9,6 +9,7 @@ export function LineaPedidoRow({
   fecha,
   piezasPorCaja: piezasInicial,
   cajasRecibidas: cajasInicial,
+  botellasExtra: botellasExtraInicial = 0,
   costoPorCaja: costoInicial,
   recibida,
   costoPorBotellaMXN,
@@ -21,6 +22,7 @@ export function LineaPedidoRow({
   fecha: string;
   piezasPorCaja: number;
   cajasRecibidas: number;
+  botellasExtra?: number;
   costoPorCaja: number;
   recibida: boolean;
   costoPorBotellaMXN?: number;
@@ -32,15 +34,17 @@ export function LineaPedidoRow({
   const [editando, setEditando] = useState(false);
   const [piezasPorCaja, setPiezasPorCaja] = useState<number | "">(piezasInicial);
   const [cajas, setCajas] = useState<number | "">(cajasInicial);
+  const [botellasExtra, setBotellasExtra] = useState<number | "">(botellasExtraInicial);
   const [costoBotella, setCostoBotella] = useState<number | "">(
     piezasInicial > 0 ? Math.round((costoInicial / piezasInicial) * 100) / 100 : 0,
   );
 
   const piezas = piezasPorCaja === "" ? 0 : piezasPorCaja;
   const numCajas = cajas === "" ? 0 : cajas;
+  const numBotellasExtra = botellasExtra === "" ? 0 : botellasExtra;
   const numCostoBotella = costoBotella === "" ? 0 : costoBotella;
   const costoPorCaja = numCostoBotella * piezas;
-  const totalBotellas = numCajas * piezas;
+  const totalBotellas = numCajas * piezas + numBotellasExtra;
   const totalLinea = numCajas * costoPorCaja;
 
   if (editando) {
@@ -101,6 +105,23 @@ export function LineaPedidoRow({
               />
             </label>
           </div>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="font-medium">Botellas extra (sueltas, de más)</span>
+            <input
+              name="botellasExtra"
+              type="number"
+              step="1"
+              min="0"
+              value={botellasExtra}
+              onChange={(e) => setBotellasExtra(e.target.value === "" ? "" : Number(e.target.value))}
+              className="rounded-md border border-border bg-surface px-3 py-2"
+              placeholder="0"
+            />
+            <span className="text-xs text-muted">
+              Si llegaron botellas sueltas de más, fuera de las cajas completas — no les mete
+              costo de mercancía propio, pero sí les toca su parte del flete y la aduana.
+            </span>
+          </label>
           <p className="text-xs text-muted -mt-1">
             = {totalBotellas} botella{totalBotellas === 1 ? "" : "s"} · Total: $
             {totalLinea.toLocaleString("es-MX")} USD
@@ -135,8 +156,9 @@ export function LineaPedidoRow({
       <div className="flex-1 min-w-0">
         <p className="font-medium truncate">{producto.nombre}</p>
         <p className="text-xs text-muted">
-          {cajasInicial} caja{cajasInicial === 1 ? "" : "s"} × {piezasInicial} ={" "}
-          {cajasInicial * piezasInicial} botellas
+          {cajasInicial} caja{cajasInicial === 1 ? "" : "s"} × {piezasInicial}
+          {botellasExtraInicial > 0 ? ` + ${botellasExtraInicial} sueltas` : ""} ={" "}
+          {cajasInicial * piezasInicial + botellasExtraInicial} botellas
         </p>
         <p className="text-xs text-muted">
           ${(costoInicial / piezasInicial).toFixed(2)} USD/botella · Total: $

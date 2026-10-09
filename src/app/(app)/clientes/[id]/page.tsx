@@ -1,6 +1,6 @@
 import { PreciosClienteTabla } from "@/components/PreciosClienteTabla";
 import { DateField } from "@/components/DateField";
-import { calcularEstadoCuentaCliente, formatoMXN } from "@/lib/costeo";
+import { calcularEstadoCuentaCliente, calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
 import { asegurarCodigoCliente } from "@/lib/clienteCodigo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -21,18 +21,20 @@ export default async function DetalleClientePage({
 }: PageProps<"/clientes/[id]">) {
   const { id } = await params;
 
-  const [cliente, ordenes, productos, preciosGuardados, abonos, estadoCuenta] = await Promise.all([
-    prisma.cliente.findUnique({ where: { id } }),
-    prisma.orden.findMany({
-      where: { clienteId: id },
-      include: { lineas: { include: { producto: true } }, cobros: true },
-      orderBy: { fecha: "desc" },
-    }),
-    prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
-    prisma.precioClienteProducto.findMany({ where: { clienteId: id } }),
-    prisma.abonoCliente.findMany({ where: { clienteId: id }, orderBy: { fecha: "desc" } }),
-    calcularEstadoCuentaCliente(id),
-  ]);
+  const [cliente, ordenes, productos, preciosGuardados, abonos, estadoCuenta, saldosOrdenes] =
+    await Promise.all([
+      prisma.cliente.findUnique({ where: { id } }),
+      prisma.orden.findMany({
+        where: { clienteId: id },
+        include: { lineas: { include: { producto: true } }, cobros: true },
+        orderBy: { fecha: "desc" },
+      }),
+      prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
+      prisma.precioClienteProducto.findMany({ where: { clienteId: id } }),
+      prisma.abonoCliente.findMany({ where: { clienteId: id }, orderBy: { fecha: "desc" } }),
+      calcularEstadoCuentaCliente(id),
+      calcularSaldosOrdenes(id),
+    ]);
   if (!cliente) notFound();
   const codigo = await asegurarCodigoCliente(cliente);
   const hoy = new Date().toISOString().slice(0, 10);
@@ -237,8 +239,7 @@ export default async function DetalleClientePage({
         <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
           {ordenes.map((o) => {
             const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
-            const cobrado = o.cobros.reduce((acc, c) => acc + c.monto, 0);
-            const pendiente = total - cobrado;
+            const pendiente = saldosOrdenes.get(o.id)?.pendiente ?? total;
             return (
               <Link
                 key={o.id}

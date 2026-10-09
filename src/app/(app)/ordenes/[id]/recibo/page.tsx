@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatoMXN } from "@/lib/costeo";
+import { calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
 import { BotonImprimir } from "@/components/BotonImprimir";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -39,7 +39,9 @@ export default async function ReciboOrdenPage({
   const descuentoRegalos = totalSinRegalos - total;
   const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
-  const pendiente = total - cobrado;
+  const saldo = (await calcularSaldosOrdenes(orden.clienteId)).get(orden.id);
+  const pendiente = saldo?.pendiente ?? total - cobrado;
+  const abonoAplicado = saldo?.abonoAplicado ?? 0;
 
   return (
     <div className="flex flex-col gap-6 bg-background print:bg-background">
@@ -162,6 +164,12 @@ export default async function ReciboOrdenPage({
               <div className="flex justify-between w-44">
                 <span className="text-muted">Cobrado</span>
                 <span>{formatoMXN(cobrado)}</span>
+              </div>
+            )}
+            {abonoAplicado > 0.5 && (
+              <div className="flex justify-between w-44">
+                <span className="text-muted">Abono aplicado</span>
+                <span>{formatoMXN(abonoAplicado)}</span>
               </div>
             )}
             <div className="flex justify-between w-44 text-sm">

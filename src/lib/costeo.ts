@@ -666,6 +666,52 @@ export async function calcularEstadoCuentaCliente(clienteId: string) {
   };
 }
 
+export type SaldoOrden = {
+  pendiente: number; // lo que falta de pagar de ESTA orden, ya restando abonos generales
+  abonoAplicado: number; // cuánto de los abonos generales del cliente le tocó a esta orden
+};
+
+/**
+ * Lo que falta de pagar de cada orden, aplicando los abonos a cuenta general
+ * del cliente (AbonoCliente) a sus órdenes más viejas primero, hasta donde
+ * alcance — así Isaac no tiene que decidir a mano a qué orden amarrar un
+ * abono que le mandaron "a cuenta". Si un cliente paga de más, lo que sobra
+ * no se le quita a ninguna orden (se queda como saldo a favor del cliente,
+ * ver calcularEstadoCuentaCliente). Se calcula siempre en vivo, igual que el
+ * resto de Finanzas — si agregas o editas una orden o un abono, se ajusta
+ * solo la próxima vez que se muestre.
+ *
+ * Si se pasa clienteId, solo trae las órdenes de ese cliente (más rápido
+ * para una pantalla de un solo cliente); sin clienteId trae todas.
+ */
+export async function calcularSaldosOrdenes(clienteId?: string): Promise<Map<string, SaldoOrden>> {
+  const [ordenes, abonos] = await Promise.all([
+    prisma.orden.findMany({
+      where: clienteId ? { clienteId } : undefined,
+      include: { lineas: true, cobros: true },
+      orderBy: { fecha: "asc" },
+    }),
+    prisma.abonoCliente.findMany({ where: clienteId ? { clienteId } : undefined }),
+  ]);
+
+  const poolPorCliente = new Map<string, number>();
+  for (const a of abonos) {
+    poolPorCliente.set(a.clienteId, (poolPorCliente.get(a.clienteId) ?? 0) + a.monto);
+  }
+
+  const saldos = new Map<string, SaldoOrden>();
+  for (const o of ordenes) {
+    const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+    const cobradoDirecto = o.cobros.reduce((acc, c) => acc + c.monto, 0);
+    const debeDespuesDeCobros = Math.max(0, total - cobradoDirecto);
+    const poolDisponible = poolPorCliente.get(o.clienteId) ?? 0;
+    const abonoAplicado = Math.min(poolDisponible, debeDespuesDeCobros);
+    poolPorCliente.set(o.clienteId, poolDisponible - abonoAplicado);
+    saldos.set(o.id, { pendiente: debeDespuesDeCobros - abonoAplicado, abonoAplicado });
+  }
+  return saldos;
+}
+
 /**
  * Activa/desactiva un producto solo, según si tiene botellas en stock ahora
  * mismo. Se llama después de cualquier cambio que mueva su inventario

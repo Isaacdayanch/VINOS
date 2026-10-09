@@ -1,7 +1,7 @@
 import { crearCobro, marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
 import { DateField } from "@/components/DateField";
 import { prisma } from "@/lib/prisma";
-import { formatoMXN } from "@/lib/costeo";
+import { calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -24,7 +24,9 @@ export default async function DetalleOrdenPage({
   const total = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
   const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
-  const pendiente = total - cobrado;
+  const saldo = (await calcularSaldosOrdenes(orden.clienteId)).get(orden.id);
+  const pendiente = saldo?.pendiente ?? total - cobrado;
+  const abonoAplicado = saldo?.abonoAplicado ?? 0;
   const hoy = new Date().toISOString().slice(0, 10);
   const registrarCobro = crearCobro.bind(null, orden.id);
 
@@ -137,6 +139,12 @@ export default async function DetalleOrdenPage({
           <span>Cobrado</span>
           <span>{formatoMXN(cobrado)}</span>
         </div>
+        {abonoAplicado > 0.5 && (
+          <div className="flex items-center justify-between text-sm text-ok">
+            <span>Cubierto con abono a cuenta</span>
+            <span>{formatoMXN(abonoAplicado)}</span>
+          </div>
+        )}
         {pendiente > 0.5 && (
           <div className="flex items-center justify-between text-sm text-warn">
             <span>Pendiente</span>

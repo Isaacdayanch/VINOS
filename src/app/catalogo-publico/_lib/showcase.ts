@@ -24,7 +24,7 @@ const selection: readonly ShowcaseWine[] = [
     description: "Un tinto seco de Galilea que combina 80% Cabernet Sauvignon, 10% Shiraz y 10% Petit Verdot. Su cuerpo va de medio a pleno, con una textura suave y aterciopelada y un final largo. Dieciocho meses en barricas de roble francés de Allier aportan intensidad y elegancia.",
     facts: ["Galilea · Israel", "18 meses en roble francés", "750 ml · 14.3% alc.", "Servir a 18–22 °C", "Kosher para Pésaj, según etiqueta"] },
   { slug: "titora-grand-2023", producer: "La Citadelle de Diamant · Givat Titora", name: "Grande Réserve", year: 2023, image: "titora-grand-2023-front.webp", editorialHref: "/catalogo-publico/seleccion/titora-grand-2023",
-    description: "Próxima llegada: añada 2023. Descubre su presentación visual y nuestras propuestas de maridaje. Ficha técnica pendiente de confirmar con la nueva etiqueta." },
+    description: "Cabernet Sauvignon predominante de Alta Galilea. Fruta roja madura, especias, cacao y café, con 24 meses de crianza en roble francés, según su etiqueta de 2023." },
   { slug: "titora-reserve-2023", producer: "La Citadelle de Diamant · Givat Titora", name: "Cabernet Sauvignon Reserve", year: 2023, image: "titora-reserve-2023-front.webp", editorialHref: "/catalogo-publico/seleccion/titora-reserve-2023",
     description: "95% Cabernet Sauvignon y 5% Petit Verdot de Galilea. Frutos del bosque, cuerpo de medio a pleno y doce meses en roble francés, según su etiqueta." },
   { slug: "dadah-cabernet-reserve-2019", productId: "cmtssyq4b0004l4044dcpucfr", producer: "Dādāh", name: "Cabernet Sauvignon Reserve", year: 2019, image: "dadah-cabernet-reserve-2019.webp", editorialHref: "/catalogo-publico/seleccion/dadah-cabernet-reserve-2019" },

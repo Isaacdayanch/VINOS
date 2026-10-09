@@ -47,6 +47,7 @@ export default async function DetallePedidoPage({
     (acc, l) => acc + l.cajasRecibidas * l.piezasPorCaja,
     0,
   );
+  const totalCajasPedido = pedido.entradas.reduce((acc, l) => acc + l.cajasRecibidas, 0);
 
   const hoy = new Date().toISOString().slice(0, 10);
   const guardarPedido = actualizarPedido.bind(null, pedido.id);
@@ -107,9 +108,27 @@ export default async function DetallePedidoPage({
         <p className="text-muted text-sm">
           {new Date(pedido.fecha).toLocaleDateString("es-MX")}
           {pedido.proveedor ? ` · ${pedido.proveedor}` : ""}
-          {totalBotellasPedido > 0 ? ` · 📦 ${totalBotellasPedido} botellas en total` : ""}
         </p>
       </div>
+
+      {totalBotellasPedido > 0 && (
+        <div className="flex gap-6 rounded-lg border border-border bg-surface px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🍾</span>
+            <span className="text-sm">
+              <span className="font-semibold text-wine">{totalBotellasPedido}</span>{" "}
+              <span className="text-muted">botellas</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📦</span>
+            <span className="text-sm">
+              <span className="font-semibold text-wine">{totalCajasPedido}</span>{" "}
+              <span className="text-muted">cajas</span>
+            </span>
+          </div>
+        </div>
+      )}
 
       {avisoCredito && (
         <div

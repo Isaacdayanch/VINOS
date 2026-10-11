@@ -37,9 +37,14 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
     // Extra images are the ambient gallery; the catalog packshot comes last.
     // Keep the source photograph in the CRM while displaying its studio replacement.
     const sourceRear = "https://lwekyvwfrmgzmavwveji.supabase.co/storage/v1/object/public/fotos-productos/7b4dd274-4997-4d2f-a810-a8b1ba0279a9.jpeg";
-    const gallery = product.id === "cmtssyq4l0005l4047nx3t1lc" && product.imagenesExtra.length > 5
+    let gallery = product.id === "cmtssyq4l0005l4047nx3t1lc" && product.imagenesExtra.length > 5
       ? product.imagenesExtra.filter((photo) => photo.url !== sourceRear)
       : product.imagenesExtra;
+    // The service retake is uploaded after Dadah's original four scenes.
+    // Keep the source in the CRM and substitute it in the public gallery.
+    if (product.id === "cmtssyq3k0001l404n0341dmg" && product.anio === 2023 && gallery.length >= 5) {
+      gallery = [gallery[0], gallery[4], gallery[2], gallery[3], ...gallery.slice(5)];
+    }
     const ambient = gallery.map((photo, index) => ({ url: photo.url, caption: `Ambientación ${index + 1}`, ambient: true }));
     // Approved Tanya opening scene: the sunset table is its last uploaded image.
     if (product.id === "cmtssyq4u0006l404sytto49b" && ambient.length === 4) ambient.unshift(ambient.pop()!);

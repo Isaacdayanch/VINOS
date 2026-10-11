@@ -18,6 +18,8 @@ export default async function PreciosPage() {
     piezasPorCaja: p.piezasPorCaja,
     costoActual: resumen.get(p.id)?.costoPromedioPorBotella ?? 0,
     precioLista: p.precioLista,
+    precioDescuentoChico: p.precioDescuentoChico,
+    precioDescuentoGrande: p.precioDescuentoGrande,
     precioDistribuidor: p.precioDistribuidor,
   }));
 
@@ -26,8 +28,29 @@ export default async function PreciosPage() {
       <div>
         <h1 className="text-2xl font-bold text-wine">Precios</h1>
         <p className="text-muted text-sm">
-          Precio de venta a clientes y precio para distribuidores de cada vino. El margen se
-          calcula solo, comparado contra el costo actual.
+          Los 4 precios de cada vino, para qué se usa cada uno, y el margen calculado solo
+          contra el costo actual.
+        </p>
+      </div>
+
+      <div className="rounded-lg border border-border bg-wine-light/30 p-4 text-sm flex flex-col gap-1.5">
+        <p>
+          <span className="font-semibold text-wine">Precio de lista</span> — el que se usa en el
+          catálogo público (vinos-catalogo.vercel.app) y se sugiere en una orden nueva a clientes
+          de categoría &quot;Lista&quot;.
+        </p>
+        <p>
+          <span className="font-semibold text-wine">Descuento chico / Descuento grande</span> —
+          se sugieren en una orden nueva según la categoría del cliente. No salen en el catálogo
+          público.
+        </p>
+        <p>
+          <span className="font-semibold text-wine">Precio distribuidor</span> — el que se usa al
+          armar una nota de consignación para un distribuidor.
+        </p>
+        <p className="text-muted text-xs mt-1">
+          ⚠️ Cambiar un precio aquí no actualiza el catálogo público solo — eso solo pasa cuando
+          le picas &quot;Publicar catálogo&quot; en Productos.
         </p>
       </div>
 

@@ -11,11 +11,13 @@ function numeroOpcional(valor: FormDataEntryValue | null) {
 
 export async function actualizarPreciosProducto(productoId: string, formData: FormData) {
   const precioLista = numeroOpcional(formData.get("precioLista"));
+  const precioDescuentoChico = numeroOpcional(formData.get("precioDescuentoChico"));
+  const precioDescuentoGrande = numeroOpcional(formData.get("precioDescuentoGrande"));
   const precioDistribuidor = numeroOpcional(formData.get("precioDistribuidor"));
 
   await prisma.producto.update({
     where: { id: productoId },
-    data: { precioLista, precioDistribuidor },
+    data: { precioLista, precioDescuentoChico, precioDescuentoGrande, precioDistribuidor },
   });
 
   revalidatePath("/precios");

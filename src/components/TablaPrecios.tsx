@@ -12,6 +12,8 @@ type ProductoPrecio = {
   piezasPorCaja: number;
   costoActual: number;
   precioLista: number | null;
+  precioDescuentoChico: number | null;
+  precioDescuentoGrande: number | null;
   precioDistribuidor: number | null;
 };
 
@@ -45,8 +47,52 @@ function Margen({ costo, precio }: { costo: number; precio: number | "" }) {
   );
 }
 
+function CampoPrecio({
+  label,
+  caption,
+  name,
+  value,
+  onChange,
+  costo,
+}: {
+  label: string;
+  caption: string;
+  name: string;
+  value: number | "";
+  onChange: (v: number | "") => void;
+  costo: number;
+}) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      <span className="font-medium">{label}</span>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+          $
+        </span>
+        <input
+          name={name}
+          type="number"
+          step="0.01"
+          min="0"
+          value={value}
+          onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
+          className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2"
+        />
+      </div>
+      <p className="text-[11px] text-muted leading-snug">{caption}</p>
+      <Margen costo={costo} precio={value} />
+    </label>
+  );
+}
+
 function FilaPrecio({ producto: p }: { producto: ProductoPrecio }) {
   const [precioLista, setPrecioLista] = useState<number | "">(p.precioLista ?? "");
+  const [precioDescuentoChico, setPrecioDescuentoChico] = useState<number | "">(
+    p.precioDescuentoChico ?? "",
+  );
+  const [precioDescuentoGrande, setPrecioDescuentoGrande] = useState<number | "">(
+    p.precioDescuentoGrande ?? "",
+  );
   const [precioDistribuidor, setPrecioDistribuidor] = useState<number | "">(
     p.precioDistribuidor ?? "",
   );
@@ -84,47 +130,38 @@ function FilaPrecio({ producto: p }: { producto: ProductoPrecio }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Precio de venta</span>
-          <div className="relative">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
-              $
-            </span>
-            <input
-              name="precioLista"
-              type="number"
-              step="0.01"
-              min="0"
-              value={precioLista}
-              onChange={(e) =>
-                setPrecioLista(e.target.value === "" ? "" : Number(e.target.value))
-              }
-              className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2"
-            />
-          </div>
-          <Margen costo={p.costoActual} precio={precioLista} />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Precio distribuidor</span>
-          <div className="relative">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
-              $
-            </span>
-            <input
-              name="precioDistribuidor"
-              type="number"
-              step="0.01"
-              min="0"
-              value={precioDistribuidor}
-              onChange={(e) =>
-                setPrecioDistribuidor(e.target.value === "" ? "" : Number(e.target.value))
-              }
-              className="w-full rounded-md border border-border bg-surface pl-7 pr-3 py-2"
-            />
-          </div>
-          <Margen costo={p.costoActual} precio={precioDistribuidor} />
-        </label>
+        <CampoPrecio
+          label="Precio de lista"
+          caption="Catálogo público + clientes categoría Lista"
+          name="precioLista"
+          value={precioLista}
+          onChange={setPrecioLista}
+          costo={p.costoActual}
+        />
+        <CampoPrecio
+          label="Descuento chico"
+          caption="Clientes categoría Descuento chico"
+          name="precioDescuentoChico"
+          value={precioDescuentoChico}
+          onChange={setPrecioDescuentoChico}
+          costo={p.costoActual}
+        />
+        <CampoPrecio
+          label="Descuento grande"
+          caption="Clientes categoría Descuento grande"
+          name="precioDescuentoGrande"
+          value={precioDescuentoGrande}
+          onChange={setPrecioDescuentoGrande}
+          costo={p.costoActual}
+        />
+        <CampoPrecio
+          label="Precio distribuidor"
+          caption="Notas de consignación a distribuidores"
+          name="precioDistribuidor"
+          value={precioDistribuidor}
+          onChange={setPrecioDistribuidor}
+          costo={p.costoActual}
+        />
       </div>
 
       <div className="flex items-center gap-3">

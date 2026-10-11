@@ -10,6 +10,7 @@ import { WineDetailPage } from "../_components/WineDetailPage";
 import { EditorialWinePage } from "../_components/EditorialWinePage";
 import { editorialMetadata } from "../_lib/editorial-wine";
 import { publicPhotograph } from "../_lib/public-photography";
+import type { WinePhoto } from "../_components/WineHero";
 
 export const dynamic = "force-dynamic";
 
@@ -45,23 +46,25 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
     if (product.id === "cmtssyq3k0001l404n0341dmg" && product.anio === 2023 && gallery.length >= 5) {
       gallery = [gallery[0], gallery[4], gallery[2], gallery[3], ...gallery.slice(5)];
     }
-    const ambient = gallery.map((photo, index) => ({ url: photo.url, caption: `Ambientación ${index + 1}`, ambient: true }));
+    const ambient: WinePhoto[] = gallery.map((photo, index) => ({ url: photo.url, caption: `Ambientación ${index + 1}`, ambient: true }));
     // Approved Tanya opening scene: the sunset table is its last uploaded image.
     if (product.id === "cmtssyq4u0006l404sytto49b" && ambient.length === 4) ambient.unshift(ambient.pop()!);
     const front = publicPhotograph(product.id, product.fotoUrl);
     const tanya = product.id === "cmtssyq4u0006l404sytto49b" && product.anio === 2021;
     const enosh = product.id === "cmtssyq4l0005l4047nx3t1lc" && product.anio === 2018;
     const dadahBlend = product.id === "cmtssyq3k0001l404n0341dmg" && product.anio === 2023;
+    const rear: WinePhoto[] = [];
     if (enosh) {
       ["Una mesa al anochecer", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: res braseada con hongos"].forEach((caption, index) => {
         if (ambient[index]) ambient[index].caption = caption;
       });
       if (ambient[4]) {
-        ambient[4].caption = "La contraetiqueta";
-        ambient[4].ambient = false;
+        const back = ambient.splice(4, 1)[0];
+        rear.push({ ...back, caption: "La contraetiqueta, sobre blanco", ambient: false, zoomUrl: "/catalogo/enosh-2018-label-original.jpeg" });
       }
     }
     if (dadahBlend) {
+      rear.push({ url: "/catalogo/dadah-blend-2023-back.webp", caption: "La contraetiqueta, sobre blanco", ambient: false, zoomUrl: "/catalogo/dadah-blend-2023-label-original.jpeg" });
       ["Una mesa entre viñedos", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: cordero y berenjena"].forEach((caption, index) => {
         if (ambient[index]) ambient[index].caption = caption;
       });
@@ -73,7 +76,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
       description: product.descripcion,
       commerce: { precioLista: product.precioLista, activo: product.activo },
       facts: [...additionalWineFacts(product.id, product.anio), ...details.map(([label, value]) => [String(label), String(value)])],
-      photos: [...ambient, ...(front ? [{ url: front, caption: "La botella", ambient: false }] : [])],
+      photos: [...ambient, ...(front ? [{ url: front, caption: "La botella", ambient: false }] : []), ...rear],
       stories: [["En la copa", product.notas], ["En la mesa", product.maridaje]].flatMap(([title, text]) => text ? [{ title: title!, text }] : []),
     }} />;
   }

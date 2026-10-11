@@ -7,7 +7,7 @@ export function EditorialWinePage({ wine, commerce }: { wine: EditorialWine; com
   return <WineDetailPage wine={{
     name: wine.name, title: wine.title, eyebrow: `${wine.producer} · ${wine.year}`,
     style: wine.style, description: wine.description, facts: wine.facts, commerce,
-    photos: order.filter(index => Boolean(wine.photos[index])).map(index => ({ url: wine.photos[index], caption: wine.captions[index], ambient: index >= 2 })),
+    photos: order.filter(index => Boolean(wine.photos[index])).map(index => ({ url: wine.photos[index], caption: wine.captions[index], ambient: index >= 2, zoomUrl: index === 1 ? wine.labelImage : index === 0 ? wine.originalFront : undefined })),
     stories: [
       { title: "En la copa", text: wine.description },
       { title: "En la mesa", text: wine.pairing },

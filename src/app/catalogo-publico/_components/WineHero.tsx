@@ -3,12 +3,15 @@ import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
 import styles from "../catalog.module.css";
 
-export type WinePhoto = { url: string; caption: string; ambient: boolean };
+export type WinePhoto = { url: string; caption: string; ambient: boolean; zoomUrl?: string };
 
 export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name: string; children: ReactNode }) {
   const [active, setActive] = useState(0);
   const track = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; left: number } | null>(null);
+  const viewer = useRef<HTMLDialogElement>(null);
+  const [enlarged, setEnlarged] = useState<WinePhoto | null>(null);
+  const [zoom, setZoom] = useState(1);
   const photo = photos[active];
   function show(index: number) {
     const element = track.current;
@@ -50,7 +53,7 @@ export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name
             <Image src={item.url} alt={`${name}: ${item.caption}`} fill preload={index === 0} draggable={false} sizes="(max-width: 700px) 100vw, 57vw" />
           </div>)}
         </div>
-        <div className={styles.photoDissolve} aria-hidden="true" />
+        {photo.ambient && <div className={styles.photoDissolve} aria-hidden="true" />}
         {photos.length > 1 && <div className={styles.photoNavigation}>
           <div className={styles.photoDots} role="group" aria-label="Elegir fotografía">
             {photos.map((item, index) => <button key={`${item.url}-${index}`} type="button" aria-label={`Ver ${item.caption}`} aria-pressed={active === index} onClick={() => show(index)}><span /></button>)}
@@ -58,8 +61,27 @@ export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name
           <p>Desliza para ver más</p>
         </div>}
         <p className={styles.photoAnnouncement} aria-live="polite" aria-atomic="true">{active + 1} de {photos.length}: {photo.caption}</p>
+        {!photo.ambient && <button type="button" className={styles.photoEnlarge} onClick={() => {
+          setEnlarged(photo); setZoom(1); viewer.current?.showModal();
+        }}>{photo.zoomUrl ? "Ampliar etiqueta real" : "Ampliar fotografía"} <span aria-hidden="true">＋</span></button>}
       </div>
       <div className={styles.immersiveIntro}>{children}</div>
     </section>
+    <dialog ref={viewer} className={styles.photoViewer} aria-label={`Fotografía ampliada de ${name}`} onClose={() => setEnlarged(null)}>
+      <div className={styles.photoViewerBar}>
+        <p>{enlarged?.zoomUrl ? "Etiqueta original" : enlarged?.caption}</p>
+        <div>
+          <button type="button" aria-label="Reducir imagen" disabled={zoom <= 1} onClick={() => setZoom(value => Math.max(1, value - .5))}>−</button>
+          <span aria-live="polite">{Math.round(zoom * 100)}%</span>
+          <button type="button" aria-label="Acercar imagen" disabled={zoom >= 3} onClick={() => setZoom(value => Math.min(3, value + .5))}>＋</button>
+          <button type="button" aria-label="Cerrar fotografía ampliada" onClick={() => viewer.current?.close()}>×</button>
+        </div>
+      </div>
+      <div className={styles.photoViewerScroll}>
+        <div className={styles.photoViewerCanvas}>
+          {enlarged && <Image src={enlarged.zoomUrl ?? enlarged.url} alt={`${name}: ${enlarged.zoomUrl ? "etiqueta original" : enlarged.caption}`} width={1600} height={2200} unoptimized style={{ width: `${zoom * 88}vw`, maxWidth: `${zoom * 900}px`, height: "auto" }} />}
+        </div>
+      </div>
+    </dialog>
   </>;
 }

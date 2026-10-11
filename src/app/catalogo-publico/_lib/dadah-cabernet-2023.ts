@@ -24,6 +24,4 @@ export const dadahCabernet2023: EditorialWine = {
     "/catalogo/dadah-cabernet-2023-service-v2.webp", "/catalogo/dadah-cabernet-2023-glass-v2.webp",
     "/catalogo/dadah-cabernet-2023-pairing-v2.webp", "/catalogo/dadah-cabernet-2023-table-v2.webp"],
   captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: rib eye con hongos", "Una mesa entre las colinas"],
-  labelImage: "/catalogo/dadah-cabernet-2023-label-original.jpeg",
-  originalFront: "/catalogo/dadah-cabernet-2023-front-label-original.jpeg",
 };

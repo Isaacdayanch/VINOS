@@ -25,6 +25,4 @@ export const titoraReserve2023: EditorialWine = {
   ],
   photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/titora-reserve-2023-${view}.webp`),
   captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El ritual del servicio", "Una copa a la luz de la ventana", "Maridaje sugerido: cordero con verduras asadas", "Una mesa íntima al anochecer"],
-  labelImage: "/catalogo/titora-reserve-2023-label-original.jpeg",
-  originalFront: "/catalogo/titora-reserve-2023-front-original.jpeg",
 };

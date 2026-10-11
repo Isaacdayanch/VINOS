@@ -33,6 +33,4 @@ export const reserve2019: EditorialWine = {
     "Vino sirviéndose", "Copa con vino rojo profundo",
     "Sugerencia de maridaje: res a la parrilla con verduras", "Una mesa para compartir",
   ],
-  labelImage: "/catalogo/dadah-reserve-2019-label-original.webp",
-  originalFront: "/catalogo/dadah-reserve-2019-front-original.webp",
 };

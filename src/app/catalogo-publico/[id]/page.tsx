@@ -60,11 +60,11 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
       });
       if (ambient[4]) {
         const back = ambient.splice(4, 1)[0];
-        rear.push({ ...back, caption: "La contraetiqueta, sobre blanco", ambient: false, zoomUrl: "/catalogo/enosh-2018-label-original.jpeg" });
+        rear.push({ ...back, caption: "La contraetiqueta, sobre blanco", ambient: false });
       }
     }
     if (dadahBlend) {
-      rear.push({ url: "/catalogo/dadah-blend-2023-back.webp", caption: "La contraetiqueta, sobre blanco", ambient: false, zoomUrl: "/catalogo/dadah-blend-2023-label-original.jpeg" });
+      rear.push({ url: "/catalogo/dadah-blend-2023-back.webp", caption: "La contraetiqueta, sobre blanco", ambient: false });
       ["Una mesa entre viñedos", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: cordero y berenjena"].forEach((caption, index) => {
         if (ambient[index]) ambient[index].caption = caption;
       });

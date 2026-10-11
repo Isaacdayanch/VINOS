@@ -25,5 +25,4 @@ export const titoraGrand2023: EditorialWine = {
   ],
   photos: ["front", "back-verified", "pour", "glass", "pairing", "table"].map(view => `/catalogo/titora-grand-2023-${view}.webp`),
   captions: ["La botella · Grande Réserve 2023", "La contraetiqueta · añada 2023", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: res braseada con hongos", "Una mesa al caer la tarde"],
-  labelImage: "/catalogo/titora-grand-2023-back-verified.webp",
 };

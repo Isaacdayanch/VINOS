@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRef, useState, type ReactNode } from "react";
 import styles from "../catalog.module.css";
 
-export type WinePhoto = { url: string; caption: string; ambient: boolean; zoomUrl?: string };
+export type WinePhoto = { url: string; caption: string; ambient: boolean };
 
 export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name: string; children: ReactNode }) {
   const [active, setActive] = useState(0);
@@ -64,13 +64,13 @@ export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name
         <p className={styles.photoAnnouncement} aria-live="polite" aria-atomic="true">{active + 1} de {photos.length}: {photo.caption}</p>
         {!photo.ambient && <button type="button" className={styles.photoEnlarge} onClick={() => {
           setEnlarged(photo); setZoom(1); viewer.current?.showModal();
-        }}>{photo.zoomUrl ? "Ampliar etiqueta real" : "Ampliar fotografía"} <span aria-hidden="true">＋</span></button>}
+        }}>Ampliar fotografía <span aria-hidden="true">＋</span></button>}
       </div>
       <div className={styles.immersiveIntro}>{children}</div>
     </section>
     <dialog ref={viewer} className={styles.photoViewer} aria-label={`Fotografía ampliada de ${name}`} onClose={() => setEnlarged(null)}>
       <div className={styles.photoViewerBar}>
-        <p>{enlarged?.zoomUrl ? "Etiqueta original" : enlarged?.caption}</p>
+        <p>{enlarged?.caption}</p>
         <div>
           <button type="button" aria-label="Reducir imagen" disabled={zoom <= 1} onClick={() => setZoom(value => Math.max(1, value - .5))}>−</button>
           <span aria-live="polite">{Math.round(zoom * 100)}%</span>
@@ -80,7 +80,7 @@ export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name
       </div>
       <div className={styles.photoViewerScroll}>
         <div className={styles.photoViewerCanvas}>
-          {enlarged && <Image src={enlarged.zoomUrl ?? enlarged.url} alt={`${name}: ${enlarged.zoomUrl ? "etiqueta original" : enlarged.caption}`} width={1600} height={2200} unoptimized style={{ width: `${zoom * 88}vw`, maxWidth: `${zoom * 900}px`, height: "auto" }} />}
+          {enlarged && <Image src={enlarged.url} alt={`${name}: ${enlarged.caption}`} width={1600} height={2200} unoptimized style={{ width: `${zoom * 88}vw`, maxWidth: `${zoom * 900}px`, height: "auto" }} />}
         </div>
       </div>
     </dialog>

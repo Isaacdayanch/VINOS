@@ -26,6 +26,4 @@ export const tanyaLateHarvest2024: EditorialWine = {
     "/catalogo/tanya-late-harvest-2024-service-v3.webp", "/catalogo/tanya-late-harvest-2024-glass-v3.webp",
     "/catalogo/tanya-late-harvest-2024-pairing-v3.webp", "/catalogo/tanya-late-harvest-2024-table-v3.webp"],
   captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "Burbujas sutiles en copa", "El dorado en copa", "Maridaje sugerido: fruta y almendra", "Una sobremesa dorada"],
-  labelImage: "/catalogo/tanya-late-harvest-2024-label-original.jpeg",
-  originalFront: "/catalogo/tanya-late-harvest-2024-front-label-original.jpeg",
 };

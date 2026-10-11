@@ -12,7 +12,6 @@ export type ShowcaseWine = {
   image: string;
   description?: string;
   facts?: readonly string[];
-  labelImage?: string;
   editorialHref?: string;
 };
 
@@ -20,7 +19,6 @@ const selection: readonly ShowcaseWine[] = [
   { slug: "grand-rivallon-2012", productId: "cmtugbmde0002ih049z900g5i", producer: "Château Grand Rivallon", name: "Saint-Émilion Grand Cru", year: 2012, image: "grand-rivallon-2012-front.webp", editorialHref: "/catalogo-publico/cmtugbmde0002ih049z900g5i", description: "Un ensamblaje de Merlot, Cabernet Sauvignon y Cabernet Franc. Redondo, de cuerpo pleno y taninos delicados, según su contraetiqueta." },
   { slug: "reserve-2017", productId: "cmu3qg06j0000ic04z60he8vj", producer: "Dādāh", name: "Special Reserve", year: 2017, image: "reserve-2017-softlight.webp", editorialHref: "/catalogo-publico/seleccion/reserve-2017" },
   { slug: "titora-special-2021", producer: "La Citadelle de Diamant · Titora", name: "Réserve Spéciale", year: 2021, image: "titora-special-2021.webp",
-    labelImage: "titora-special-label.webp",
     description: "Un tinto seco de Galilea que combina 80% Cabernet Sauvignon, 10% Shiraz y 10% Petit Verdot. Su cuerpo va de medio a pleno, con una textura suave y aterciopelada y un final largo. Dieciocho meses en barricas de roble francés de Allier aportan intensidad y elegancia.",
     facts: ["Galilea · Israel", "18 meses en roble francés", "750 ml · 14.3% alc.", "Servir a 18–22 °C", "Kosher para Pésaj, según etiqueta"] },
   { slug: "titora-grand-2023", producer: "La Citadelle de Diamant · Givat Titora", name: "Grande Réserve", year: 2023, image: "titora-grand-2023-front.webp", editorialHref: "/catalogo-publico/seleccion/titora-grand-2023",

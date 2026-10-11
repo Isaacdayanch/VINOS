@@ -15,8 +15,6 @@ export type EditorialWine = {
   facts: string[][];
   photos: string[];
   captions: string[];
-  labelImage: string;
-  originalFront?: string;
 };
 
 // Producer story supplied on Special Reserve packaging IMG_0409, not a grape-origin claim.

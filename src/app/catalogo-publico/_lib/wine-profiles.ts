@@ -1,5 +1,6 @@
 import { grandRivallon, grandRivallonId } from "./grand-rivallon";
 import { reserve2017 } from "./reserve-2017";
+import { reserve2018 } from "./reserve-2018";
 import { reserve2019 } from "./reserve-2019";
 import { titoraReserve2023 } from "./titora-reserve-2023";
 import type { EditorialWine } from "./editorial-wine";
@@ -8,6 +9,7 @@ import { tanyaLateHarvest2024 } from "./tanya-late-harvest-2024";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
+  cmtssyq3t0002l404jdevszsb: reserve2018,
   cmtssyq5c0008l404fkede9in: tanyaLateHarvest2024,
   cmtssyq350000l404mdg2nzou: dadahCabernet2023,
   [grandRivallonId]: grandRivallon,

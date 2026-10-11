@@ -20,6 +20,22 @@ export function wineProfile(id: string, year: number | null) {
 // https://www.kosherwine.com/tanya-cabernet-eliya-tan-0002.html
 // The winery's current Eliya Cabernet page also corroborates French-oak aging.
 export function additionalWineFacts(id: string, year: number | null): string[][] {
+  // Front and Hebrew rear labels supplied as IMG_0422 and IMG_0423.
+  if (id === "cmtssyq3k0001l404n0341dmg" && year === 2023) return [
+    ["Bodega", "Dadah Winery"], ["País", "Israel"],
+    ["Tipo", "Tinto seco"], ["Contenido", "750 ml"],
+    ["Ensamble", "50% Malbec · 50% Barbera"],
+    ["Viñedos", "Laderas occidentales del Carmelo, cerca de Meir Shfeya"],
+    ["Crianza", "18 meses"], ["Barrica", "Roble francés"],
+    ["Elaboración", "Sin clarificar ni filtrar, según contraetiqueta"],
+    ["Servicio según etiqueta", "17–19 °C"],
+    ["Color", "Profundo con matices púrpura"],
+    ["Textura", "Aterciopelada, según contraetiqueta"],
+    ["Taninos", "Firmes, según contraetiqueta"],
+    ["Mevushal", "No mevushal, según sello de la etiqueta"],
+    ["Kosher", "Para Pésaj, según etiqueta"],
+    ["Alérgenos", "Contiene sulfitos"],
+  ];
   // Original 2018 labels supplied as IMG_0490, IMG_0491 and IMG_0492.
   // They do not specify an aging duration or grape percentages.
   if (id === "cmtssyq4l0005l4047nx3t1lc" && year === 2018) return [

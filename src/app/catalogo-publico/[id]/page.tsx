@@ -35,25 +35,36 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
   ].filter(([, value]) => value != null && value !== "");
   if (product.imagenesExtra.length) {
     // Extra images are the ambient gallery; the catalog packshot comes last.
-    const ambient = product.imagenesExtra.map((photo, index) => ({ url: photo.url, caption: `Ambientación ${index + 1}`, ambient: true }));
+    // Keep the source photograph in the CRM while displaying its studio replacement.
+    const sourceRear = "https://lwekyvwfrmgzmavwveji.supabase.co/storage/v1/object/public/fotos-productos/7b4dd274-4997-4d2f-a810-a8b1ba0279a9.jpeg";
+    const gallery = product.id === "cmtssyq4l0005l4047nx3t1lc" && product.imagenesExtra.length > 5
+      ? product.imagenesExtra.filter((photo) => photo.url !== sourceRear)
+      : product.imagenesExtra;
+    const ambient = gallery.map((photo, index) => ({ url: photo.url, caption: `Ambientación ${index + 1}`, ambient: true }));
     // Approved Tanya opening scene: the sunset table is its last uploaded image.
     if (product.id === "cmtssyq4u0006l404sytto49b" && ambient.length === 4) ambient.unshift(ambient.pop()!);
     const front = publicPhotograph(product.id, product.fotoUrl);
     const tanya = product.id === "cmtssyq4u0006l404sytto49b" && product.anio === 2021;
     const enosh = product.id === "cmtssyq4l0005l4047nx3t1lc" && product.anio === 2018;
+    const dadahBlend = product.id === "cmtssyq3k0001l404n0341dmg" && product.anio === 2023;
     if (enosh) {
       ["Una mesa al anochecer", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: res braseada con hongos"].forEach((caption, index) => {
         if (ambient[index]) ambient[index].caption = caption;
       });
       if (ambient[4]) {
-        ambient[4].caption = "La contraetiqueta original";
+        ambient[4].caption = "La contraetiqueta";
         ambient[4].ambient = false;
       }
     }
+    if (dadahBlend) {
+      ["Una mesa entre viñedos", "El ritual del servicio", "Una copa entre luz y piedra", "Maridaje sugerido: cordero y berenjena"].forEach((caption, index) => {
+        if (ambient[index]) ambient[index].caption = caption;
+      });
+    }
     return <WineDetailPage wine={{
-      name: product.nombre, title: tanya ? "Eliyah" : enosh ? "Enosh" : product.nombre,
-      eyebrow: tanya ? "TANYA · ISRAEL · 2021" : enosh ? "BY TANYA · ISRAEL · 2018" : [product.categoria, product.anio].filter(Boolean).join(" · "),
-      style: tanya ? "Cabernet Sauvignon · Reserve" : product.varietal ?? undefined,
+      name: product.nombre, title: tanya ? "Eliyah" : enosh ? "Enosh" : dadahBlend ? "Dadah" : product.nombre,
+      eyebrow: tanya ? "TANYA · ISRAEL · 2021" : enosh ? "BY TANYA · ISRAEL · 2018" : dadahBlend ? "CARMELO · ISRAEL · 2023" : [product.categoria, product.anio].filter(Boolean).join(" · "),
+      style: tanya ? "Cabernet Sauvignon · Reserve" : dadahBlend ? "Malbec–Barbera" : product.varietal ?? undefined,
       description: product.descripcion,
       commerce: { precioLista: product.precioLista, activo: product.activo },
       facts: [...additionalWineFacts(product.id, product.anio), ...details.map(([label, value]) => [String(label), String(value)])],

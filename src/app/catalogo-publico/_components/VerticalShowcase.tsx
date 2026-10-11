@@ -1,7 +1,7 @@
 import { getPublication } from "../_lib/catalog";
-import Image from "next/image";
 import Link from "next/link";
 import { orderShowcase } from "../_lib/showcase";
+import { ShowcaseBottle } from "./ShowcaseBottle";
 import styles from "../catalog.module.css";
 
 /** Native vertical page scrolling: no wheel handlers or nested scroll container.
@@ -17,10 +17,12 @@ export async function VerticalShowcase() {
       <div className={styles.showcaseIntro}><p>Desliza hacia abajo para descubrir.</p><Link href="/catalogo-publico/catalogo" className={styles.textLink}>Ir al catálogo </Link></div>
     </div>
     {showcaseWines.map((wine, index) => <article key={wine.slug} id={`descubre-${wine.slug}`} className={styles.showcaseScene} aria-labelledby={`titulo-${wine.slug}`}>
-      <div className={styles.showcaseImage}>
-        {wine.editorialHref && <Link href={wine.editorialHref} className={styles.showcaseBottleLink} aria-label={`Conocer ${wine.producer} ${wine.name} ${wine.year}`} />}
-        <Image src={`/catalogo/${wine.image}`} alt={`${wine.producer} ${wine.name} ${wine.year}, botella completa`} fill sizes="(max-width: 700px) 90vw, 48vw" className={styles.showcaseBottle} />
-      </div>
+      <ShowcaseBottle
+        src={`/catalogo/${wine.image}`}
+        alt={`${wine.producer} ${wine.name} ${wine.year}, botella completa`}
+        editorialHref={wine.editorialHref}
+        ariaLabel={`Conocer ${wine.producer} ${wine.name} ${wine.year}`}
+      />
       <div className={styles.showcaseCopy}>
         <span className={styles.eyebrow}>{String(index + 1).padStart(2, "0")} / {String(showcaseWines.length).padStart(2, "0")} <span aria-hidden="true">—</span> {wine.producer}</span>
         <h3 id={`titulo-${wine.slug}`}>{wine.name}</h3>

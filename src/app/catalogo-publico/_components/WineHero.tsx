@@ -55,10 +55,11 @@ export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name
         </div>
         {photo.ambient && <div className={styles.photoDissolve} aria-hidden="true" />}
         {photos.length > 1 && <div className={styles.photoNavigation}>
+          <button type="button" className={styles.photoArrow} aria-label="Fotografía anterior" onClick={() => show((active - 1 + photos.length) % photos.length)}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12 5-5 5 5 5" /></svg></button>
           <div className={styles.photoDots} role="group" aria-label="Elegir fotografía">
             {photos.map((item, index) => <button key={`${item.url}-${index}`} type="button" aria-label={`Ver ${item.caption}`} aria-pressed={active === index} onClick={() => show(index)}><span /></button>)}
           </div>
-          <p>Desliza para ver más</p>
+          <button type="button" className={styles.photoArrow} aria-label="Fotografía siguiente" onClick={() => show((active + 1) % photos.length)}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m8 5 5 5-5 5" /></svg></button>
         </div>}
         <p className={styles.photoAnnouncement} aria-live="polite" aria-atomic="true">{active + 1} de {photos.length}: {photo.caption}</p>
         {!photo.ambient && <button type="button" className={styles.photoEnlarge} onClick={() => {

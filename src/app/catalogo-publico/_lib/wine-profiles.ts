@@ -4,9 +4,11 @@ import { reserve2019 } from "./reserve-2019";
 import { titoraReserve2023 } from "./titora-reserve-2023";
 import type { EditorialWine } from "./editorial-wine";
 import { dadahCabernet2023 } from "./dadah-cabernet-2023";
+import { tanyaLateHarvest2024 } from "./tanya-late-harvest-2024";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
+  cmtssyq5c0008l404fkede9in: tanyaLateHarvest2024,
   cmtssyq350000l404mdg2nzou: dadahCabernet2023,
   [grandRivallonId]: grandRivallon,
   cmu3qg06j0000ic04z60he8vj: reserve2017,

@@ -54,13 +54,16 @@
 .photoSlide { position: relative; flex: 0 0 100%; min-width: 0; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
 .photoSlide > img { object-fit: cover; user-select: none; }
 .immersiveBottle > img { object-fit: contain; padding: 40px; }
-.photoNavigation { position: absolute; z-index: 2; top: 22px; left: 50%; transform: translateX(-50%); padding: 5px 14px 10px; border-radius: 24px; background: rgba(250,247,241,.9); box-shadow: 0 2px 18px rgba(25,20,15,.08); text-align: center; }
+.photoNavigation { position: absolute; z-index: 2; top: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; padding: 0 5px; border-radius: 30px; color: #42362e; isolation: isolate; }
+.photoNavigation::before { content: ""; position: absolute; inset: 7px 0; z-index: -1; border: 1px solid rgba(255,255,255,.65); border-radius: inherit; background: rgba(255,255,255,.4); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); box-shadow: 0 2px 12px rgba(30,22,15,.08); }
+.photoArrow { display: grid; place-items: center; width: 32px; height: 44px; border: 0; background: transparent; color: inherit; padding: 0; cursor: pointer; }
+.photoArrow svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.photoArrow:focus-visible { outline: 2px solid var(--burgundy); border-radius: 20px; }
 .photoDots { display: flex; justify-content: center; }
-.photoDots button { display: grid; place-items: center; width: 32px; height: 32px; border: 0; background: transparent; padding: 0; cursor: pointer; }
-.photoDots button span { display: block; width: 6px; height: 6px; border-radius: 50%; background: #aaa19a; transition: transform .2s, background .2s; }
-.photoDots button[aria-pressed="true"] span { background: var(--burgundy); transform: scale(1.4); }
+.photoDots button { display: grid; place-items: center; width: 24px; height: 44px; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.photoDots button span { display: block; width: 4px; height: 4px; border-radius: 50%; background: rgba(66,54,46,.45); transition: transform .2s, background .2s; }
+.photoDots button[aria-pressed="true"] span { background: var(--burgundy); transform: scale(1.5); }
 .photoDots button:focus-visible { outline: 2px solid var(--burgundy); border-radius: 50%; }
-.photoNavigation p { margin: 0; font-size: 10px; letter-spacing: .025em; color: #51443f; white-space: nowrap; }
 .photoAnnouncement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .photoEnlarge { position: absolute; z-index: 2; bottom: 24px; left: 50%; transform: translateX(-50%); border: 1px solid var(--line); border-radius: 30px; background: var(--cream); color: var(--ink); padding: 12px 20px; font-size: 12px !important; white-space: nowrap; }
 .photoEnlarge span { margin-left: 10px; }

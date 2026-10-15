@@ -150,6 +150,58 @@ export async function calcularResumenInventario(): Promise<
   return resumen;
 }
 
+/**
+ * Igual que calcularResumenInventario, pero separado por ubicación (bodega)
+ * además de por producto — para la vista de Stock por ubicación. El costo
+ * promedio por botella no cambia por ubicación: una botella cuesta lo mismo
+ * esté donde esté, así que ese número se sigue sacando de
+ * calcularResumenInventario (global).
+ *
+ * Los movimientos de antes de que existieran las ubicaciones no tienen
+ * ubicacionId (quedan en null) — por eso no aparecen en ninguna bodega
+ * específica, solo en el consolidado, hasta que Isaac haga un conteo físico
+ * por bodega y los registre con su ubicación.
+ */
+export async function calcularStockPorUbicacion(): Promise<
+  Map<string, Map<string | null, number>>
+> {
+  const [entradas, salidas, ajustes] = await Promise.all([
+    prisma.entradaLinea.findMany({
+      where: { recibida: true },
+      select: { productoId: true, ubicacionId: true, cajasRecibidas: true, piezasPorCaja: true, botellasExtra: true },
+    }),
+    prisma.salida.findMany({ select: { productoId: true, ubicacionId: true, botellas: true } }),
+    prisma.ajusteStock.findMany({ select: { productoId: true, ubicacionId: true, botellas: true } }),
+  ]);
+
+  const mapa = new Map<string, Map<string | null, number>>();
+  function sumar(productoId: string, ubicacionId: string | null, delta: number) {
+    const porProducto = mapa.get(productoId) ?? new Map<string | null, number>();
+    porProducto.set(ubicacionId, (porProducto.get(ubicacionId) ?? 0) + delta);
+    mapa.set(productoId, porProducto);
+  }
+
+  for (const e of entradas) {
+    sumar(e.productoId, e.ubicacionId, e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra);
+  }
+  for (const s of salidas) {
+    sumar(s.productoId, s.ubicacionId, -s.botellas);
+  }
+  for (const a of ajustes) {
+    sumar(a.productoId, a.ubicacionId, a.botellas);
+  }
+
+  return mapa;
+}
+
+export function stockEnUbicacion(
+  mapa: Map<string, Map<string | null, number>>,
+  productoId: string,
+  ubicacionId: string | null,
+): number {
+  return mapa.get(productoId)?.get(ubicacionId) ?? 0;
+}
+
 export type ResumenSocio = {
   socioId: string;
   nombre: string;
@@ -557,10 +609,10 @@ export async function calcularMovimientosStock(limite?: number): Promise<Movimie
   const [entradas, salidas, ajustes] = await Promise.all([
     prisma.entradaLinea.findMany({
       where: { recibida: true },
-      include: { producto: true, pedido: true },
+      include: { producto: true, pedido: true, ubicacion: true },
     }),
-    prisma.salida.findMany({ include: { producto: true } }),
-    prisma.ajusteStock.findMany({ include: { producto: true, socio: true } }),
+    prisma.salida.findMany({ include: { producto: true, ubicacion: true } }),
+    prisma.ajusteStock.findMany({ include: { producto: true, socio: true, ubicacion: true } }),
   ]);
 
   const movimientos: MovimientoStock[] = [];
@@ -573,7 +625,7 @@ export async function calcularMovimientosStock(limite?: number): Promise<Movimie
       signo: 1,
       botellas: Math.round(e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra),
       producto: e.producto.nombre,
-      detalle: `Pedido ${e.pedido.folio}`,
+      detalle: `Pedido ${e.pedido.folio}${e.ubicacion ? ` · ${e.ubicacion.nombre}` : ""}`,
       href: `/pedidos/${e.pedidoId}`,
     });
   }
@@ -586,7 +638,7 @@ export async function calcularMovimientosStock(limite?: number): Promise<Movimie
       signo: -1,
       botellas: s.botellas,
       producto: s.producto.nombre,
-      detalle: s.motivo,
+      detalle: `${s.motivo}${s.ubicacion ? ` · ${s.ubicacion.nombre}` : ""}`,
       href: s.ordenId ? `/ordenes/${s.ordenId}` : null,
     });
   }
@@ -599,7 +651,7 @@ export async function calcularMovimientosStock(limite?: number): Promise<Movimie
       signo: a.botellas >= 0 ? 1 : -1,
       botellas: Math.abs(a.botellas),
       producto: a.producto.nombre,
-      detalle: a.motivo || (a.socio ? `Se las llevó ${a.socio.nombre}` : "Ajuste de inventario"),
+      detalle: `${a.motivo || (a.socio ? `Se las llevó ${a.socio.nombre}` : "Ajuste de inventario")}${a.ubicacion ? ` · ${a.ubicacion.nombre}` : ""}`,
       href: `/stock/${a.productoId}/ajustar`,
     });
   }

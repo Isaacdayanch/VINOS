@@ -25,10 +25,12 @@ export default async function DetallePedidoPage({
   const { id } = await params;
   const sp = await searchParams;
   const nuevoProducto = typeof sp.nuevoProducto === "string" ? sp.nuevoProducto : undefined;
-  const [pedido, productos, socios, pagos] = await Promise.all([
+  const [pedido, productos, socios, pagos, ubicaciones] = await Promise.all([
     prisma.pedido.findUnique({
       where: { id },
-      include: { entradas: { include: { producto: true }, orderBy: { createdAt: "asc" } } },
+      include: {
+        entradas: { include: { producto: true, ubicacion: true }, orderBy: { createdAt: "asc" } },
+      },
     }),
     prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.socio.findMany(),
@@ -37,6 +39,7 @@ export default async function DetallePedidoPage({
       include: { socio: true },
       orderBy: { fecha: "desc" },
     }),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
   if (!pedido) notFound();
 
@@ -262,6 +265,9 @@ export default async function DetallePedidoPage({
               costoPorCaja={l.costoPorCaja}
               recibida={l.recibida}
               costoPorBotellaMXN={costosPorEntrada.get(l.id)}
+              ubicacion={l.ubicacion?.nombre ?? null}
+              ubicaciones={ubicaciones}
+              ubicacionIdInicial={l.ubicacionId}
               actualizarAction={actualizar}
               marcarRecibidaAction={marcarRecibida}
               desmarcarAction={desmarcar}
@@ -278,15 +284,26 @@ export default async function DetallePedidoPage({
 
       <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-4">
         <p className="text-sm font-medium">+ Agregar producto al pedido</p>
-        <AgregarLineaPedidoForm
-          action={agregarLinea}
-          productos={productos}
-          nuevoHref={`/productos/nuevo?volver=${encodeURIComponent(`/pedidos/${pedido.id}`)}${
-            pedido.proveedor ? `&proveedor=${encodeURIComponent(pedido.proveedor)}` : ""
-          }`}
-          seleccionInicial={nuevoProducto}
-          hoy={hoy}
-        />
+        {ubicaciones.length === 0 ? (
+          <p className="text-sm text-warn">
+            Primero necesitas crear al menos una ubicación.{" "}
+            <Link href="/stock/ubicaciones" className="underline">
+              Créala aquí
+            </Link>
+            .
+          </p>
+        ) : (
+          <AgregarLineaPedidoForm
+            action={agregarLinea}
+            productos={productos}
+            nuevoHref={`/productos/nuevo?volver=${encodeURIComponent(`/pedidos/${pedido.id}`)}${
+              pedido.proveedor ? `&proveedor=${encodeURIComponent(pedido.proveedor)}` : ""
+            }`}
+            seleccionInicial={nuevoProducto}
+            hoy={hoy}
+            ubicaciones={ubicaciones}
+          />
+        )}
         {productos.length === 0 && (
           <p className="text-sm text-warn">
             Todavía no tienes productos.{" "}

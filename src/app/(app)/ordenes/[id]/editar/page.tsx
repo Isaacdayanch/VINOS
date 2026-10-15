@@ -13,12 +13,13 @@ export default async function EditarOrdenPage({
 }: PageProps<"/ordenes/[id]/editar">) {
   const { id } = await params;
 
-  const [orden, clientes, productos, preciosGuardados, resumen] = await Promise.all([
+  const [orden, clientes, productos, preciosGuardados, resumen, ubicaciones] = await Promise.all([
     prisma.orden.findUnique({ where: { id }, include: { lineas: true } }),
     prisma.cliente.findMany({ orderBy: { nombre: "asc" } }),
     prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.precioClienteProducto.findMany(),
     calcularResumenInventario(),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
   if (!orden) notFound();
 
@@ -63,6 +64,8 @@ export default async function EditarOrdenPage({
         stockPorProducto={stockPorProducto}
         clienteIdInicial={orden.clienteId}
         fechaInicial={orden.fecha.toISOString().slice(0, 10)}
+        ubicaciones={ubicaciones}
+        ubicacionIdInicial={orden.ubicacionId}
         lineasIniciales={orden.lineas.map((l) => ({
           productoId: l.productoId,
           cantidadBotellas: l.cantidadBotellas,

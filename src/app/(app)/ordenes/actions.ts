@@ -27,9 +27,10 @@ type LineaForm = {
 export async function crearOrden(formData: FormData) {
   const clienteId = String(formData.get("clienteId") ?? "");
   const fecha = String(formData.get("fecha") ?? "");
+  const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
   const lineasJson = String(formData.get("lineas") ?? "[]");
 
-  if (!clienteId || !fecha) {
+  if (!clienteId || !fecha || !ubicacionId) {
     throw new Error("Faltan datos de la orden");
   }
 
@@ -49,6 +50,7 @@ export async function crearOrden(formData: FormData) {
       folio,
       fecha: new Date(fecha),
       clienteId,
+      ubicacionId,
       estatus: "Surtida - pendiente de pago",
     },
   });
@@ -80,6 +82,7 @@ export async function crearOrden(formData: FormData) {
           botellas: l.cantidadBotellas,
           motivo: "Venta",
           ordenId: orden.id,
+          ubicacionId,
         },
       });
     }
@@ -106,9 +109,10 @@ export async function crearOrden(formData: FormData) {
 export async function actualizarOrden(ordenId: string, formData: FormData) {
   const clienteId = String(formData.get("clienteId") ?? "");
   const fecha = String(formData.get("fecha") ?? "");
+  const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
   const lineasJson = String(formData.get("lineas") ?? "[]");
 
-  if (!clienteId || !fecha) {
+  if (!clienteId || !fecha || !ubicacionId) {
     throw new Error("Faltan datos de la orden");
   }
 
@@ -132,7 +136,7 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
 
   await prisma.orden.update({
     where: { id: ordenId },
-    data: { clienteId, fecha: new Date(fecha) },
+    data: { clienteId, fecha: new Date(fecha), ubicacionId },
   });
 
   for (const l of lineas) {
@@ -160,6 +164,7 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
           botellas: l.cantidadBotellas,
           motivo: "Venta",
           ordenId,
+          ubicacionId,
         },
       });
     }
@@ -186,7 +191,10 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
 }
 
 export async function marcarLineaEntregada(ordenLineaId: string, ordenId: string) {
-  const linea = await prisma.ordenLinea.findUnique({ where: { id: ordenLineaId } });
+  const [linea, orden] = await Promise.all([
+    prisma.ordenLinea.findUnique({ where: { id: ordenLineaId } }),
+    prisma.orden.findUnique({ where: { id: ordenId }, select: { ubicacionId: true } }),
+  ]);
   if (!linea || linea.entregado) return;
 
   const resumen = await calcularResumenInventario();
@@ -201,6 +209,7 @@ export async function marcarLineaEntregada(ordenLineaId: string, ordenId: string
         motivo: "Venta",
         costoUnitario,
         ordenId,
+        ubicacionId: orden?.ubicacionId,
         notas: "Entrega de línea marcada como pendiente al vender",
       },
     }),

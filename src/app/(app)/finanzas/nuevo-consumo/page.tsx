@@ -6,10 +6,11 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function NuevoConsumoPersonalPage() {
-  const [productos, socios, resumen] = await Promise.all([
+  const [productos, socios, resumen, ubicaciones] = await Promise.all([
     prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.socio.findMany(),
     calcularResumenInventario(),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
   const hoy = new Date().toISOString().slice(0, 10);
   const costoPorProducto: Record<string, number> = {};
@@ -30,12 +31,23 @@ export default async function NuevoConsumoPersonalPage() {
         </p>
       </div>
 
-      <ConsumoPersonalForm
-        productos={productos}
-        socios={socios}
-        costoPorProducto={costoPorProducto}
-        hoy={hoy}
-      />
+      {ubicaciones.length === 0 ? (
+        <p className="text-sm text-warn">
+          Primero necesitas crear al menos una ubicación.{" "}
+          <Link href="/stock/ubicaciones" className="underline">
+            Créala aquí
+          </Link>
+          .
+        </p>
+      ) : (
+        <ConsumoPersonalForm
+          productos={productos}
+          socios={socios}
+          costoPorProducto={costoPorProducto}
+          hoy={hoy}
+          ubicaciones={ubicaciones}
+        />
+      )}
     </div>
   );
 }

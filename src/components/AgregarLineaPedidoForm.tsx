@@ -10,6 +10,7 @@ type ProductoOpcion = {
   fotoUrl: string | null;
   piezasPorCaja: number;
 };
+type Ubicacion = { id: string; nombre: string };
 
 export function AgregarLineaPedidoForm({
   action,
@@ -17,12 +18,14 @@ export function AgregarLineaPedidoForm({
   nuevoHref,
   seleccionInicial,
   hoy,
+  ubicaciones,
 }: {
   action: (formData: FormData) => void;
   productos: ProductoOpcion[];
   nuevoHref: string;
   seleccionInicial?: string;
   hoy: string;
+  ubicaciones: Ubicacion[];
 }) {
   const inicial =
     productos.find((p) => p.id === seleccionInicial) ?? productos[0] ?? null;
@@ -46,6 +49,22 @@ export function AgregarLineaPedidoForm({
       />
 
       <DateField name="fecha" label="Fecha en que lo apartaste" defaultValue={hoy} />
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">¿A cuál bodega llega?</span>
+        <select
+          name="ubicacionId"
+          defaultValue={ubicaciones[0]?.id ?? ""}
+          required
+          className="rounded-md border border-border bg-surface px-3 py-2"
+        >
+          {ubicaciones.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.nombre}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">Costo por botella (USD)</span>

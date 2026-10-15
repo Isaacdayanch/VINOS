@@ -12,12 +12,13 @@ export default async function ReplicarOrdenPage({
 }: PageProps<"/ordenes/[id]/replicar">) {
   const { id } = await params;
 
-  const [orden, clientes, productos, preciosGuardados, resumen] = await Promise.all([
+  const [orden, clientes, productos, preciosGuardados, resumen, ubicaciones] = await Promise.all([
     prisma.orden.findUnique({ where: { id }, include: { lineas: true } }),
     prisma.cliente.findMany({ orderBy: { nombre: "asc" } }),
     prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
     prisma.precioClienteProducto.findMany(),
     calcularResumenInventario(),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
   if (!orden) notFound();
 
@@ -52,6 +53,8 @@ export default async function ReplicarOrdenPage({
         esUltimoPrecio={esUltimoPrecio}
         stockPorProducto={stockPorProducto}
         clienteIdInicial={orden.clienteId}
+        ubicaciones={ubicaciones}
+        ubicacionIdInicial={orden.ubicacionId}
         lineasIniciales={orden.lineas.map((l) => ({
           productoId: l.productoId,
           cantidadBotellas: l.cantidadBotellas,

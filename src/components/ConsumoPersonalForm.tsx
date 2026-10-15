@@ -8,6 +8,7 @@ import { formatoMXN } from "@/lib/costeo";
 
 type Producto = { id: string; nombre: string; fotoUrl: string | null; piezasPorCaja: number };
 type Socio = { id: string; nombre: string };
+type Ubicacion = { id: string; nombre: string };
 
 export function ConsumoPersonalForm({
   productos,
@@ -17,6 +18,7 @@ export function ConsumoPersonalForm({
   initial,
   action,
   botonTexto = "Registrar",
+  ubicaciones,
 }: {
   productos: Producto[];
   socios: Socio[];
@@ -30,9 +32,11 @@ export function ConsumoPersonalForm({
     montoRepuesto: number | null;
     cuentaRepuesto: "EFECTIVO" | "CUENTA" | null;
     notas: string | null;
+    ubicacionId?: string | null;
   };
   action?: (formData: FormData) => void;
   botonTexto?: string;
+  ubicaciones: Ubicacion[];
 }) {
   const [productoId, setProductoId] = useState(initial?.productoId ?? "");
   const [botellas, setBotellas] = useState<number | "">(initial?.botellas ?? 1);
@@ -61,6 +65,22 @@ export function ConsumoPersonalForm({
       />
 
       <DateField name="fecha" label="Fecha" defaultValue={initial?.fecha ?? hoy} />
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">¿De cuál bodega sale?</span>
+        <select
+          name="ubicacionId"
+          defaultValue={initial?.ubicacionId ?? ubicaciones[0]?.id ?? ""}
+          required
+          className="rounded-md border border-border bg-surface px-3 py-2"
+        >
+          {ubicaciones.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.nombre}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">Botellas</span>

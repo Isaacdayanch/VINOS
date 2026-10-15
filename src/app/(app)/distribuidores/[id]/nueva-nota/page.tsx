@@ -12,10 +12,11 @@ export default async function NuevaNotaConsignacionPage({
 }: PageProps<"/distribuidores/[id]/nueva-nota">) {
   const { id } = await params;
 
-  const [distribuidor, productos, resumen] = await Promise.all([
+  const [distribuidor, productos, resumen, ubicaciones] = await Promise.all([
     prisma.distribuidor.findUnique({ where: { id } }),
     prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
     calcularResumenInventario(),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
   if (!distribuidor) notFound();
 
@@ -47,8 +48,21 @@ export default async function NuevaNotaConsignacionPage({
           </Link>
           .
         </p>
+      ) : ubicaciones.length === 0 ? (
+        <p className="text-sm text-warn">
+          Primero necesitas crear al menos una ubicación.{" "}
+          <Link href="/stock/ubicaciones" className="underline">
+            Créala aquí
+          </Link>
+          .
+        </p>
       ) : (
-        <NotaConsignacionForm productos={productos} stockPorProducto={stockPorProducto} action={crear} />
+        <NotaConsignacionForm
+          productos={productos}
+          stockPorProducto={stockPorProducto}
+          action={crear}
+          ubicaciones={ubicaciones}
+        />
       )}
     </div>
   );

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import {
   calcularResumenInventario,
+  calcularStockPorUbicacion,
+  stockEnUbicacion,
   formatearCajasYBotellas,
   formatoMXN,
 } from "@/lib/costeo";
@@ -8,16 +10,31 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function StockPage() {
-  const [productos, resumen] = await Promise.all([
+export default async function StockPage({ searchParams }: PageProps<"/stock">) {
+  const sp = await searchParams;
+  const ubicacionSeleccionada = typeof sp.ubicacion === "string" ? sp.ubicacion : null;
+
+  const [productos, resumen, ubicaciones, stockPorUbicacion] = await Promise.all([
     prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     calcularResumenInventario(),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
+    calcularStockPorUbicacion(),
   ]);
+
+  const ubicacionActual = ubicaciones.find((u) => u.id === ubicacionSeleccionada) ?? null;
+  const consolidado = !ubicacionActual;
 
   const valorTotal = [...resumen.values()].reduce(
     (acc, r) => acc + r.valorInventario,
     0,
   );
+  const valorEnUbicacion = ubicacionActual
+    ? [...resumen.values()].reduce(
+        (acc, r) =>
+          acc + stockEnUbicacion(stockPorUbicacion, r.productoId, ubicacionActual.id) * r.costoPromedioPorBotella,
+        0,
+      )
+    : 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -25,7 +42,9 @@ export default async function StockPage() {
         <div>
           <h1 className="text-2xl font-bold text-wine">Stock</h1>
           <p className="text-muted text-sm">
-            Valor total del inventario: {formatoMXN(valorTotal)}
+            {consolidado
+              ? `Valor total del inventario: ${formatoMXN(valorTotal)}`
+              : `Valor del inventario en ${ubicacionActual.nombre}: ${formatoMXN(valorEnUbicacion)}`}
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
@@ -46,6 +65,41 @@ export default async function StockPage() {
         </div>
       </div>
 
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
+          <Link
+            href="/stock"
+            className={`rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap ${
+              consolidado ? "bg-wine text-white" : "bg-surface border border-border text-muted"
+            }`}
+          >
+            Consolidado
+          </Link>
+          {ubicaciones.map((u) => (
+            <Link
+              key={u.id}
+              href={`/stock?ubicacion=${u.id}`}
+              className={`rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap ${
+                ubicacionActual?.id === u.id ? "bg-wine text-white" : "bg-surface border border-border text-muted"
+              }`}
+            >
+              {u.nombre}
+            </Link>
+          ))}
+        </div>
+        <Link href="/stock/ubicaciones" className="text-xs text-wine underline whitespace-nowrap">
+          Editar ubicaciones
+        </Link>
+      </div>
+
+      {!consolidado && (
+        <p className="text-xs text-muted -mt-2">
+          Solo se cuentan los movimientos que ya se registraron con esta ubicación. Lo que
+          entró o salió antes de tener ubicaciones sigue sumando al Consolidado, pero no
+          aparece aquí.
+        </p>
+      )}
+
       <Link
         href="/productos"
         className="rounded-lg border border-border bg-surface p-4 flex items-center justify-between gap-3 hover:bg-wine-light/40"
@@ -60,9 +114,11 @@ export default async function StockPage() {
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {productos.map((p) => {
           const r = resumen.get(p.id);
-          const stock = r?.stockActual ?? 0;
+          const stock = consolidado
+            ? r?.stockActual ?? 0
+            : stockEnUbicacion(stockPorUbicacion, p.id, ubicacionActual.id);
           const minimo = p.stockMinimo ?? 8;
-          const bajo = stock <= minimo;
+          const bajo = consolidado && stock <= minimo;
           return (
             <div key={p.id} className="p-4 flex items-center gap-3 hover:bg-wine-light/40">
               <Link href={`/productos/${p.id}/editar`} className="flex items-center gap-3 flex-1 min-w-0">
@@ -87,7 +143,7 @@ export default async function StockPage() {
                 </p>
                 {bajo && <p className="text-xs text-warn">⚠ Reponer</p>}
                 <Link
-                  href={`/stock/${p.id}/ajustar`}
+                  href={`/stock/${p.id}/ajustar${ubicacionActual ? `?ubicacion=${ubicacionActual.id}` : ""}`}
                   className="text-xs text-wine underline whitespace-nowrap"
                 >
                   Ajustar

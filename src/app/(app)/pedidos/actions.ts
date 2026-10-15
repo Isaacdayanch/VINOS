@@ -86,8 +86,9 @@ export async function agregarLineaPedido(pedidoId: string, formData: FormData) {
   const cajasRecibidas = Number(formData.get("cajasRecibidas"));
   const costoPorCaja = Number(formData.get("costoPorCaja"));
   const piezasPorCajaForm = numeroOpcional(formData.get("piezasPorCaja"));
+  const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
 
-  if (!productoId || !fecha || !cajasRecibidas || !costoPorCaja) {
+  if (!productoId || !fecha || !cajasRecibidas || !costoPorCaja || !ubicacionId) {
     throw new Error("Faltan datos para agregar el producto al pedido");
   }
 
@@ -103,6 +104,7 @@ export async function agregarLineaPedido(pedidoId: string, formData: FormData) {
       cajasRecibidas,
       piezasPorCaja: piezasPorCajaForm ?? producto.piezasPorCaja,
       costoPorCaja,
+      ubicacionId,
       recibida: false,
     },
   });
@@ -161,14 +163,15 @@ export async function actualizarLineaPedido(
   const piezasPorCaja = Number(formData.get("piezasPorCaja"));
   const costoPorCaja = Number(formData.get("costoPorCaja"));
   const botellasExtra = Math.trunc(Number(formData.get("botellasExtra") ?? 0));
+  const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
 
-  if (!fecha || !cajasRecibidas || !piezasPorCaja || !costoPorCaja) {
+  if (!fecha || !cajasRecibidas || !piezasPorCaja || !costoPorCaja || !ubicacionId) {
     throw new Error("Faltan datos para editar el producto del pedido");
   }
 
   const linea = await prisma.entradaLinea.update({
     where: { id: entradaLineaId },
-    data: { fecha: new Date(fecha), cajasRecibidas, piezasPorCaja, costoPorCaja, botellasExtra },
+    data: { fecha: new Date(fecha), cajasRecibidas, piezasPorCaja, costoPorCaja, botellasExtra, ubicacionId },
   });
   await sincronizarActivoPorStock(linea.productoId);
 

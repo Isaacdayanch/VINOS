@@ -12,11 +12,12 @@ export default async function EditarConsumoPersonalPage({
 }: PageProps<"/finanzas/consumo-personal/[id]/editar">) {
   const { id } = await params;
 
-  const [salida, productos, socios, resumen] = await Promise.all([
+  const [salida, productos, socios, resumen, ubicaciones] = await Promise.all([
     prisma.salida.findUnique({ where: { id } }),
     prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.socio.findMany(),
     calcularResumenInventario(),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
   if (!salida || salida.motivo !== "Consumo personal") notFound();
 
@@ -49,9 +50,11 @@ export default async function EditarConsumoPersonalPage({
           montoRepuesto: salida.montoRepuesto,
           cuentaRepuesto: salida.cuentaRepuesto,
           notas: salida.notas,
+          ubicacionId: salida.ubicacionId,
         }}
         action={guardar}
         botonTexto="Guardar cambios"
+        ubicaciones={ubicaciones}
       />
     </div>
   );

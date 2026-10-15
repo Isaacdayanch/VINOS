@@ -8,16 +8,19 @@ export function AjusteStockForm({
   action,
   stockSistema,
   socios,
+  ubicacionIdInicial,
 }: {
   action: (formData: FormData) => void;
   stockSistema: number;
   socios: Socio[];
+  ubicacionIdInicial: string;
 }) {
   const [cantidadReal, setCantidadReal] = useState<number | "">(stockSistema);
   const faltan = cantidadReal !== "" && cantidadReal < stockSistema;
 
   return (
     <form action={action} className="flex flex-col gap-4">
+      <input type="hidden" name="ubicacionId" value={ubicacionIdInicial} />
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">¿Cuántas botellas tienes en realidad?</span>
         <input

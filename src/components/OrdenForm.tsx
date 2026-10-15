@@ -9,6 +9,7 @@ import { DateField } from "@/components/DateField";
 
 type Cliente = { id: string; nombre: string; codigo?: string | null };
 type Producto = { id: string; nombre: string; fotoUrl: string | null; piezasPorCaja: number };
+type Ubicacion = { id: string; nombre: string };
 type Unidad = "BOTELLAS" | "CAJAS";
 type Linea = {
   key: string;
@@ -48,6 +49,8 @@ export function OrdenForm({
   clienteIdInicial,
   fechaInicial,
   lineasIniciales,
+  ubicaciones,
+  ubicacionIdInicial,
   action,
   botonTexto = "Crear orden",
 }: {
@@ -67,6 +70,8 @@ export function OrdenForm({
     entregado?: boolean;
     fechaEstimada?: string | null;
   }[];
+  ubicaciones: Ubicacion[];
+  ubicacionIdInicial?: string | null;
   action?: (formData: FormData) => void;
   botonTexto?: string;
 }) {
@@ -184,6 +189,22 @@ export function OrdenForm({
     <form action={action ?? crearOrden} className="flex flex-col gap-4">
       <input type="hidden" name="fecha" value={fecha} />
       <input type="hidden" name="lineas" value={JSON.stringify(lineasParaEnviar)} />
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">¿De cuál bodega sale?</span>
+        <select
+          name="ubicacionId"
+          defaultValue={ubicacionIdInicial ?? ubicaciones[0]?.id ?? ""}
+          required
+          className="rounded-md border border-border bg-surface px-3 py-2"
+        >
+          {ubicaciones.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.nombre}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <div className="flex flex-col gap-1 text-sm">
         {clientes.length > 0 && (

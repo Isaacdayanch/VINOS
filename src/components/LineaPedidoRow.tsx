@@ -4,6 +4,8 @@ import { useState } from "react";
 import { DateField } from "@/components/DateField";
 import { formatoMXN } from "@/lib/costeo";
 
+type Ubicacion = { id: string; nombre: string };
+
 export function LineaPedidoRow({
   producto,
   fecha,
@@ -13,6 +15,9 @@ export function LineaPedidoRow({
   costoPorCaja: costoInicial,
   recibida,
   costoPorBotellaMXN,
+  ubicacion,
+  ubicaciones,
+  ubicacionIdInicial,
   actualizarAction,
   marcarRecibidaAction,
   desmarcarAction,
@@ -26,6 +31,9 @@ export function LineaPedidoRow({
   costoPorCaja: number;
   recibida: boolean;
   costoPorBotellaMXN?: number;
+  ubicacion: string | null;
+  ubicaciones: Ubicacion[];
+  ubicacionIdInicial: string | null;
   actualizarAction: (formData: FormData) => Promise<void>;
   marcarRecibidaAction: (formData: FormData) => void;
   desmarcarAction: (formData: FormData) => void;
@@ -106,6 +114,21 @@ export function LineaPedidoRow({
             </label>
           </div>
           <label className="flex flex-col gap-1 text-sm">
+            <span className="font-medium">¿A cuál bodega llega?</span>
+            <select
+              name="ubicacionId"
+              defaultValue={ubicacionIdInicial ?? ubicaciones[0]?.id ?? ""}
+              required
+              className="rounded-md border border-border bg-surface px-3 py-2"
+            >
+              {ubicaciones.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
             <span className="font-medium">Botellas de más (+) o de menos (−)</span>
             <input
               name="botellasExtra"
@@ -165,6 +188,7 @@ export function LineaPedidoRow({
           ${(costoInicial / piezasInicial).toFixed(2)} USD/botella · Total: $
           {(cajasInicial * costoInicial).toLocaleString("es-MX")} USD
         </p>
+        <p className="text-xs text-muted">{ubicacion ?? "Sin bodega asignada"}</p>
       </div>
       <div className="flex flex-col items-end gap-1">
         {recibida && costoPorBotellaMXN != null && (

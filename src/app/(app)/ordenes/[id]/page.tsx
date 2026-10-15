@@ -17,6 +17,7 @@ export default async function DetalleOrdenPage({
       lineas: { include: { producto: true } },
       cliente: true,
       cobros: { orderBy: { fecha: "desc" } },
+      ubicacion: true,
     },
   });
   if (!orden) notFound();
@@ -46,6 +47,7 @@ export default async function DetalleOrdenPage({
           <p className="text-muted text-sm">
             {orden.cliente.nombre.replace("Cliente Especial - ", "")} ·{" "}
             {pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
+            {orden.ubicacion ? ` · ${orden.ubicacion.nombre}` : ""}
           </p>
           <div className="flex flex-wrap gap-3">
             <Link

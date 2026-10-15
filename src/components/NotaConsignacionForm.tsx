@@ -11,6 +11,7 @@ type Producto = {
   precioDistribuidor: number | null;
 };
 type Unidad = "BOTELLAS" | "CAJAS";
+type Ubicacion = { id: string; nombre: string };
 type Linea = {
   key: string;
   productoId: string;
@@ -36,11 +37,13 @@ export function NotaConsignacionForm({
   stockPorProducto,
   action,
   fechaInicial,
+  ubicaciones,
 }: {
   productos: Producto[];
   stockPorProducto?: Record<string, number>;
   action: (formData: FormData) => void;
   fechaInicial?: string;
+  ubicaciones: Ubicacion[];
 }) {
   const [fecha] = useState(fechaInicial ?? (() => new Date().toISOString().slice(0, 10))());
   const [lineas, setLineas] = useState<Linea[]>([lineaVacia()]);
@@ -96,6 +99,22 @@ export function NotaConsignacionForm({
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="fecha" value={fecha} />
       <input type="hidden" name="lineas" value={JSON.stringify(lineasParaEnviar)} />
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">¿De cuál bodega sale?</span>
+        <select
+          name="ubicacionId"
+          defaultValue={ubicaciones[0]?.id ?? ""}
+          required
+          className="rounded-md border border-border bg-surface px-3 py-2"
+        >
+          {ubicaciones.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.nombre}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <div className="flex flex-col gap-3">
         <p className="text-sm font-medium">Vinos que le das en consignación</p>

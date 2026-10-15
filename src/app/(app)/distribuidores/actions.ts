@@ -49,10 +49,11 @@ type LineaForm = { productoId: string; cantidadBotellas: number; precioUnitario:
 
 export async function crearNotaConsignacion(distribuidorId: string, formData: FormData) {
   const fecha = String(formData.get("fecha") ?? "");
+  const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
   const lineasJson = String(formData.get("lineas") ?? "[]");
 
-  if (!fecha) {
-    throw new Error("Falta la fecha de la nota");
+  if (!fecha || !ubicacionId) {
+    throw new Error("Falta la fecha o la bodega de la nota");
   }
 
   const lineas: LineaForm[] = JSON.parse(lineasJson).filter(
@@ -67,7 +68,7 @@ export async function crearNotaConsignacion(distribuidorId: string, formData: Fo
   const folio = await siguienteFolioConsignacion();
 
   const nota = await prisma.notaConsignacion.create({
-    data: { folio, fecha: new Date(fecha), distribuidorId },
+    data: { folio, fecha: new Date(fecha), distribuidorId, ubicacionId },
   });
 
   for (const l of lineas) {
@@ -90,6 +91,7 @@ export async function crearNotaConsignacion(distribuidorId: string, formData: Fo
         botellas: l.cantidadBotellas,
         motivo: "Consignación",
         notaConsignacionId: nota.id,
+        ubicacionId,
       },
     });
   }

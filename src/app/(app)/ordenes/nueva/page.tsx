@@ -7,13 +7,14 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function NuevaOrdenPage() {
-  const [clientes, productos, preciosGuardados, resumen] = await Promise.all([
+  const [clientes, productos, preciosGuardados, resumen, ubicaciones] = await Promise.all([
     prisma.cliente.findMany({ orderBy: { nombre: "asc" } }),
     // Se incluyen también los inactivos (sin stock): así puedes ir vendiendo lo
     // que todavía no llega y marcarlo como "pendiente de surtir" en la línea.
     prisma.producto.findMany({ orderBy: { nombre: "asc" } }),
     prisma.precioClienteProducto.findMany(),
     calcularResumenInventario(),
+    prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
   ]);
 
   const { preciosPorClienteProducto, categoriaPorCliente, esUltimoPrecio } = construirDatosPrecios(
@@ -46,6 +47,14 @@ export default async function NuevaOrdenPage() {
           </Link>
           .
         </p>
+      ) : ubicaciones.length === 0 ? (
+        <p className="text-sm text-warn">
+          Primero necesitas crear al menos una ubicación.{" "}
+          <Link href="/stock/ubicaciones" className="underline">
+            Créala aquí
+          </Link>
+          .
+        </p>
       ) : (
         <OrdenForm
           clientes={clientes}
@@ -54,6 +63,7 @@ export default async function NuevaOrdenPage() {
           categoriaPorCliente={categoriaPorCliente}
           esUltimoPrecio={esUltimoPrecio}
           stockPorProducto={stockPorProducto}
+          ubicaciones={ubicaciones}
         />
       )}
     </div>

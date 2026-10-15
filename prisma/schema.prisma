@@ -33,6 +33,19 @@ enum OrigenPago {
   REINVERSION // dinero que ya estaba guardado en Caja/Cuenta, de ventas pasadas
 }
 
+model Ubicacion {
+  id        String   @id @default(cuid())
+  nombre    String
+  direccion String?
+  createdAt DateTime @default(now())
+
+  entradas          EntradaLinea[]
+  salidas           Salida[]
+  ajustesStock      AjusteStock[]
+  ordenes           Orden[]
+  notasConsignacion NotaConsignacion[]
+}
+
 model Producto {
   id                    String   @id @default(cuid())
   nombre                String
@@ -74,10 +87,12 @@ model AjusteStock {
   costoUnitario Float // costo promedio del producto al momento del ajuste
   motivo        String? // nota libre, ej. "Conteo físico de septiembre"
   socioId       String? // solo si botellas<0: se le carga a este socio como consumo personal (null = pérdida del negocio)
+  ubicacionId   String? // en qué bodega se hizo el conteo físico
   createdAt     DateTime @default(now())
 
-  producto Producto @relation(fields: [productoId], references: [id])
-  socio    Socio?   @relation(fields: [socioId], references: [id])
+  producto  Producto   @relation(fields: [productoId], references: [id])
+  socio     Socio?     @relation(fields: [socioId], references: [id])
+  ubicacion Ubicacion? @relation(fields: [ubicacionId], references: [id])
 }
 
 model ProductoImagenExtra {
@@ -171,23 +186,27 @@ model EntradaLinea {
   botellasExtra  Int      @default(0) // ajuste con signo: + botellas sueltas de más, - si llegaron de menos
   costoPorCaja   Float // dólares
   recibida       Boolean  @default(false) // false = apartado con el proveedor, aún no llega físicamente
+  ubicacionId    String? // a qué bodega llegó esta mercancía
   createdAt      DateTime @default(now())
 
-  pedido   Pedido   @relation(fields: [pedidoId], references: [id])
-  producto Producto @relation(fields: [productoId], references: [id])
+  pedido    Pedido     @relation(fields: [pedidoId], references: [id])
+  producto  Producto   @relation(fields: [productoId], references: [id])
+  ubicacion Ubicacion? @relation(fields: [ubicacionId], references: [id])
 }
 
 model Orden {
-  id        String   @id @default(cuid())
-  folio     String   @unique
-  fecha     DateTime
-  clienteId String
-  estatus   String   @default("Cotización")
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  folio       String   @unique
+  fecha       DateTime
+  clienteId   String
+  estatus     String   @default("Cotización")
+  ubicacionId String? // de qué bodega sale toda la orden
+  createdAt   DateTime @default(now())
 
-  cliente Cliente      @relation(fields: [clienteId], references: [id])
-  lineas  OrdenLinea[]
-  cobros  Cobro[]
+  cliente   Cliente      @relation(fields: [clienteId], references: [id])
+  ubicacion Ubicacion?   @relation(fields: [ubicacionId], references: [id])
+  lineas    OrdenLinea[]
+  cobros    Cobro[]
 }
 
 model OrdenLinea {
@@ -218,11 +237,13 @@ model Salida {
   cuentaRepuesto     Cuenta? // dónde repuso el dinero (si montoRepuesto tiene valor)
   ordenId            String?
   notaConsignacionId String?
+  ubicacionId        String? // de qué bodega salió físicamente
   notas              String?
   createdAt          DateTime @default(now())
 
-  producto Producto @relation(fields: [productoId], references: [id])
-  socio    Socio?   @relation(fields: [socioId], references: [id])
+  producto  Producto   @relation(fields: [productoId], references: [id])
+  socio     Socio?     @relation(fields: [socioId], references: [id])
+  ubicacion Ubicacion? @relation(fields: [ubicacionId], references: [id])
 }
 
 model Cobro {
@@ -274,9 +295,11 @@ model NotaConsignacion {
   folio          String   @unique
   fecha          DateTime
   distribuidorId String
+  ubicacionId    String? // de qué bodega salieron las botellas de esta nota
   createdAt      DateTime @default(now())
 
   distribuidor Distribuidor            @relation(fields: [distribuidorId], references: [id])
+  ubicacion    Ubicacion?              @relation(fields: [ubicacionId], references: [id])
   lineas       NotaConsignacionLinea[]
   cobros       CobroConsignacion[]
 }

@@ -88,20 +88,21 @@ function datosConsumoPersonal(formData: FormData) {
   const productoId = String(formData.get("productoId") ?? "");
   const botellas = Number(formData.get("botellas"));
   const quien = String(formData.get("quien") ?? ""); // socioId, o "COMPARTIDO"
+  const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
   const notas = String(formData.get("notas") ?? "").trim() || null;
   const montoRepuesto = numeroOpcional(formData.get("montoRepuesto"));
   const cuentaRepuesto = montoRepuesto
     ? (String(formData.get("cuentaRepuesto") ?? "EFECTIVO") as "EFECTIVO" | "CUENTA")
     : null;
 
-  if (!fecha || !productoId || !botellas) {
+  if (!fecha || !productoId || !botellas || !ubicacionId) {
     throw new Error("Faltan datos del consumo");
   }
 
   const dividido = quien === "COMPARTIDO";
   const socioId = dividido ? null : quien || null;
 
-  return { fecha, productoId, botellas, socioId, dividido, montoRepuesto, cuentaRepuesto, notas };
+  return { fecha, productoId, botellas, socioId, dividido, ubicacionId, montoRepuesto, cuentaRepuesto, notas };
 }
 
 export async function crearConsumoPersonal(formData: FormData) {
@@ -119,6 +120,7 @@ export async function crearConsumoPersonal(formData: FormData) {
       costoUnitario,
       socioId: datos.socioId,
       dividido: datos.dividido,
+      ubicacionId: datos.ubicacionId,
       montoRepuesto: datos.montoRepuesto,
       cuentaRepuesto: datos.cuentaRepuesto,
       notas: datos.notas,
@@ -149,6 +151,7 @@ export async function actualizarConsumoPersonal(salidaId: string, formData: Form
       costoUnitario,
       socioId: datos.socioId,
       dividido: datos.dividido,
+      ubicacionId: datos.ubicacionId,
       montoRepuesto: datos.montoRepuesto,
       cuentaRepuesto: datos.cuentaRepuesto,
       notas: datos.notas,

@@ -6,9 +6,11 @@ import { titoraReserve2023 } from "./titora-reserve-2023";
 import type { EditorialWine } from "./editorial-wine";
 import { dadahCabernet2023 } from "./dadah-cabernet-2023";
 import { tanyaLateHarvest2024 } from "./tanya-late-harvest-2024";
+import { tanyaEliya2021 } from "./tanya-eliya-2021";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
+  cmtssyq4u0006l404sytto49b: tanyaEliya2021,
   cmtssyq3t0002l404jdevszsb: reserve2018,
   cmtssyq5c0008l404fkede9in: tanyaLateHarvest2024,
   cmtssyq350000l404mdg2nzou: dadahCabernet2023,

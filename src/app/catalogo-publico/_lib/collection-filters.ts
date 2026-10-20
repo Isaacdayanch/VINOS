@@ -1,4 +1,4 @@
-import type { PublicWine } from "./catalog";
+import type { ProductKind, PublicWine } from "./catalog";
 
 export const BUDGETS = [
   { label: "Todos los precios", min: -1, max: Infinity },
@@ -11,11 +11,18 @@ export const FACETS = [
   ["varietal", "Uva"], ["region", "Región"], ["cuerpo", "Cuerpo"], ["alcohol", "Alcohol"],
 ] as const;
 export type FacetKey = typeof FACETS[number][0];
+export type Facet = readonly [FacetKey, string];
+
+/** Which descriptive filters make sense for each kind of product. */
+export const FACETS_BY_KIND: Record<ProductKind, readonly Facet[]> = {
+  VINO: FACETS,
+  DESTILADO: [["varietal", "Hecho de"], ["region", "Región o país"], ["alcohol", "Alcohol"]],
+};
 export type CollectionFilters = {
   query: string; category: string; year: string; budget: number;
   facets: Partial<Record<FacetKey, string>>; sort: string;
 };
-const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+const normalize = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
 export function filterCollection(wines: PublicWine[], filters: CollectionFilters) {
   const { query, category, year, budget, facets, sort } = filters;

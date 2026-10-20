@@ -13,10 +13,11 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps<"/catalogo-publico/[id]">): Promise<Metadata> {
   const product = await getPublicWine((await params).id);
-  if (!product) return { title: "Vino no encontrado", robots: { index: false } };
+  if (!product) return { title: "Botella no encontrada", robots: { index: false } };
   if (product.id === grandRivallonId && product.anio === 2012) return editorialMetadata(grandRivallon);
   const title = `${product.nombre}${product.anio ? ` · ${product.anio}` : ""}`;
-  const description = product.descripcion?.slice(0, 180) ?? `${title}. Descubre la ficha y las fotografías de este vino.`;
+  const noun = product.tipo === "DESTILADO" ? "destilado" : "vino";
+  const description = product.descripcion?.slice(0, 180) ?? `${title}. Descubre la ficha y las fotografías de este ${noun}.`;
   return { title, description, openGraph: { title, description, type: "website", images: product.fotoUrl ? [{ url: product.fotoUrl, alt: title }] : [] } };
 }
 
@@ -24,15 +25,20 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
   const product = await getPublicWine((await params).id);
   if (!product) notFound();
   if (product.id === grandRivallonId && product.anio === 2012) return <EditorialWinePage wine={grandRivallon} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
+  const spirit = product.tipo === "DESTILADO";
+  const collectionHref = spirit ? "/catalogo-publico/destilados" : "/catalogo-publico/catalogo";
   const photos = [product.fotoUrl, ...product.imagenesExtra.map((p) => p.url)].filter((p): p is string => Boolean(p));
-  const details = [
-    ["Añada", product.anio], ["Región", product.region], ["Uva", product.varietal],
-    ["Cuerpo", product.cuerpo], ["Alcohol", product.alcohol != null ? `${product.alcohol}%` : null],
-  ].filter(([, value]) => value != null && value !== "");
+  const details = (spirit
+    ? [["Año", product.anio], ["Región", product.region], ["Hecho de", product.varietal], ["Alcohol", product.alcohol != null ? `${product.alcohol}%` : null]]
+    : [["Añada", product.anio], ["Región", product.region], ["Uva", product.varietal], ["Cuerpo", product.cuerpo], ["Alcohol", product.alcohol != null ? `${product.alcohol}%` : null]]
+  ).filter(([, value]) => value != null && value !== "");
+  const story = spirit
+    ? [["El destilado", product.descripcion], ["Notas de cata", product.notas], ["Cómo tomarlo", product.maridaje]]
+    : [["El vino", product.descripcion], ["Notas de cata", product.notas], ["En la mesa", product.maridaje]];
   return <>
     <Header />
     <main id="contenido" className={styles.winePage}>
-      <Link className={styles.back} href="/catalogo-publico/catalogo">Volver a la selección</Link>
+      <Link className={styles.back} href={collectionHref}>{spirit ? "Volver a destilados" : "Volver a la selección"}</Link>
       <div className={styles.wineTop}>
         <Gallery photos={photos} name={product.nombre} />
         <div className={styles.wineInfo}>
@@ -40,18 +46,18 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
           <h1>{product.nombre}</h1>
           {product.region && <p className={styles.region}>{product.region}</p>}
           <p className={styles.winePrice}>{product.precioLista !== null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(product.precioLista) : "Precio por confirmar"}<span>MXN</span></p>
-          <p className={styles.purchaseNote}>{product.activo ? "Los pedidos en línea estarán disponibles próximamente." : "Este vino no está disponible actualmente."}</p>
+          <p className={styles.purchaseNote}>{product.activo ? "Los pedidos en línea estarán disponibles próximamente." : "Esta botella no está disponible actualmente."}</p>
           <dl className={styles.details}>{details.map(([label, value]) => <div key={String(label)}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
-          <a href="#sobre-el-vino" className={styles.textLink}>Conoce este vino </a>
+          <a href="#sobre-el-vino" className={styles.textLink}>{spirit ? "Conoce este destilado " : "Conoce este vino "}</a>
         </div>
       </div>
       <section id="sobre-el-vino" className={styles.wineStory}>
-        <p className={styles.eyebrow}>DEL PRIMER SORBO A LA MESA</p>
+        <p className={styles.eyebrow}>{spirit ? "DE LA BOTELLA AL VASO" : "DEL PRIMER SORBO A LA MESA"}</p>
         <h2>Cada botella,<br />una conversación.</h2>
         <div className={styles.storySections}>
-          {[["El vino", product.descripcion], ["Notas de cata", product.notas], ["En la mesa", product.maridaje]].filter(([, text]) => Boolean(text)).map(([title, text]) => <section key={title}><h3>{title}</h3><p>{text}</p></section>)}
+          {story.filter(([, text]) => Boolean(text)).map(([title, text]) => <section key={title}><h3>{title}</h3><p>{text}</p></section>)}
         </div>
-        <Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Seguir descubriendo </Link>
+        <Link href={collectionHref} className={styles.darkPill}>Seguir descubriendo </Link>
       </section>
     </main>
   </>;

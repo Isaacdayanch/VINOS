@@ -59,6 +59,7 @@ function datosDesdeFormulario(formData: FormData) {
     piezasPorCaja: Number(formData.get("piezasPorCaja")),
     anio: enteroOpcional(formData.get("anio")),
     proveedor: String(formData.get("proveedor") ?? "").trim() || null,
+    tipo: formData.get("tipo") === "DESTILADO" ? ("DESTILADO" as const) : ("VINO" as const),
     categoria: String(formData.get("categoria") ?? "").trim() || null,
     activo: formData.get("activo") === "on",
     stockMinimo: enteroOpcional(formData.get("stockMinimo")),
@@ -147,7 +148,7 @@ export async function publicarCatalogo() {
   const productos = await prisma.producto.findMany({
     where: { activo: true },
     orderBy: { nombre: "asc" },
-    select: { id: true, nombre: true, fotoUrl: true, categoria: true, anio: true, precioLista: true },
+    select: { id: true, nombre: true, fotoUrl: true, tipo: true, categoria: true, anio: true, precioLista: true },
   });
 
   await prisma.catalogoPublicado.create({
@@ -156,4 +157,6 @@ export async function publicarCatalogo() {
 
   revalidatePath("/productos/publicar-catalogo");
   revalidatePath("/catalogo-publico");
+  revalidatePath("/catalogo-publico/catalogo");
+  revalidatePath("/catalogo-publico/destilados");
 }

@@ -21,7 +21,8 @@ export default function CatalogLayout({ children }: { children: React.ReactNode 
       <p>Una selección con carácter.</p>
       <nav className={styles.footerNav} aria-label="Enlaces del pie de página">
         <Link href="/catalogo-publico">Inicio</Link>
-        <Link href="/catalogo-publico/catalogo">Catálogo con precios</Link>
+        <Link href="/catalogo-publico/catalogo">Vinos con precios</Link>
+        <Link href="/catalogo-publico/destilados">Destilados</Link>
         <Link href="/catalogo-publico/nosotros">Acerca de nosotros</Link>
       </nav>
       <p>Venta exclusiva a mayores de edad.</p>

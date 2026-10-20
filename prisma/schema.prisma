@@ -23,6 +23,12 @@ enum Moneda {
   USD
 }
 
+// Vino o destilado (arak, whisky, tequila...). Separa el catálogo público en dos páginas.
+enum TipoProducto {
+  VINO
+  DESTILADO
+}
+
 enum Cuenta {
   EFECTIVO
   CUENTA // banco / tarjeta / digital
@@ -53,7 +59,8 @@ model Producto {
   piezasPorCaja         Int
   anio                  Int?
   proveedor             String?
-  categoria             String?
+  tipo                  TipoProducto @default(VINO)
+  categoria             String? // subcategoría: en vinos "Tinto, Reserva..."; en destilados "Arak, Whisky, Tequila..."
   activo                Boolean  @default(true)
   fotoUrl               String?
   stockMinimo           Int?

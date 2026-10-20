@@ -85,6 +85,19 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   pidió esto explícitamente para saber cuánto ha invertido cada quien.
 - **"Recibo"** = recibo de venta en PDF para el cliente (no recibo de
   mercancía entrante). Isaac lo confirmó explícitamente.
+- **Vinos vs. destilados**: cada producto tiene `tipo` (`VINO` default /
+  `DESTILADO`), y `categoria` es la subcategoría libre (Tinto, Reserva… o
+  Arak, Whisky, Tequila…). El catálogo público los separa en dos páginas:
+  `/catalogo-publico/catalogo` (vinos) y `/catalogo-publico/destilados`,
+  que comparten el componente `Collection` (con textos y filtros por
+  `kind`). El `tipo` se lee en vivo del producto (no de la foto congelada
+  de `CatalogoPublicado`), así que mover un producto a Destilado cambia de
+  página sin volver a publicar.
+- **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
+  queda tal cual para el público. Isaac quiere armar carrito + pedidos,
+  pero NO le convenció la primera propuesta de logística (pedido web →
+  WhatsApp prellenado → correo → convertir a Orden). Hay que re-proponerla
+  con él antes de construir nada.
 
 ## Datos reales importados
 

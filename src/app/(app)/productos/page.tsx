@@ -12,7 +12,7 @@ export default async function ProductosPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-wine">Productos</h1>
-            <p className="text-muted text-sm">Tu catálogo de vinos</p>
+            <p className="text-muted text-sm">Tu catálogo de vinos y destilados</p>
           </div>
           <Link
             href="/productos/nuevo"
@@ -58,6 +58,11 @@ export default async function ProductosPage() {
                 {p.categoria ? ` · ${p.categoria}` : ""}
               </p>
             </div>
+            {p.tipo === "DESTILADO" && (
+              <span className="text-xs text-wine border border-wine/40 rounded px-2 py-0.5 whitespace-nowrap">
+                Destilado
+              </span>
+            )}
             {!p.activo && (
               <span className="text-xs text-muted border border-border rounded px-2 py-0.5">
                 Inactivo

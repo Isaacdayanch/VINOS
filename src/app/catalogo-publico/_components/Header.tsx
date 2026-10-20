@@ -11,7 +11,8 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
       {overHero ? "SELECCIÓN DE VINOS" : "VINOS"}
     </Link>
     <div className={styles.headerActions}>
-      <Link href="/catalogo-publico/catalogo">Catálogo </Link>
+      <Link href="/catalogo-publico/catalogo">Vinos </Link>
+      <Link href="/catalogo-publico/destilados">Destilados </Link>
       <button type="button" className={styles.menuButton} aria-label="Abrir navegación" onClick={() => menu.current?.showModal()}>
         <span /><span />
       </button>
@@ -21,7 +22,8 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
       <p className={styles.eyebrow}>DESCUBRE NUESTRA SELECCIÓN</p>
       <nav aria-label="Navegación pública">
         <Link href="/catalogo-publico" onClick={() => menu.current?.close()}>Inicio </Link>
-        <Link href="/catalogo-publico/catalogo" onClick={() => menu.current?.close()}>Catálogo con precios </Link>
+        <Link href="/catalogo-publico/catalogo" onClick={() => menu.current?.close()}>Vinos con precios </Link>
+        <Link href="/catalogo-publico/destilados" onClick={() => menu.current?.close()}>Destilados </Link>
         <Link href="/catalogo-publico/nosotros" onClick={() => menu.current?.close()}>Acerca de nosotros </Link>
       </nav>
     </dialog>

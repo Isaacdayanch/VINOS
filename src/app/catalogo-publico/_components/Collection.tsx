@@ -3,15 +3,45 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { PublicWine } from "../_lib/catalog";
-import { BUDGETS, FACETS, filterCollection, type FacetKey } from "../_lib/collection-filters";
+import type { ProductKind, PublicWine } from "../_lib/catalog";
+import { BUDGETS, FACETS_BY_KIND, filterCollection, type FacetKey } from "../_lib/collection-filters";
 import styles from "../catalog.module.css";
 import { OrderNotice } from "./OrderNotice";
 
 const money = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 });
 function CloseIcon() { return <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" /></svg>; }
 
-export function Collection({ wines, date }: { wines: PublicWine[]; date: string | null }) {
+/** Wording for each kind of collection. Layout and behaviour are shared. */
+const COPY = {
+  VINO: {
+    noun: "vino", plural: "vinos", yearLabel: "Añada", yearAll: "Todas las añadas",
+    eyebrow: "LA SELECCIÓN · CATÁLOGO CON PRECIOS",
+    title: <>Tu próxima<br /><em>gran botella.</em></>,
+    lead: <>Para compartir, para descubrir,<br />para abrir algo especial.</>,
+    all: "Todos los vinos", railLabel: "Filtrar por tipo de vino",
+    searchLabel: "Buscar por vino, uva, región, añada o maridaje", searchPlaceholder: "Busca un vino, uva o región…",
+    filterTitle: <>Encuentra <br />tu vino.</>,
+    emptyTitle: "Tu vino está por descubrir.", emptyHint: "Prueba otra búsqueda o retira algún filtro.",
+    noneTitle: "Estamos preparando la selección.", noneHint: "Muy pronto, nuevas botellas por descubrir.",
+    publication: "Nuestra selección de vinos.",
+  },
+  DESTILADO: {
+    noun: "destilado", plural: "destilados", yearLabel: "Año", yearAll: "Todos los años",
+    eyebrow: "LA SELECCIÓN · DESTILADOS",
+    title: <>Arak, whisky<br /><em>y algo más.</em></>,
+    lead: <>Para abrir la noche o cerrarla.<br />Un trago corto, con carácter.</>,
+    all: "Todos los destilados", railLabel: "Filtrar por tipo de destilado",
+    searchLabel: "Buscar por destilado, tipo, país o materia prima", searchPlaceholder: "Busca un destilado, tipo o país…",
+    filterTitle: <>Encuentra <br />tu destilado.</>,
+    emptyTitle: "Tu destilado está por descubrir.", emptyHint: "Prueba otra búsqueda o retira algún filtro.",
+    noneTitle: "Estamos preparando los destilados.", noneHint: "Muy pronto, arak, whisky y más.",
+    publication: "Nuestra selección de destilados.",
+  },
+} as const;
+
+export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]; date: string | null; kind?: ProductKind }) {
+  const copy = COPY[kind];
+  const facetList = FACETS_BY_KIND[kind];
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [year, setYear] = useState("");
@@ -26,7 +56,8 @@ export function Collection({ wines, date }: { wines: PublicWine[]; date: string 
   const filtered = useMemo(() => filterCollection(wines, { query, category, year, budget, facets, sort }), [wines, query, category, year, budget, facets, sort]);
   const activeCount = Number(Boolean(category)) + Number(Boolean(year)) + Number(Boolean(budget)) + Object.values(facets).filter(Boolean).length;
   const active = Boolean(query || activeCount);
-  const facetOptions = FACETS.map(([key, label]) => ({ key, label, options: [...new Set(wines.flatMap(wine => wine[key] != null && wine[key] !== "" ? [String(wine[key])] : []))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })) }));
+  const facetOptions = facetList.map(([key, label]) => ({ key, label, options: [...new Set(wines.flatMap(wine => wine[key] != null && wine[key] !== "" ? [String(wine[key])] : []))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })) }));
+  const count = (n: number) => `${n} ${n === 1 ? copy.noun : copy.plural}`;
 
   useEffect(() => {
     if (!filtersOpen) return;
@@ -40,27 +71,27 @@ export function Collection({ wines, date }: { wines: PublicWine[]; date: string 
   const chips = [
     ...(query ? [{ label: `Búsqueda: ${query}`, clear: () => setQuery("") }] : []),
     ...(category ? [{ label: category, clear: () => setCategory("") }] : []),
-    ...(year ? [{ label: `Añada ${year}`, clear: () => setYear("") }] : []),
+    ...(year ? [{ label: `${copy.yearLabel} ${year}`, clear: () => setYear("") }] : []),
     ...(budget ? [{ label: BUDGETS[budget].label, clear: () => setBudget(0) }] : []),
-    ...FACETS.flatMap(([key, label]) => facets[key] ? [{ label: `${label}: ${facets[key]}${key === "alcohol" ? "%" : ""}`, clear: () => clearFacet(key) }] : []),
+    ...facetList.flatMap(([key, label]) => facets[key] ? [{ label: `${label}: ${facets[key]}${key === "alcohol" ? "%" : ""}`, clear: () => clearFacet(key) }] : []),
   ];
 
   return <section id="seleccion" className={styles.collection} aria-labelledby="selection-heading">
     <div className={styles.shopIntro}>
-      <div><p className={styles.eyebrow}>LA SELECCIÓN · CATÁLOGO CON PRECIOS</p><h1 id="selection-heading">Tu próxima<br /><em>gran botella.</em></h1></div>
-      <div className={styles.shopIntroAside}><p>Para compartir, para descubrir,<br />para abrir algo especial.</p><OrderNotice /></div>
+      <div><p className={styles.eyebrow}>{copy.eyebrow}</p><h1 id="selection-heading">{copy.title}</h1></div>
+      <div className={styles.shopIntroAside}><p>{copy.lead}</p><OrderNotice /></div>
     </div>
 
     <div className={styles.shopDiscovery}>
-      {categories.length > 0 && <div className={styles.categoryRail} role="group" aria-label="Filtrar por tipo de vino">
-        <button type="button" aria-pressed={!category} onClick={() => setCategory("")}>Todos los vinos</button>
+      {categories.length > 0 && <div className={styles.categoryRail} role="group" aria-label={copy.railLabel}>
+        <button type="button" aria-pressed={!category} onClick={() => setCategory("")}>{copy.all}</button>
         {categories.map(type => <button type="button" key={type} aria-pressed={category === type} onClick={() => setCategory(type)}>{type}</button>)}
       </div>}
       <div className={styles.toolbar}>
         <label className={styles.search}>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="1.4" /><path d="m15.5 15.5 4.5 4.5" stroke="currentColor" strokeWidth="1.4" /></svg>
-          <span className={styles.srOnly}>Buscar por vino, uva, región, añada o maridaje</span>
-          <input ref={searchInput} type="search" placeholder="Busca un vino, uva o región…" value={query} onChange={event => setQuery(event.target.value)} />
+          <span className={styles.srOnly}>{copy.searchLabel}</span>
+          <input ref={searchInput} type="search" placeholder={copy.searchPlaceholder} value={query} onChange={event => setQuery(event.target.value)} />
         </label>
         <button className={styles.filterButton} type="button" aria-haspopup="dialog" onClick={openFilters}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 17h16M9 4v6m6 4v6" stroke="currentColor" strokeWidth="1.4" /></svg>
@@ -74,22 +105,22 @@ export function Collection({ wines, date }: { wines: PublicWine[]; date: string 
       {chips.map(chip => <button type="button" key={chip.label} onClick={chip.clear} aria-label={`Quitar ${chip.label}`}>{chip.label}<CloseIcon /></button>)}
       <button type="button" className={styles.clearAll} onClick={reset}>Borrar todo</button>
     </div>}
-    <div className={styles.resultSummary}><p role="status" aria-live="polite">{filtered.length} vino{filtered.length === 1 ? "" : "s"}{active ? " en tu selección" : " por descubrir"}</p><span>Precios en MXN</span></div>
+    <div className={styles.resultSummary}><p role="status" aria-live="polite">{count(filtered.length)}{active ? " en tu selección" : " por descubrir"}</p><span>Precios en MXN</span></div>
     <div className={styles.productGrid}>
       {filtered.map((wine, index) => <WineCard wine={wine} key={wine.id ?? `${wine.nombre}-${index}`} />)}
     </div>
-    {!filtered.length && <div className={styles.empty}><h2>{wines.length ? "Tu vino está por descubrir." : "Estamos preparando la selección."}</h2><p>{wines.length ? "Prueba otra búsqueda o retira algún filtro." : "Muy pronto, nuevas botellas por descubrir."}</p>{active && <button type="button" className={styles.darkPill} onClick={() => { reset(); searchInput.current?.focus(); }}>Ver todos los vinos</button>}</div>}
-    <div className={styles.publication}><p>{date ? `Selección publicada el ${date}.` : "Nuestra selección de vinos."}</p><button type="button" onClick={() => window.print()}>Imprimir selección</button></div>
+    {!filtered.length && <div className={styles.empty}><h2>{wines.length ? copy.emptyTitle : copy.noneTitle}</h2><p>{wines.length ? copy.emptyHint : copy.noneHint}</p>{active && <button type="button" className={styles.darkPill} onClick={() => { reset(); searchInput.current?.focus(); }}>Ver {copy.all.toLowerCase()}</button>}</div>}
+    <div className={styles.publication}><p>{date ? `Selección publicada el ${date}.` : copy.publication}</p><button type="button" onClick={() => window.print()}>Imprimir selección</button></div>
 
     <dialog ref={drawer} className={`${styles.filterDialog} ${styles.shopFilterDialog}`} aria-labelledby="filters-heading" onClose={() => setFiltersOpen(false)} onClick={event => { if (event.target === event.currentTarget) drawer.current?.close(); }}>
-      <div className={styles.filterPanelHeading}><p className={styles.eyebrow}>A TU GUSTO</p><button type="button" className={styles.close} aria-label="Cerrar filtros" onClick={() => drawer.current?.close()}><CloseIcon /></button><h2 id="filters-heading">Encuentra<br />tu vino.</h2></div>
+      <div className={styles.filterPanelHeading}><p className={styles.eyebrow}>A TU GUSTO</p><button type="button" className={styles.close} aria-label="Cerrar filtros" onClick={() => drawer.current?.close()}><CloseIcon /></button><h2 id="filters-heading">{copy.filterTitle}</h2></div>
       <div className={styles.filterPanelBody}><div className={styles.filters}>
         {categories.length > 0 && <label htmlFor="filter-type">Tipo<select id="filter-type" value={category} onChange={event => setCategory(event.target.value)}><option value="">Todos los tipos</option>{categories.map(type => <option key={type}>{type}</option>)}</select></label>}
-        {years.length > 0 && <label htmlFor="filter-year">Añada<select id="filter-year" value={year} onChange={event => setYear(event.target.value)}><option value="">Todas las añadas</option>{years.map(value => <option key={value}>{value}</option>)}</select></label>}
+        {years.length > 0 && <label htmlFor="filter-year">{copy.yearLabel}<select id="filter-year" value={year} onChange={event => setYear(event.target.value)}><option value="">{copy.yearAll}</option>{years.map(value => <option key={value}>{value}</option>)}</select></label>}
         <label htmlFor="filter-price">Presupuesto<select id="filter-price" value={budget} onChange={event => setBudget(Number(event.target.value))}>{BUDGETS.map((range, index) => <option key={range.label} value={index}>{range.label}</option>)}</select></label>
         {facetOptions.filter(facet => facet.options.length > 0).map(({ key, label, options }) => <label key={key} htmlFor={`filter-${key}`}>{label}<select id={`filter-${key}`} value={facets[key] ?? ""} onChange={event => setFacets(current => ({ ...current, [key]: event.target.value }))}><option value="">Todos</option>{options.map(value => <option key={value} value={value}>{value}{key === "alcohol" ? "%" : ""}</option>)}</select></label>)}
       </div></div>
-      <div className={styles.filterPanelFooter}><button type="button" className={styles.darkPill} onClick={() => drawer.current?.close()}>Ver {filtered.length} vino{filtered.length === 1 ? "" : "s"}</button>{active && <button type="button" className={styles.reset} onClick={reset}>Borrar todo</button>}</div>
+      <div className={styles.filterPanelFooter}><button type="button" className={styles.darkPill} onClick={() => drawer.current?.close()}>Ver {count(filtered.length)}</button>{active && <button type="button" className={styles.reset} onClick={reset}>Borrar todo</button>}</div>
     </dialog>
   </section>;
 }

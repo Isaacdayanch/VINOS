@@ -42,7 +42,8 @@ export const getPublication = cache(async () => {
 });
 
 // Read only public descriptive fields, and only for products already published.
-// The approved publication remains authoritative for price, membership and image.
+// The approved publication remains authoritative for price and membership.
+// Public bottle names, years and photos follow the same live content as details.
 // The product kind (wine or spirit) is read live so a product moved to "Destilado"
 // changes page without waiting for the next publication.
 const getShopProducts = cache(async () => {
@@ -50,7 +51,7 @@ const getShopProducts = cache(async () => {
   const ids = publication.wines.flatMap(wine => wine.id ? [wine.id] : []);
   const products = ids.length ? await prisma.producto.findMany({
     where: { id: { in: ids } },
-    select: { id: true, tipo: true, varietal: true, region: true, cuerpo: true, alcohol: true, maridaje: true },
+    select: { id: true, nombre: true, anio: true, fotoUrl: true, tipo: true, varietal: true, region: true, cuerpo: true, alcohol: true, maridaje: true },
   }) : [];
   const metadata = new Map(products.map(product => [product.id, product]));
   return { ...publication, wines: publication.wines.map(wine => ({

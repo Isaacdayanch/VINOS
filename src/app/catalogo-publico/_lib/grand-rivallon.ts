@@ -25,6 +25,4 @@ export const grandRivallon: EditorialWine = {
   ],
   photos: ["front", "back", "pour", "glass", "pairing", "table"].map(view => `/catalogo/grand-rivallon-2012-${view}.webp`),
   captions: ["Botella frontal en fondo blanco", "Reverso en fondo blanco", "El servicio, en un salón francés", "La copa: una interpretación visual", "Maridaje sugerido: cordero con hierbas y verduras", "Una mesa para dos"],
-  labelImage: "/catalogo/grand-rivallon-2012-label-original.jpeg",
-  originalFront: "/catalogo/grand-rivallon-2012-front-original.jpeg",
 };

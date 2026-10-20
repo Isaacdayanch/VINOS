@@ -36,10 +36,79 @@
 .hero { position: relative; height: max(780px,100svh); max-height: 1150px; isolation: isolate; overflow: hidden; color: white; background: #57534e; }
 .heroBackground { object-fit: cover; object-position: center; transform: translateY(var(--hero-shift,0px)) scale(1.07); }
 .heroShade { position: absolute; inset: 0; background: linear-gradient(90deg,rgb(0 0 0 / .32),transparent 65%),linear-gradient(0deg,rgb(0 0 0 / .44),transparent 50%,rgb(0 0 0 / .14)); }
-.heroWordmark { position: absolute; top: 9%; left: 1.5%; right: 1.5%; text-align: center; font: 400 clamp(110px,23vw,400px)/.85 var(--serif); letter-spacing: .035em; }
+.heroWordmark { position: absolute; top: 9%; left: 1.5%; right: 1.5%; text-align: center; font: 400 clamp(110px,23vw,400px)/.85 var(--serif); letter-spacing: .14em; opacity: 0; animation: wordmarkReveal 1.3s .15s cubic-bezier(.16,1,.3,1) both; }
+@keyframes wordmarkReveal { from { opacity: 0; letter-spacing: .4em; transform: scale(1.06); } to { opacity: 1; letter-spacing: .035em; transform: scale(1); } }
 .heroOrigin { position: absolute; top: 38%; left: var(--gutter); font-size: 11px; letter-spacing: .38em; }
 .heroBottle { position: absolute; width: 40%; height: 86%; bottom: 4%; right: 12%; transform: translateY(var(--hero-shift,0px)) rotate(var(--bottle-angle,0deg)); transform-origin: 50% 90%; filter: drop-shadow(20px 25px 18px rgb(0 0 0 / .26)); }
 .bottleImage { object-fit: contain; }
+
+/* Public wine details: ambient-first photography dissolves into the page. */
+.immersivePage { padding-bottom: 70px; }
+.immersiveBack { display: inline-block; margin: 0 var(--gutter) 22px; font-size: 11px; }
+.immersiveHero { display: grid; grid-template-columns: 57% 43%; align-items: center; }
+.immersivePhoto { position: relative; min-width: 0; aspect-ratio: 2/3; }
+.photoTrack { position: absolute; inset: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; cursor: grab; }
+.photoTrack::-webkit-scrollbar { display: none; }
+.photoTrack[data-dragging="true"] { cursor: grabbing; scroll-snap-type: none; }
+.photoTrack:focus-visible { outline: 2px solid var(--burgundy); outline-offset: -3px; }
+.photoSlide { position: relative; flex: 0 0 100%; min-width: 0; height: 100%; scroll-snap-align: start; scroll-snap-stop: always; }
+.photoSlide > img { object-fit: cover; user-select: none; }
+.immersiveBottle > img { object-fit: contain; padding: 40px; }
+.photoNavigation { position: absolute; z-index: 2; top: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; padding: 0 5px; border-radius: 30px; color: #42362e; isolation: isolate; }
+.photoNavigation::before { content: ""; position: absolute; inset: 7px 0; z-index: -1; border: 1px solid rgba(255,255,255,.65); border-radius: inherit; background: rgba(255,255,255,.4); backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); box-shadow: 0 2px 12px rgba(30,22,15,.08); }
+.photoArrow { display: grid; place-items: center; width: 32px; height: 44px; border: 0; background: transparent; color: inherit; padding: 0; cursor: pointer; }
+.photoArrow svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.photoArrow:focus-visible { outline: 2px solid var(--burgundy); border-radius: 20px; }
+.photoDots { display: flex; justify-content: center; }
+.photoDots button { display: grid; place-items: center; width: 24px; height: 44px; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.photoDots button span { display: block; width: 4px; height: 4px; border-radius: 50%; background: rgba(66,54,46,.45); transition: transform .2s, background .2s; }
+.photoDots button[aria-pressed="true"] span { background: var(--burgundy); transform: scale(1.5); }
+.photoDots button:focus-visible { outline: 2px solid var(--burgundy); border-radius: 50%; }
+.photoAnnouncement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.photoEnlarge { position: absolute; z-index: 2; bottom: 24px; left: 50%; transform: translateX(-50%); border: 1px solid var(--line); border-radius: 30px; background: var(--cream); color: var(--ink); padding: 12px 20px; font-size: 12px !important; white-space: nowrap; }
+.photoEnlarge span { margin-left: 10px; }
+.photoViewer { width: 96vw; height: 94dvh; max-width: 1400px; max-height: 96dvh; padding: 0; border: 0; border-radius: 12px; color: var(--ink); background: white; overflow: hidden; }
+.photoViewer::backdrop { background: rgb(20 15 12 / .75); }
+.photoViewerBar { height: 68px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); background: var(--cream); }
+.photoViewerBar p { font-size: 12px; }
+.photoViewerBar > div { display: flex; align-items: center; gap: 8px; }
+.photoViewerBar button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: white; color: var(--ink); font-size: 24px; }
+.photoViewerBar button:disabled { opacity: .35; cursor: default; }
+.photoViewerBar span { font-size: 11px; min-width: 35px; text-align: center; }
+.photoViewerScroll { height: calc(100% - 68px); overflow: auto; overscroll-behavior: contain; }
+.photoViewerCanvas { width: max-content; min-width: 100%; padding: 24px; }
+.photoViewerCanvas img { display: block; margin: 0 auto; }
+.photoDissolve { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to right, transparent 68%, var(--cream) 100%), linear-gradient(to bottom, transparent 72%, var(--cream) 100%); }
+.immersiveIntro { position: relative; padding: 45px var(--gutter) 55px 0; min-width: 0; }
+.immersiveIntro h1 { font: 400 clamp(42px, 5.8vw, 90px)/1.03 var(--serif); letter-spacing: -.025em; margin: 20px 0; overflow-wrap: anywhere; }
+.immersiveStyle { font: 400 clamp(22px, 2.6vw, 32px)/1.4 var(--serif); color: var(--muted); }
+.immersiveRule { display: block; width: 42px; height: 1px; background: var(--muted); margin: 30px 0; }
+.immersiveDescription { font-size: 14px; line-height: 1.9; white-space: pre-line; max-width: 440px; }
+.immersiveIntro .winePrice { margin: 28px 0 20px !important; }
+.immersiveLink { display: inline-block; font-size: 12px; margin-top: 26px; padding-bottom: 8px; border-bottom: 1px solid var(--muted); }
+.technicalSection { display: grid; grid-template-columns: 28% 72%; padding: 60px var(--gutter) 70px; border-top: 1px solid var(--line); }
+.technicalSection h2 { font: 400 clamp(36px, 4vw, 54px)/1.1 var(--serif); margin: 18px 0; }
+.technicalFacts { margin: 0; padding-left: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 35px; align-content: start; }
+.technicalFacts > div { padding: 18px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.technicalFacts dt { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.technicalFacts dd { font-size: 16px; line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+.immersiveStories { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 45px 70px; margin: 0 var(--gutter); padding: 60px 0; border-top: 1px solid var(--line); }
+.immersiveStories h2 { font: 400 36px/1.15 var(--serif); margin-bottom: 22px; }
+.immersiveStories p { font-size: 14px; line-height: 1.9; white-space: pre-line; max-width: 540px; }
+.immersiveContinue { padding: 0 var(--gutter); }
+@media (min-width: 1500px) { .immersiveHero, .technicalSection, .immersiveStories { max-width: 1500px; margin-left: auto; margin-right: auto; } }
+@media (max-width: 700px) {
+  .immersiveHero { display: block; }
+  .photoDissolve { background: linear-gradient(to bottom, transparent 70%, var(--cream) 100%); }
+  .immersiveIntro { padding: 0 var(--gutter) 45px; margin-top: -22px; }
+  .immersiveIntro h1 { font-size: clamp(42px,12vw,68px); }
+  .photoNavigation { top: 16px; }
+  .technicalSection { display: block; padding-top: 40px; padding-bottom: 45px; }
+  .technicalFacts { padding: 12px 0 0; gap: 0 22px; }
+  .technicalFacts dd { font-size: 15px; }
+  .immersiveStories { grid-template-columns: 1fr; gap: 35px; padding: 40px 0; }
+}
+@media (max-width: 380px) { .technicalFacts { grid-template-columns: 1fr; } }
 .heroCopy { position: absolute; left: var(--gutter); bottom: 12%; width: 34%; max-width: 510px; }
 .heroCopy h1 { font: 400 clamp(32px,3.25vw,55px)/1.05 var(--serif); text-wrap: balance; text-shadow: 0 2px 18px rgb(0 0 0 / .2); }
 .pill, .darkPill { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 48px; border-radius: 50px; padding: 14px 26px; font-size: 12px; border: 1px solid transparent; }
@@ -56,8 +125,9 @@
 .showcaseHeading h2 { font: 400 clamp(58px,8vw,120px)/.93 var(--serif); letter-spacing: -.04em; margin-top: 24px; }
 .showcaseIntro { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 35px; font-size: 12px; color: var(--muted); }
 .showcaseScene { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px,6vw,100px); align-items: center; min-height: 100svh; padding: 70px var(--gutter); border-bottom: 1px solid var(--line); }
-.showcaseImage { position: relative; height: min(82svh,900px); min-height: 460px; background: white; }
-.showcaseBottle { object-fit: contain; transform-origin: center bottom; }
+.showcaseImage { position: relative; height: min(82svh,900px); min-height: 460px; background: white; overflow: hidden; }
+.showcaseBottle { object-fit: contain; transform-origin: 50% 50%; transform: rotate(-90deg) scale(.82); transition: transform 1s cubic-bezier(.16,1,.3,1); }
+.showcaseBottleIn { transform: rotate(0deg) scale(1); }
 .showcaseCopy { padding: 35px 0; max-width: 570px; }
 .showcaseCopy h3 { font: 400 clamp(48px,5vw,82px)/.98 var(--serif); letter-spacing: -.035em; margin-top: 24px; text-wrap: balance; }
 .showcaseYear { font: 400 44px/1.1 var(--serif); color: var(--burgundy); margin-top: 20px !important; }
@@ -66,13 +136,8 @@
 .showcaseFacts summary { cursor: pointer; padding: 16px 0; min-height: 48px; }
 .showcaseFacts ul { padding: 0 0 20px 18px; line-height: 2; }
 .showcaseFacts summary:focus-visible { outline: 2px solid var(--burgundy); outline-offset: 4px; }
-.showcaseActions { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 35px; }
-@keyframes bottlePassage { from { transform: translateY(45px) rotate(-2deg); } to { transform: translateY(-45px) rotate(2deg); } }
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .showcaseBottle { animation: bottlePassage linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
-  }
-}
+.showcaseActions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 35px; }
+.showcaseActions .textLink { flex: 0 0 auto; }
 .discovery { padding: 100px var(--gutter); border-top: 1px solid var(--line); margin-top: 40px; }
 .discovery h2 { font: 400 clamp(40px,5vw,76px)/1.05 var(--serif); margin: 18px 0 38px; }
 .discoveryLinks { display: grid; grid-template-columns: repeat(2,1fr); column-gap: 70px; }
@@ -203,6 +268,8 @@
 @media (prefers-reduced-motion: reduce) {
   .shell *, .shell *::before, .shell *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .heroBottle, .heroBackground { transform: none; }
+  .heroWordmark { opacity: 1; letter-spacing: .035em; }
+  .showcaseBottle { transform: none; }
 }
 @media print {
   .shell { background: white; color: black; }

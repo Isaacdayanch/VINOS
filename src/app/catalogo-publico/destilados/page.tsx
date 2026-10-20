@@ -6,7 +6,7 @@ import styles from "../catalog.module.css";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Destilados",
+  title: "Cava de destilados",
   description: "Arak, whisky y otros destilados con carácter. Explora por tipo, país, alcohol y presupuesto, con precios en pesos mexicanos.",
 };
 

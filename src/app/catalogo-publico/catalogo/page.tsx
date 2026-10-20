@@ -6,7 +6,7 @@ import styles from "../catalog.module.css";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Catálogo con precios",
+  title: "Cava de vinos",
   description: "Encuentra tu próxima botella. Explora vinos por tipo, añada, uva, región, cuerpo y presupuesto, con precios en pesos mexicanos.",
 };
 

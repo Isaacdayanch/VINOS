@@ -15,8 +15,8 @@ function CloseIcon() { return <svg width="14" height="14" viewBox="0 0 16 16" fi
 const COPY = {
   VINO: {
     noun: "vino", plural: "vinos", yearLabel: "Añada", yearAll: "Todas las añadas",
-    eyebrow: "LA SELECCIÓN · CATÁLOGO CON PRECIOS",
-    title: <>Tu próxima<br /><em>gran botella.</em></>,
+    eyebrow: "LA SELECCIÓN",
+    title: <>Cava<br /><em>de vinos</em></>,
     lead: <>Para compartir, para descubrir,<br />para abrir algo especial.</>,
     all: "Todos los vinos", railLabel: "Filtrar por tipo de vino",
     searchLabel: "Buscar por vino, uva, región, añada o maridaje", searchPlaceholder: "Busca un vino, uva o región…",
@@ -27,9 +27,9 @@ const COPY = {
   },
   DESTILADO: {
     noun: "destilado", plural: "destilados", yearLabel: "Año", yearAll: "Todos los años",
-    eyebrow: "LA SELECCIÓN · DESTILADOS",
-    title: <>Arak, whisky<br /><em>y algo más.</em></>,
-    lead: <>Para abrir la noche o cerrarla.<br />Un trago corto, con carácter.</>,
+    eyebrow: "LA SELECCIÓN",
+    title: <>Cava<br /><em>de destilados</em></>,
+    lead: <>Arak, whisky y algo más.<br />Para abrir la noche o cerrarla.</>,
     all: "Todos los destilados", railLabel: "Filtrar por tipo de destilado",
     searchLabel: "Buscar por destilado, tipo, país o materia prima", searchPlaceholder: "Busca un destilado, tipo o país…",
     filterTitle: <>Encuentra <br />tu destilado.</>,

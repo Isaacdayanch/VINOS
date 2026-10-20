@@ -208,6 +208,30 @@ desarrollo, porque no hay salida de red directa a Postgres desde aquí (solo
 desde Vercel/Supabase sí hay). El build y el chequeo de tipos de TypeScript
 sí pasan.
 
+### Ramas y sitios publicados (OJO antes de hacer cambios)
+
+Hay **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde
+una rama distinta:
+
+- **Página pública**: `vinos-catalogo.vercel.app` se publica desde la rama
+  `catalog-redesign`.
+- **Sistema interno (CRM)**: se publica desde `claude/wine-crm-setup-13v2ux`
+  (que además es la rama por defecto del repo).
+
+Ambas ramas se habían separado (la pública con galerías/fotos editoriales,
+la del CRM con abonos, ubicaciones, etc.). El 20-oct-2026 se **unieron** en
+un solo historial (commit `41b1a1a`) y se empujó el mismo commit a las dos
+ramas. **Regla**: cualquier cambio futuro debe terminar empujado a AMBAS
+ramas (con permiso de Isaac), para que no se vuelvan a separar. Trabajar en
+una rama `claude/...` y, al final, hacer push de ese mismo commit a
+`catalog-redesign` y a `claude/wine-crm-setup-13v2ux` (ambos fast-forward).
+
+Las dos apps comparten la misma base de datos de Supabase (proyecto
+`lwekyvwfrmgzmavwveji`). Los cambios de esquema se corren a mano en el SQL
+Editor: `https://supabase.com/dashboard/project/lwekyvwfrmgzmavwveji/sql/new`
+(Isaac ya sabe usarlo; mandarle el SQL listo para pegar, idealmente con
+`IF NOT EXISTS` para que no truene si lo corre dos veces).
+
 ### Vercel — estado del despliegue
 
 Isaac tiene varios proyectos duplicados en Vercel de intentos anteriores

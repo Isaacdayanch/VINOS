@@ -428,7 +428,10 @@
 .spiritsPage { --cream: #f7f2e8; --paper: #f7f2e8; --line: #ddd4c4; --muted: #5f574b; background: var(--cream); }
 .spiritsPage .collection, .spiritsPage .shopDiscovery, .spiritsPage .productImage, .spiritsPage .categoryRail button, .spiritsPage .activeFilters button, .spiritsPage .shopFilterDialog, .spiritsPage .filterPanelFooter { background: var(--cream); }
 .spiritsPage .categoryRail button:is(:hover,[aria-pressed="true"]) { background: var(--burgundy); }
-@media print { .spiritsPage { background: white; } .spiritsPage .collection, .spiritsPage .productImage { background: white; } }
+/* Bottle photos are shot on white: multiply melts that white into the cream paper, so no white box shows. The slight lift turns near-white (254) into pure white first. */
+.spiritsPage .productImage { isolation: isolate; }
+.spiritsPage .productImage > img { mix-blend-mode: multiply; filter: brightness(1.06) contrast(1.05); }
+@media print { .spiritsPage { background: white; } .spiritsPage .collection, .spiritsPage .productImage { background: white; } .spiritsPage .productImage > img { mix-blend-mode: normal; filter: none; } }
 
 .showcaseBottleLink { position: absolute; inset: 0; z-index: 2; }
 .showcaseBottleLink:focus-visible { outline: 2px solid var(--wine, #602e3b); outline-offset: -6px; }

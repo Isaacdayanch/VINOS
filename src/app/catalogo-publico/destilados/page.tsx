@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function SpiritsCatalogPage() {
   const { wines, date } = await getShopCollection("DESTILADO");
-  return <div className={`${styles.shopPage} ${styles.spiritsPage}`}>
+  return <div className={`${styles.shopPage} ${styles.creamShop}`}>
     <Header />
     <main id="contenido">
       <Collection kind="DESTILADO" wines={wines} date={date?.toLocaleDateString("es-MX", { timeZone: "America/Mexico_City" }) ?? null} />

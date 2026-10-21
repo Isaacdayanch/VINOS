@@ -30,7 +30,7 @@ const selection: readonly ShowcaseWine[] = [
   { slug: "dadah-cabernet-2023", productId: "cmtssyq350000l404mdg2nzou", producer: "Dādāh", name: "Cabernet Sauvignon", year: 2023, image: "dadah-cabernet-2023.webp" },
   { slug: "dadah-malbec-barbera-2023", productId: "cmtssyq3k0001l404n0341dmg", producer: "Dādāh", name: "Malbec Barbera", year: 2023, image: "dadah-malbec-barbera-2023.webp" },
   { slug: "tanya-enosh-2018", producer: "Enosh by Tanya", name: "Cabernet Sauvignon", year: 2018, image: "tanya-enosh-2018.webp" },
-  { slug: "tanya-petit-verdot-2021", producer: "Tanya", name: "Petit Verdot · Tchelet", year: 2021, image: "tanya-petit-verdot-2021.webp" },
+  { slug: "tanya-petit-verdot-2021", productId: "cmtssyq530007l404ab37xcal", producer: "Tanya", name: "Petit Verdot · Tchelet", year: 2021, image: "tanya-tchelet-2021-front-v1.webp", editorialHref: "/catalogo-publico/cmtssyq530007l404ab37xcal" },
 ];
 
 // Vino destacado a pedido de Isaac: la botella con el sello de cera, arriba

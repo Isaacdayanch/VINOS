@@ -12,6 +12,11 @@ const DOMINIO_CATALOGO_PUBLICO = process.env.DOMINIO_CATALOGO_PUBLICO;
 // Mientras no esté puesta en Vercel, el sistema queda abierto (como antes).
 const APP_PASSWORD = process.env.APP_PASSWORD;
 
+// Íconos generados por Next desde src/app (favicon.ico, icon.png, apple-icon.png).
+function esIcono(pathname: string) {
+  return /^\/(favicon\.ico|icon\.png|apple-icon\.png)$/.test(pathname);
+}
+
 function esRutaPublica(pathname: string) {
   return (
     pathname === "/catalogo-publico" ||
@@ -25,9 +30,10 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (DOMINIO_CATALOGO_PUBLICO && host === DOMINIO_CATALOGO_PUBLICO) {
-    // Las fotos editoriales son archivos públicos, no páginas del CRM.
-    // Reescribirlas al inicio devuelve HTML y rompe también next/image.
-    if (pathname.startsWith("/catalogo/")) {
+    // Las fotos editoriales y los íconos del sitio son archivos públicos, no
+    // páginas del CRM. Reescribirlos al inicio devuelve HTML y rompe también
+    // next/image y el ícono en celulares.
+    if (pathname.startsWith("/catalogo/") || esIcono(pathname)) {
       return NextResponse.next();
     }
 
@@ -58,7 +64,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (esRutaPublica(pathname)) {
+  if (esRutaPublica(pathname) || esIcono(pathname)) {
     return NextResponse.next();
   }
 
@@ -80,5 +86,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico).*)"],
+  matcher: ["/((?!_next|favicon.ico|icon.png|apple-icon.png).*)"],
 };

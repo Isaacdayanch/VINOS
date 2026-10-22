@@ -93,6 +93,13 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   `kind`). El `tipo` se lee en vivo del producto (no de la foto congelada
   de `CatalogoPublicado`), así que mover un producto a Destilado cambia de
   página sin volver a publicar.
+- **Fotos de botella sobre crema (regla fija)**: Cava de vinos, Destilados y
+  la foto de botella de cada ficha usan fondo crema `#f6f2eb`. Las fotos
+  vienen con fondo blanco; el servidor les repinta el blanco en crema
+  (`/catalogo-publico/foto-crema`, ver `_lib/cream-photo.ts`). **NO** usar
+  `mix-blend-mode` ni filtros CSS para esto: en iPhone (Safari) no funciona y
+  se ven cuadros blancos — Isaac lo reportó como lo menos profesional posible.
+  Siempre revisar los cambios de diseño también en tamaño celular.
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →

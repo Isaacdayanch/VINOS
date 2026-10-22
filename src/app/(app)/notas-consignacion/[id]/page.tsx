@@ -1,5 +1,6 @@
-import { crearCobroConsignacion } from "@/app/(app)/distribuidores/actions";
-import { DateField } from "@/components/DateField";
+import { registrarLiquidacionConsignacion, eliminarNotaConsignacion } from "@/app/(app)/distribuidores/actions";
+import { BotonEliminarConfirmado } from "@/components/BotonEliminarConfirmado";
+import { LiquidacionConsignacionForm } from "@/components/LiquidacionConsignacionForm";
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
@@ -23,9 +24,25 @@ export default async function DetalleNotaConsignacionPage({
 
   const total = nota.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
   const cobrado = nota.cobros.reduce((acc, c) => acc + c.monto, 0);
-  const pendiente = total - cobrado;
+  const pendiente = nota.lineas.reduce(
+    (acc, l) => acc + (l.cantidadBotellas - l.botellasPagadas - l.botellasDevueltas) * l.precioUnitario,
+    0,
+  );
+  const totalDevuelto = nota.lineas.reduce((acc, l) => acc + l.botellasDevueltas, 0);
   const hoy = new Date().toISOString().slice(0, 10);
-  const registrarCobro = crearCobroConsignacion.bind(null, nota.id);
+  const liquidar = registrarLiquidacionConsignacion.bind(null, nota.id);
+  const eliminar = eliminarNotaConsignacion.bind(null, nota.id);
+  const sinActividad =
+    nota.cobros.length === 0 && nota.lineas.every((l) => l.botellasPagadas === 0 && l.botellasDevueltas === 0);
+
+  const lineasPendientes = nota.lineas
+    .map((l) => ({
+      id: l.id,
+      productoNombre: l.producto.nombre,
+      pendiente: l.cantidadBotellas - l.botellasPagadas - l.botellasDevueltas,
+      precioUnitario: l.precioUnitario,
+    }))
+    .filter((l) => l.pendiente > 0);
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -39,39 +56,67 @@ export default async function DetalleNotaConsignacionPage({
             {new Date(nota.fecha).toLocaleDateString("es-MX")}
           </span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <p className="text-muted text-sm">{nota.distribuidor.nombre}</p>
-          <Link
-            href={`/notas-consignacion/${nota.id}/recibo`}
-            className="text-sm text-wine underline whitespace-nowrap"
-          >
-            Ver nota imprimible
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/notas-consignacion/${nota.id}/recibo`}
+              className="text-sm text-wine underline whitespace-nowrap"
+            >
+              Ver nota imprimible
+            </Link>
+            {sinActividad && (
+              <BotonEliminarConfirmado
+                action={eliminar}
+                mensaje={`¿Seguro que quieres eliminar la nota ${nota.folio}? Esto le regresa las botellas al stock, como si nunca hubiera salido.`}
+                className="text-sm text-warn underline whitespace-nowrap"
+              >
+                Eliminar nota
+              </BotonEliminarConfirmado>
+            )}
+          </div>
         </div>
       </div>
 
+      {!sinActividad && (
+        <p className="text-xs text-muted -mt-4">
+          Esta nota ya tiene pagos o devoluciones registradas, así que ya no se puede eliminar.
+        </p>
+      )}
+
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
-        {nota.lineas.map((l) => (
-          <div key={l.id} className="p-4 flex items-center gap-3">
-            <div className="w-10 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
-              {l.producto.fotoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={l.producto.fotoUrl} alt={l.producto.nombre} className="w-full h-full object-contain" />
-              ) : (
-                <span className="text-lg">🍷</span>
-              )}
+        {nota.lineas.map((l) => {
+          const pendienteLinea = l.cantidadBotellas - l.botellasPagadas - l.botellasDevueltas;
+          return (
+            <div key={l.id} className="p-4 flex items-center gap-3">
+              <div className="w-10 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
+                {l.producto.fotoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={l.producto.fotoUrl} alt={l.producto.nombre} className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-lg">🍷</span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{l.producto.nombre}</p>
+                <p className="text-xs text-muted">
+                  {l.cantidadBotellas} botella{l.cantidadBotellas === 1 ? "" : "s"} × {formatoMXN(l.precioUnitario)}
+                </p>
+                {(l.botellasPagadas > 0 || l.botellasDevueltas > 0) && (
+                  <p className="text-xs text-muted">
+                    {l.botellasPagadas > 0 ? `${l.botellasPagadas} pagada${l.botellasPagadas === 1 ? "" : "s"}` : ""}
+                    {l.botellasPagadas > 0 && l.botellasDevueltas > 0 ? " · " : ""}
+                    {l.botellasDevueltas > 0 ? `${l.botellasDevueltas} devuelta${l.botellasDevueltas === 1 ? "" : "s"}` : ""}
+                    {pendienteLinea > 0 ? ` · ${pendienteLinea} pendiente${pendienteLinea === 1 ? "" : "s"}` : ""}
+                  </p>
+                )}
+              </div>
+              <span className="font-semibold whitespace-nowrap">
+                {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
+              </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{l.producto.nombre}</p>
-              <p className="text-xs text-muted">
-                {l.cantidadBotellas} botella{l.cantidadBotellas === 1 ? "" : "s"} × {formatoMXN(l.precioUnitario)}
-              </p>
-            </div>
-            <span className="font-semibold whitespace-nowrap">
-              {formatoMXN(l.cantidadBotellas * l.precioUnitario)}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="rounded-lg border border-border bg-wine-light p-4 flex flex-col gap-1">
@@ -83,9 +128,15 @@ export default async function DetalleNotaConsignacionPage({
           <span>Cobrado</span>
           <span>{formatoMXN(cobrado)}</span>
         </div>
+        {totalDevuelto > 0 && (
+          <div className="flex items-center justify-between text-sm text-muted">
+            <span>Devuelto</span>
+            <span>{totalDevuelto} botella{totalDevuelto === 1 ? "" : "s"}</span>
+          </div>
+        )}
         {pendiente > 0 && (
           <div className="flex items-center justify-between text-sm text-warn">
-            <span>Pendiente</span>
+            <span>Pendiente (ni pagado ni devuelto)</span>
             <span>{formatoMXN(pendiente)}</span>
           </div>
         )}
@@ -109,57 +160,19 @@ export default async function DetalleNotaConsignacionPage({
         </div>
       )}
 
-      {pendiente > 0 && (
+      {lineasPendientes.length > 0 && (
         <details className="rounded-lg border border-border bg-surface">
-          <summary className="p-4 cursor-pointer text-sm font-medium">+ Registrar pago</summary>
-          <form action={registrarCobro} className="p-4 pt-0 flex flex-col gap-4">
-            <DateField name="fecha" label="Fecha" defaultValue={hoy} />
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Monto (MXN)</span>
-              <input
-                name="monto"
-                type="number"
-                step="0.01"
-                min="0"
-                defaultValue={pendiente}
-                className="rounded-md border border-border bg-surface px-3 py-2"
-                required
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">¿Dónde te llegó el dinero?</span>
-              <select
-                name="cuenta"
-                defaultValue="EFECTIVO"
-                className="rounded-md border border-border bg-surface px-3 py-2"
-              >
-                <option value="EFECTIVO">Efectivo (a Caja)</option>
-                <option value="CUENTA">Transferencia</option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Comisión % (solo si fue por Transferencia)</span>
-              <input
-                name="comisionPct"
-                type="number"
-                step="0.1"
-                min="0"
-                defaultValue={0.6}
-                className="rounded-md border border-border bg-surface px-3 py-2"
-              />
-            </label>
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Método de pago (opcional)</span>
-              <input
-                name="metodoPago"
-                placeholder="Ej. Transferencia, tarjeta, efectivo"
-                className="rounded-md border border-border bg-surface px-3 py-2"
-              />
-            </label>
-            <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
-              Registrar pago
-            </button>
-          </form>
+          <summary className="p-4 cursor-pointer text-sm font-medium">
+            + Registrar pago / devolución
+          </summary>
+          <div className="p-4 pt-0">
+            <p className="text-xs text-muted mb-3">
+              Por cada vino, pon cuántas botellas te pagaron y cuántas te regresaron sin vender.
+              Las pagadas se cuentan como venta (con su ganancia); las devueltas regresan solas al
+              stock.
+            </p>
+            <LiquidacionConsignacionForm lineas={lineasPendientes} hoy={hoy} action={liquidar} />
+          </div>
         </details>
       )}
     </div>

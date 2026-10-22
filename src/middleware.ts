@@ -12,9 +12,10 @@ const DOMINIO_CATALOGO_PUBLICO = process.env.DOMINIO_CATALOGO_PUBLICO;
 // Mientras no esté puesta en Vercel, el sistema queda abierto (como antes).
 const APP_PASSWORD = process.env.APP_PASSWORD;
 
-// Íconos generados por Next desde src/app (favicon.ico, icon.png, apple-icon.png).
+// Íconos generados por Next desde src/app (favicon.ico, icon.svg y los PNG
+// para iPhone/Android). Nunca deben pedir login ni reescribirse al catálogo.
 function esIcono(pathname: string) {
-  return /^\/(favicon\.ico|icon\.png|apple-icon\.png)$/.test(pathname);
+  return /^\/(favicon\.ico|icon\.svg|icon\.png|apple-icon\.png)$/.test(pathname);
 }
 
 function esRutaPublica(pathname: string) {
@@ -86,5 +87,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico|icon.png|apple-icon.png).*)"],
+  matcher: ["/((?!_next|favicon.ico|icon.svg|icon.png|apple-icon.png).*)"],
 };

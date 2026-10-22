@@ -1,4 +1,5 @@
-import { crearCobroConsignacion } from "@/app/(app)/distribuidores/actions";
+import { crearCobroConsignacion, eliminarNotaConsignacion } from "@/app/(app)/distribuidores/actions";
+import { BotonEliminarConfirmado } from "@/components/BotonEliminarConfirmado";
 import { DateField } from "@/components/DateField";
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
@@ -26,6 +27,7 @@ export default async function DetalleNotaConsignacionPage({
   const pendiente = total - cobrado;
   const hoy = new Date().toISOString().slice(0, 10);
   const registrarCobro = crearCobroConsignacion.bind(null, nota.id);
+  const eliminar = eliminarNotaConsignacion.bind(null, nota.id);
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -39,16 +41,33 @@ export default async function DetalleNotaConsignacionPage({
             {new Date(nota.fecha).toLocaleDateString("es-MX")}
           </span>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <p className="text-muted text-sm">{nota.distribuidor.nombre}</p>
-          <Link
-            href={`/notas-consignacion/${nota.id}/recibo`}
-            className="text-sm text-wine underline whitespace-nowrap"
-          >
-            Ver nota imprimible
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/notas-consignacion/${nota.id}/recibo`}
+              className="text-sm text-wine underline whitespace-nowrap"
+            >
+              Ver nota imprimible
+            </Link>
+            {nota.cobros.length === 0 && (
+              <BotonEliminarConfirmado
+                action={eliminar}
+                mensaje={`¿Seguro que quieres eliminar la nota ${nota.folio}? Esto le regresa las botellas al stock, como si nunca hubiera salido.`}
+                className="text-sm text-warn underline whitespace-nowrap"
+              >
+                Eliminar nota
+              </BotonEliminarConfirmado>
+            )}
+          </div>
         </div>
       </div>
+
+      {nota.cobros.length > 0 && (
+        <p className="text-xs text-muted -mt-4">
+          Esta nota ya tiene pagos registrados, así que ya no se puede eliminar.
+        </p>
+      )}
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {nota.lineas.map((l) => (

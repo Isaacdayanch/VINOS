@@ -35,6 +35,20 @@ export async function crearDistribuidorRapido(nombre: string) {
   return distribuidor;
 }
 
+export async function eliminarDistribuidor(distribuidorId: string) {
+  const notasCount = await prisma.notaConsignacion.count({ where: { distribuidorId } });
+  if (notasCount > 0) {
+    throw new Error(
+      "Este distribuidor todavía tiene notas de consignación. Bórralas primero y luego el distribuidor.",
+    );
+  }
+
+  await prisma.distribuidor.delete({ where: { id: distribuidorId } });
+
+  revalidatePath("/distribuidores");
+  redirect("/distribuidores");
+}
+
 async function siguienteFolioConsignacion() {
   const notas = await prisma.notaConsignacion.findMany({ select: { folio: true } });
   let maxNumero = 0;
@@ -103,6 +117,36 @@ export async function crearNotaConsignacion(distribuidorId: string, formData: Fo
   revalidatePath("/stock");
   revalidatePath("/");
   redirect(`/notas-consignacion/${nota.id}`);
+}
+
+// Solo se puede borrar si nunca se le registró ningún pago, para no afectar
+// cobros reales ya contados en Finanzas. Al borrarla, se le regresan las
+// botellas al stock (se borran las Salida que había creado): la mercancía
+// nunca salió de verdad.
+export async function eliminarNotaConsignacion(notaConsignacionId: string) {
+  const nota = await prisma.notaConsignacion.findUnique({
+    where: { id: notaConsignacionId },
+    include: { cobros: true, lineas: true },
+  });
+  if (!nota) return;
+
+  if (nota.cobros.length > 0) {
+    throw new Error("Esta nota ya tiene pagos registrados, no se puede eliminar.");
+  }
+
+  const productoIds = nota.lineas.map((l) => l.productoId);
+
+  await prisma.salida.deleteMany({ where: { notaConsignacionId } });
+  await prisma.notaConsignacionLinea.deleteMany({ where: { notaConsignacionId } });
+  await prisma.notaConsignacion.delete({ where: { id: notaConsignacionId } });
+
+  await sincronizarActivoPorStockVarios(productoIds);
+
+  revalidatePath(`/distribuidores/${nota.distribuidorId}`);
+  revalidatePath("/distribuidores");
+  revalidatePath("/stock");
+  revalidatePath("/");
+  redirect(`/distribuidores/${nota.distribuidorId}`);
 }
 
 export async function crearCobroConsignacion(notaConsignacionId: string, formData: FormData) {

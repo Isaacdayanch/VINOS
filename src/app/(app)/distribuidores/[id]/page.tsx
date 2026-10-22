@@ -1,3 +1,5 @@
+import { eliminarDistribuidor } from "@/app/(app)/distribuidores/actions";
+import { BotonEliminarConfirmado } from "@/components/BotonEliminarConfirmado";
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
@@ -27,16 +29,33 @@ export default async function DetalleDistribuidorPage({
     cobrado += n.cobros.reduce((acc, c) => acc + c.monto, 0);
   }
   const pendiente = total - cobrado;
+  const eliminar = eliminarDistribuidor.bind(null, distribuidor.id);
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
       <div>
-        <Link href="/distribuidores" className="text-sm text-wine underline">
-          ← Volver a Distribuidores
-        </Link>
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/distribuidores" className="text-sm text-wine underline">
+            ← Volver a Distribuidores
+          </Link>
+          {distribuidor.notasConsignacion.length === 0 && (
+            <BotonEliminarConfirmado
+              action={eliminar}
+              mensaje={`¿Seguro que quieres eliminar a ${distribuidor.nombre}?`}
+            >
+              Eliminar distribuidor
+            </BotonEliminarConfirmado>
+          )}
+        </div>
         <h1 className="text-2xl font-bold text-wine mt-2">{distribuidor.nombre}</h1>
         <p className="text-muted text-sm">{distribuidor.telefono || "Sin teléfono"}</p>
         {distribuidor.notas && <p className="text-muted text-sm mt-1">{distribuidor.notas}</p>}
+        {distribuidor.notasConsignacion.length > 0 && (
+          <p className="text-xs text-muted mt-2">
+            Para eliminar este distribuidor, primero elimina todas sus notas de consignación
+            (nada más se puede si no tienen pagos registrados).
+          </p>
+        )}
       </div>
 
       <div className="rounded-lg border border-border bg-wine-light p-4 flex flex-col gap-1">

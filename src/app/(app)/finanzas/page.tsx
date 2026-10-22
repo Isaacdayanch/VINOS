@@ -223,8 +223,8 @@ export default async function FinanzasPage() {
           <div>
             <h2 className="font-semibold text-ok">🤝 Ganancia por consignación ya cobrada</h2>
             <p className="text-xs text-muted mt-1">
-              Solo la parte que ya te pagaron en Distribuidores/Eventos — lo que todavía no te
-              pagan no cuenta como venta ni ganancia. Ya está sumada a la ganancia total.
+              Solo la parte que ya te pagaron en Consignación — lo que todavía no te pagan no
+              cuenta como venta ni ganancia. Ya está sumada a la ganancia total.
             </p>
           </div>
           <div className="text-right whitespace-nowrap">

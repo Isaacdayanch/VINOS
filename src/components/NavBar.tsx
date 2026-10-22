@@ -93,7 +93,7 @@ const links = [
   { href: "/pedidos", label: "Pedidos a proveedores", disponible: true },
   { href: "/ordenes", label: "Órdenes de clientes", disponible: true },
   { href: "/precios", label: "Precios", disponible: true },
-  { href: "/distribuidores", label: "Distribuidores", disponible: true },
+  { href: "/distribuidores", label: "Consignación", disponible: true },
 ];
 
 export function NavBar() {

@@ -218,6 +218,22 @@ export default async function FinanzasPage() {
         </div>
       )}
 
+      {finanzas.ventaConsignacionReconocida > 0 && (
+        <div className="rounded-lg border border-ok/40 bg-surface p-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-ok">🤝 Ganancia por consignación ya cobrada</h2>
+            <p className="text-xs text-muted mt-1">
+              Solo la parte que ya te pagaron en Distribuidores/Eventos — lo que todavía no te
+              pagan no cuenta como venta ni ganancia. Ya está sumada a la ganancia total.
+            </p>
+          </div>
+          <div className="text-right whitespace-nowrap">
+            <p className="font-bold text-ok">{formatoMXN(finanzas.gananciaConsignacion)}</p>
+            <p className="text-xs text-muted">de {formatoMXN(finanzas.ventaConsignacionReconocida)} vendido</p>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         <div className="p-4">
           <h2 className="font-semibold">Pagos y gastos recientes</h2>

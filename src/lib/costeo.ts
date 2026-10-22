@@ -243,6 +243,8 @@ export type ResumenFinanzas = {
   regalosClientes: { botellas: number; costo: number }; // botellas regaladas a clientes (marketing)
   perdidaAjusteInventario: { botellas: number; costo: number }; // faltantes sin dueño (pérdida del negocio)
   gananciaAjusteInventario: { botellas: number; costo: number }; // sobrantes encontrados (ganancia extra)
+  ventaConsignacionReconocida: number; // solo la parte de consignación ya cobrada (ver gananciaConsignacion)
+  gananciaConsignacion: number; // ganancia de consignación, incluida ya en gananciaTotal
 };
 
 const PORCENTAJE_MAASER = 0.1;
@@ -256,7 +258,7 @@ export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: num
  * saldo de Caja/Cuenta, y el saldo entre socios (quién le debe a quién).
  */
 export async function calcularFinanzas(): Promise<ResumenFinanzas> {
-  const [resumenInventario, socios, pagos, cobros, abonosCliente, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock] =
+  const [resumenInventario, socios, pagos, cobros, abonosCliente, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock, lineasConsignacion] =
     await Promise.all([
       calcularResumenInventario(),
       prisma.socio.findMany(),
@@ -267,6 +269,7 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
       prisma.orden.findMany({ include: { lineas: true } }),
       prisma.salida.findMany({ where: { motivo: "Consumo personal" } }),
       prisma.ajusteStock.findMany(),
+      prisma.notaConsignacionLinea.findMany(),
     ]);
 
   let valorInventario = 0;
@@ -290,7 +293,18 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
       }
     }
   }
-  const gananciaTotal = ventasTotales - costoVentas;
+  // La consignación solo se vuelve "venta" de verdad hasta que el distribuidor
+  // (o quien recibió el evento) paga esas botellas -- lo que se le regresa a
+  // Isaac sin vender nunca cuenta como venta ni ganancia, solo vuelve al stock.
+  let ventaConsignacionReconocida = 0;
+  let costoConsignacionReconocido = 0;
+  for (const l of lineasConsignacion) {
+    ventaConsignacionReconocida += l.botellasPagadas * l.precioUnitario;
+    costoConsignacionReconocido += l.botellasPagadas * l.costoUnitario;
+  }
+  const gananciaConsignacion = ventaConsignacionReconocida - costoConsignacionReconocido;
+
+  const gananciaTotal = ventasTotales - costoVentas + gananciaConsignacion;
 
   const totalCobrado =
     cobros.reduce((acc, c) => acc + c.monto, 0) +
@@ -391,6 +405,11 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   let gananciaAjusteBotellas = 0;
   let gananciaAjusteCosto = 0;
   for (const a of ajustesStock) {
+    // Las devoluciones de consignación no son un sobrante misterioso -- ya se
+    // contabilizan solas al no sumarse como venta/ganancia de consignación
+    // (ver gananciaConsignacion arriba), así que aquí se ignoran para no
+    // contarlas dos veces como "ganancia extra".
+    if (a.motivo?.startsWith("Devolución de consignación")) continue;
     if (a.botellas < 0) {
       const botellas = Math.abs(a.botellas);
       const costoBruto = a.costoUnitario * botellas;
@@ -458,6 +477,8 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     regalosClientes: { botellas: regalosBotellas, costo: regalosCosto },
     perdidaAjusteInventario: { botellas: perdidaAjusteBotellas, costo: perdidaAjusteCosto },
     gananciaAjusteInventario: { botellas: gananciaAjusteBotellas, costo: gananciaAjusteCosto },
+    ventaConsignacionReconocida,
+    gananciaConsignacion,
     maaserDebido,
     maaserDado,
     saldoMaaser,

@@ -144,6 +144,87 @@ export async function asignarTodoStockAUbicacion(ubicacionId: string) {
   redirect("/stock");
 }
 
+// Mueve botellas de una bodega a otra: le resta a la bodega de origen
+// exactamente lo mismo que le suma a la de destino, así que el Consolidado
+// nunca cambia (no toca el stock "sin bodega asignada" para nada). Valida
+// TODO antes de mover una sola botella -- si algo no alcanza, no se
+// transfiere nada, para no dejar la transferencia a medias.
+export async function transferirLoteUbicaciones(formData: FormData) {
+  const origenId = String(formData.get("origenId") ?? "").trim();
+  const destinoId = String(formData.get("destinoId") ?? "").trim();
+
+  if (!origenId || !destinoId) {
+    throw new Error("Falta elegir de dónde sale y a dónde llega el stock");
+  }
+  if (origenId === destinoId) {
+    throw new Error("El origen y el destino no pueden ser la misma bodega");
+  }
+
+  let lineasCrudas: { productoId: string; cantidad: number }[];
+  try {
+    lineasCrudas = JSON.parse(String(formData.get("lineas") ?? "[]"));
+  } catch {
+    throw new Error("No se pudieron leer las líneas a transferir");
+  }
+  const lineas = lineasCrudas.filter(
+    (l) => l.productoId && Number.isFinite(l.cantidad) && l.cantidad > 0,
+  );
+  if (lineas.length === 0) {
+    throw new Error("No hay ninguna línea válida que transferir");
+  }
+
+  const [resumen, stockUbicaciones, ubicaciones] = await Promise.all([
+    calcularResumenInventario(),
+    calcularStockPorUbicacion(),
+    prisma.ubicacion.findMany({ where: { id: { in: [origenId, destinoId] } } }),
+  ]);
+
+  const origen = ubicaciones.find((u) => u.id === origenId);
+  const destino = ubicaciones.find((u) => u.id === destinoId);
+  if (!origen || !destino) {
+    throw new Error("No encontré esas bodegas");
+  }
+
+  // Si dos líneas son el mismo producto, se suman antes de comparar contra
+  // lo disponible -- si no, cada línea por separado podría "pasar" aunque
+  // juntas excedan lo que de verdad hay en el origen.
+  const totalesPorProducto = new Map<string, number>();
+  for (const l of lineas) {
+    totalesPorProducto.set(l.productoId, (totalesPorProducto.get(l.productoId) ?? 0) + l.cantidad);
+  }
+  const faltantes: string[] = [];
+  for (const [productoId, total] of totalesPorProducto) {
+    const disponible = stockEnUbicacion(stockUbicaciones, productoId, origenId);
+    if (total > disponible) faltantes.push(productoId);
+  }
+  if (faltantes.length > 0) {
+    throw new Error(
+      `No hay suficiente stock en ${origen.nombre} para ${faltantes.length} de los vinos que pediste transferir. No se movió nada todavía.`,
+    );
+  }
+
+  const motivo = `Transferencia de bodega — ${origen.nombre} a ${destino.nombre}`;
+  await prisma.$transaction(
+    lineas.flatMap((l) => {
+      const costoUnitario = resumen.get(l.productoId)?.costoPromedioPorBotella ?? 0;
+      return [
+        prisma.ajusteStock.create({
+          data: { productoId: l.productoId, botellas: -l.cantidad, costoUnitario, motivo, ubicacionId: origenId },
+        }),
+        prisma.ajusteStock.create({
+          data: { productoId: l.productoId, botellas: l.cantidad, costoUnitario, motivo, ubicacionId: destinoId },
+        }),
+      ];
+    }),
+  );
+
+  revalidatePath("/stock");
+  revalidatePath("/stock/ubicaciones");
+  revalidatePath("/stock/movimientos");
+  revalidatePath("/");
+  redirect("/stock/ubicaciones?transferido=1");
+}
+
 export async function crearUbicacion(formData: FormData) {
   const nombre = String(formData.get("nombre") ?? "").trim();
   const direccion = String(formData.get("direccion") ?? "").trim() || null;

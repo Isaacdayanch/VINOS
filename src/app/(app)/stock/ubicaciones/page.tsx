@@ -6,7 +6,11 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function UbicacionesPage() {
+export default async function UbicacionesPage({
+  searchParams,
+}: PageProps<"/stock/ubicaciones">) {
+  const sp = await searchParams;
+  const transferido = sp.transferido === "1";
   const ubicaciones = await prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } });
 
   return (
@@ -22,7 +26,29 @@ export default async function UbicacionesPage() {
         </p>
       </div>
 
+      {transferido && (
+        <div className="rounded-lg border border-ok/40 bg-surface p-4 text-sm text-ok font-medium">
+          ✓ Listo, ya quedó transferido el stock.
+        </div>
+      )}
+
       <UbicacionesManager ubicaciones={ubicaciones} />
+
+      {ubicaciones.length >= 2 && (
+        <div className="rounded-lg border border-wine/40 bg-wine-light/30 p-4 flex flex-col gap-2">
+          <p className="font-medium text-wine">Transferencia pendiente a Quijote 9</p>
+          <p className="text-xs text-muted">
+            Herramienta de un solo uso para pasar lo que ya mandaste a Quijote 9, descontándolo
+            de 689. Cuando quede confirmada se quita de aquí.
+          </p>
+          <Link
+            href="/stock/transferir"
+            className="rounded-md bg-wine text-white px-3 py-2 text-sm font-medium self-start"
+          >
+            Ir a transferir
+          </Link>
+        </div>
+      )}
 
       {ubicaciones.length > 0 && (
         <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">

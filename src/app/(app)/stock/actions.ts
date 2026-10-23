@@ -55,6 +55,28 @@ export async function ajustarStock(productoId: string, formData: FormData) {
   redirect(`/stock?ubicacion=${ubicacionId}`);
 }
 
+// Crea el ajuste necesario para que el stock de un producto en una bodega
+// quede en "cantidadNueva" (compara contra lo que ya había ahí y solo
+// registra la diferencia). Usado por las dos pantallas de reparto de abajo.
+async function ajustarACantidad(
+  productoId: string,
+  ubicacionId: string,
+  cantidadNueva: number,
+  costoUnitario: number,
+  motivo: string,
+  stockUbicaciones: Map<string, Map<string | null, number>>,
+) {
+  if (Number.isNaN(cantidadNueva) || cantidadNueva < 0) return false;
+  const actual = stockEnUbicacion(stockUbicaciones, productoId, ubicacionId);
+  const diferencia = cantidadNueva - actual;
+  if (diferencia === 0) return false;
+
+  await prisma.ajusteStock.create({
+    data: { productoId, botellas: diferencia, costoUnitario, motivo, ubicacionId },
+  });
+  return true;
+}
+
 // Pantalla sencilla para repartir de un jalón cuánto stock de cada producto
 // hay en cada bodega (en vez de ir producto por producto en "Ajustar").
 // Compara lo que escribe Isaac contra lo que el sistema ya tenía registrado
@@ -74,24 +96,77 @@ export async function repartirStockUbicaciones(formData: FormData) {
     for (const u of ubicaciones) {
       const campo = formData.get(`cantidad_${p.id}_${u.id}`);
       if (campo === null || campo === "") continue;
-      const cantidadNueva = Number(campo);
-      if (Number.isNaN(cantidadNueva) || cantidadNueva < 0) continue;
-
-      const actual = stockEnUbicacion(stockUbicaciones, p.id, u.id);
-      const diferencia = cantidadNueva - actual;
-      if (diferencia === 0) continue;
-
-      await prisma.ajusteStock.create({
-        data: {
-          productoId: p.id,
-          botellas: diferencia,
-          costoUnitario,
-          motivo: "Reparto de stock por bodega",
-          ubicacionId: u.id,
-        },
-      });
-      productoIdsAfectados.add(p.id);
+      const cambio = await ajustarACantidad(
+        p.id,
+        u.id,
+        Number(campo),
+        costoUnitario,
+        "Reparto de stock por bodega",
+        stockUbicaciones,
+      );
+      if (cambio) productoIdsAfectados.add(p.id);
     }
+  }
+
+  await sincronizarActivoPorStockVarios([...productoIdsAfectados]);
+
+  revalidatePath("/stock");
+  revalidatePath("/stock/ubicaciones");
+  revalidatePath("/finanzas");
+  revalidatePath("/");
+  redirect("/stock");
+}
+
+// Para cuando solo tienes el conteo de UNA bodega a la mano: pones nomás esa
+// y lo demás (Consolidado menos lo que pusiste) se carga solo a la otra
+// bodega. Solo funciona si hay exactamente 2 ubicaciones.
+export async function repartirRapidoUbicaciones(formData: FormData) {
+  const ubicacionManualId = String(formData.get("ubicacionManualId") ?? "").trim();
+
+  const [productos, ubicaciones, resumen, stockUbicaciones] = await Promise.all([
+    prisma.producto.findMany({ select: { id: true } }),
+    prisma.ubicacion.findMany({ select: { id: true } }),
+    calcularResumenInventario(),
+    calcularStockPorUbicacion(),
+  ]);
+
+  if (ubicaciones.length !== 2) {
+    throw new Error("Esta pantalla solo funciona con exactamente 2 ubicaciones.");
+  }
+  const ubicacionRestoId = ubicaciones.find((u) => u.id !== ubicacionManualId)?.id;
+  if (!ubicacionManualId || !ubicacionRestoId) {
+    throw new Error("Falta decir de cuál bodega vas a dar los números.");
+  }
+
+  const productoIdsAfectados = new Set<string>();
+
+  for (const p of productos) {
+    const campo = formData.get(`cantidad_${p.id}`);
+    if (campo === null || campo === "") continue;
+    const cantidadManual = Number(campo);
+    if (Number.isNaN(cantidadManual) || cantidadManual < 0) continue;
+
+    const costoUnitario = resumen.get(p.id)?.costoPromedioPorBotella ?? 0;
+    const consolidado = resumen.get(p.id)?.stockActual ?? 0;
+    const cantidadResto = Math.max(0, consolidado - cantidadManual);
+
+    const cambio1 = await ajustarACantidad(
+      p.id,
+      ubicacionManualId,
+      cantidadManual,
+      costoUnitario,
+      "Reparto de stock por bodega",
+      stockUbicaciones,
+    );
+    const cambio2 = await ajustarACantidad(
+      p.id,
+      ubicacionRestoId,
+      cantidadResto,
+      costoUnitario,
+      "Reparto de stock por bodega",
+      stockUbicaciones,
+    );
+    if (cambio1 || cambio2) productoIdsAfectados.add(p.id);
   }
 
   await sincronizarActivoPorStockVarios([...productoIdsAfectados]);

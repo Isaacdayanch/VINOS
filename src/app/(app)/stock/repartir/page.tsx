@@ -42,6 +42,15 @@ export default async function RepartirStockPage() {
           físico. No tienes que llenar todos, solo los que quieras corregir. Al final le picas
           &quot;Guardar&quot; una sola vez.
         </p>
+        {ubicaciones.length === 2 && (
+          <p className="text-xs text-muted mt-1">
+            ¿Solo tienes el conteo de una bodega?{" "}
+            <Link href="/stock/repartir-rapido" className="text-wine underline">
+              Usa el reparto rápido
+            </Link>{" "}
+            — pones esa nada más y el resto se carga solo a la otra.
+          </p>
+        )}
       </div>
 
       <form action={repartirStockUbicaciones} className="flex flex-col gap-3">

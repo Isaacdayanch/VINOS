@@ -88,9 +88,6 @@ export default async function StockPage({ searchParams }: PageProps<"/stock">) {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/stock/repartir" className="text-xs text-wine underline whitespace-nowrap">
-            Repartir stock por bodega
-          </Link>
           <Link href="/stock/ubicaciones" className="text-xs text-wine underline whitespace-nowrap">
             Editar ubicaciones
           </Link>

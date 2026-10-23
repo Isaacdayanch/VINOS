@@ -5,8 +5,14 @@ export type EditorialWine = {
   slug: string;
   name: string;
   title: string;
-  year: number;
+  /** Vintage; spirits without a vintage omit it. */
+  year?: number;
   producer: string;
+  /** Spirits swap wine wording (copa, bodega) for whisky wording. */
+  kind?: "DESTILADO";
+  /** Spirits: tasting in three steps and how to serve it. */
+  tasting?: { nose: string; palate: string; finish: string };
+  serve?: string;
   style: string;
   description: string;
   pairing: string;
@@ -26,6 +32,6 @@ export function editorialMetadata(wine: EditorialWine): Metadata {
     ...(domain ? { metadataBase: new URL(`https://${domain}`) } : {}),
     title: wine.name,
     description: wine.description,
-    openGraph: { title: wine.name, description: wine.description, type: "website", images: [{ url: wine.photos[5], alt: wine.name }] },
+    openGraph: { title: wine.name, description: wine.description, type: "website", images: [{ url: wine.photos[5] ?? wine.photos[0], alt: wine.name }] },
   };
 }

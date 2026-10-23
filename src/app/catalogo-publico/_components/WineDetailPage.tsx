@@ -12,11 +12,13 @@ type WineDetail = {
 };
 
 /** Public presentation shared by CRM galleries and verified editorial profiles. */
-export function WineDetailPage({ wine }: { wine: WineDetail }) {
+export function WineDetailPage({ wine, spirit = false }: { wine: WineDetail; spirit?: boolean }) {
+  const noun = spirit ? "destilado" : "vino";
+  const collection = spirit ? "/catalogo-publico/destilados" : "/catalogo-publico/catalogo";
   return <>
     <Header />
     <main id="contenido" className={styles.immersivePage}>
-      <Link href="/catalogo-publico/catalogo" className={styles.immersiveBack}>Volver a la selección</Link>
+      <Link href={collection} className={styles.immersiveBack}>Volver a la selección</Link>
       <WineHero photos={wine.photos} name={wine.name}>
         <p className={styles.eyebrow}>{wine.eyebrow}</p><h1>{wine.title}</h1>
         {wine.style && <p className={styles.immersiveStyle}>{wine.style}</p>}
@@ -24,18 +26,18 @@ export function WineDetailPage({ wine }: { wine: WineDetail }) {
         {wine.description && <p className={styles.immersiveDescription}>{wine.description}</p>}
         {wine.commerce && <>
           <p className={styles.winePrice}>{wine.commerce.precioLista !== null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(wine.commerce.precioLista) : "Precio por confirmar"}{wine.commerce.precioLista !== null && <span>MXN</span>}</p>
-          {wine.commerce.activo ? <OrderNotice /> : <p className={styles.purchaseNote}>Este vino no está disponible actualmente.</p>}
+          {wine.commerce.activo ? <OrderNotice spirit={spirit} /> : <p className={styles.purchaseNote}>Este {noun} no está disponible actualmente.</p>}
         </>}
-        <a href="#ficha-tecnica" className={styles.immersiveLink}>Conoce el vino ↓</a>
+        <a href="#ficha-tecnica" className={styles.immersiveLink}>Conoce el {noun} ↓</a>
       </WineHero>
       <section id="ficha-tecnica" className={styles.technicalSection} aria-labelledby="technical-heading">
-        <div><p className={styles.eyebrow}>EL VINO EN DETALLE</p><h2 id="technical-heading">Ficha técnica</h2></div>
+        <div><p className={styles.eyebrow}>EL {noun.toUpperCase()} EN DETALLE</p><h2 id="technical-heading">Ficha técnica</h2></div>
         <dl className={styles.technicalFacts}>{wine.facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
       </section>
-      {wine.stories.length > 0 && <section id="sobre-el-vino" className={styles.immersiveStories} aria-label="En la copa y en la mesa">
+      {wine.stories.length > 0 && <section id="sobre-el-vino" className={styles.immersiveStories} aria-label={spirit ? "Cata y maridaje" : "En la copa y en la mesa"}>
         {wine.stories.map(story => <section key={story.title}><h2>{story.title}</h2><p>{story.text}</p></section>)}
       </section>}
-      <div className={styles.immersiveContinue}><Link href="/catalogo-publico/catalogo" className={styles.darkPill}>Seguir descubriendo</Link></div>
+      <div className={styles.immersiveContinue}><Link href={collection} className={styles.darkPill}>Seguir descubriendo</Link></div>
     </main>
   </>;
 }

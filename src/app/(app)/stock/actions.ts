@@ -6,6 +6,7 @@ import {
   calcularStockPorUbicacion,
   stockEnUbicacion,
   sincronizarActivoPorStock,
+  sincronizarActivoPorStockVarios,
 } from "@/lib/costeo";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -81,6 +82,66 @@ async function drenarSinAsignar(
       ubicacionId: null,
     },
   });
+}
+
+// Herramienta de un solo uso: manda todo el stock actual de cada producto a
+// UNA bodega (de donde después, a mano, se van transfiriendo botellas a la
+// otra con ajustarStock). Por cada producto crea un par de ajustes que se
+// cancelan entre sí en el Consolidado -- uno le quita exactamente lo mismo
+// al stock "sin bodega asignada" que lo que le da a la bodega elegida --
+// así nunca se duplica nada. Si un producto ya tiene algo puesto en esa
+// bodega, no le hace nada (para poder correrla más de una vez sin riesgo).
+export async function asignarTodoStockAUbicacion(ubicacionId: string) {
+  if (!ubicacionId) {
+    throw new Error("Falta decir a cuál bodega");
+  }
+
+  const [productos, resumen, stockUbicaciones] = await Promise.all([
+    prisma.producto.findMany({ select: { id: true } }),
+    calcularResumenInventario(),
+    calcularStockPorUbicacion(),
+  ]);
+
+  const productoIdsAfectados: string[] = [];
+
+  for (const p of productos) {
+    const r = resumen.get(p.id);
+    const consolidado = r?.stockActual ?? 0;
+    if (consolidado <= 0) continue;
+
+    const yaTieneAqui = stockEnUbicacion(stockUbicaciones, p.id, ubicacionId);
+    if (yaTieneAqui !== 0) continue; // ya se repartió este producto, no lo tocamos de nuevo
+
+    const costoUnitario = r?.costoPromedioPorBotella ?? 0;
+
+    await prisma.ajusteStock.create({
+      data: {
+        productoId: p.id,
+        botellas: consolidado,
+        costoUnitario,
+        motivo: "Asignación inicial de todo el stock a una bodega",
+        ubicacionId,
+      },
+    });
+    await prisma.ajusteStock.create({
+      data: {
+        productoId: p.id,
+        botellas: -consolidado,
+        costoUnitario,
+        motivo: "Asignación inicial de todo el stock a una bodega (de stock sin bodega asignada)",
+        ubicacionId: null,
+      },
+    });
+    productoIdsAfectados.push(p.id);
+  }
+
+  await sincronizarActivoPorStockVarios(productoIdsAfectados);
+
+  revalidatePath("/stock");
+  revalidatePath("/stock/ubicaciones");
+  revalidatePath("/finanzas");
+  revalidatePath("/");
+  redirect("/stock");
 }
 
 export async function crearUbicacion(formData: FormData) {

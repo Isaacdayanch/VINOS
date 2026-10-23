@@ -1,3 +1,5 @@
+import { asignarTodoStockAUbicacion } from "@/app/(app)/stock/actions";
+import { BotonEliminarConfirmado } from "@/components/BotonEliminarConfirmado";
 import { prisma } from "@/lib/prisma";
 import { UbicacionesManager } from "@/components/UbicacionesManager";
 import Link from "next/link";
@@ -21,6 +23,32 @@ export default async function UbicacionesPage() {
       </div>
 
       <UbicacionesManager ubicaciones={ubicaciones} />
+
+      {ubicaciones.length > 0 && (
+        <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
+          <div>
+            <p className="font-medium">Mandar todo tu stock actual a una bodega</p>
+            <p className="text-xs text-muted mt-1">
+              Para empezar: pone todo lo que ya tienes en el sistema en la bodega que elijas, sin
+              cambiar para nada el total (Consolidado). De ahí, para pasar botellas a la otra
+              bodega, usa &quot;Ajustar&quot; en cada vino. Si un producto ya tiene algo puesto en
+              una bodega, esto no lo toca.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {ubicaciones.map((u) => (
+              <BotonEliminarConfirmado
+                key={u.id}
+                action={asignarTodoStockAUbicacion.bind(null, u.id)}
+                mensaje={`¿Mandar todo tu stock actual a "${u.nombre}"? Esto no cambia el Consolidado, solo dice en dónde está.`}
+                className="rounded-md bg-wine text-white px-3 py-2 text-sm font-medium"
+              >
+                Todo a {u.nombre}
+              </BotonEliminarConfirmado>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

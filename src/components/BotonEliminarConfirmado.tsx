@@ -1,5 +1,7 @@
 "use client";
 
+import { SubmitButton } from "@/components/SubmitButton";
+
 export function BotonEliminarConfirmado({
   action,
   mensaje,
@@ -18,12 +20,9 @@ export function BotonEliminarConfirmado({
         if (!confirm(mensaje)) e.preventDefault();
       }}
     >
-      <button
-        type="submit"
-        className={className ?? "text-xs text-warn underline whitespace-nowrap"}
-      >
+      <SubmitButton className={className ?? "text-xs text-warn underline whitespace-nowrap"}>
         {children}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

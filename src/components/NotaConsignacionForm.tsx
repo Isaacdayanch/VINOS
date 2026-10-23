@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ProductoPicker } from "@/components/ProductoPicker";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type Producto = {
   id: string;
@@ -209,9 +210,9 @@ export function NotaConsignacionForm({
         </span>
       </div>
 
-      <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Creando...">
         Crear nota de consignación
-      </button>
+      </SubmitButton>
     </form>
   );
 }

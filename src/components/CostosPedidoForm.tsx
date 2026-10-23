@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export function CostosPedidoForm({
   action,
@@ -114,9 +115,9 @@ export function CostosPedidoForm({
         </div>
       )}
 
-      <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
+      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm" pendingText="Guardando...">
         Guardar cambios
-      </button>
+      </SubmitButton>
     </form>
   );
 }

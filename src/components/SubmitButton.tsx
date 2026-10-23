@@ -12,17 +12,19 @@ export function SubmitButton({
   children,
   className,
   pendingText,
+  disabled,
 }: {
   children: React.ReactNode;
   className: string;
   pendingText?: string;
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
 
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       aria-busy={pending}
       className={`${className} transition-all duration-200 ease-out ${
         pending ? "opacity-60 cursor-wait" : "active:scale-[0.97]"

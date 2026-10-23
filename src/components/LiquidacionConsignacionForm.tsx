@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 import { formatoMXN } from "@/lib/costeo";
 
 type Linea = {
@@ -142,13 +143,13 @@ export function LiquidacionConsignacionForm({
         <input name="notas" className="rounded-md border border-border bg-surface px-3 py-2" />
       </label>
 
-      <button
-        type="submit"
+      <SubmitButton
         disabled={!hayMovimiento}
         className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm disabled:opacity-50"
+        pendingText="Registrando..."
       >
         Registrar
-      </button>
+      </SubmitButton>
     </form>
   );
 }

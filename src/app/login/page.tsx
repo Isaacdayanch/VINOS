@@ -1,4 +1,5 @@
 import { iniciarSesion } from "./actions";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function LoginPage({
   searchParams,
@@ -29,12 +30,12 @@ export default async function LoginPage({
         {error && (
           <p className="text-xs text-warn text-center">Clave incorrecta, intenta otra vez.</p>
         )}
-        <button
-          type="submit"
-          className="rounded-md bg-wine text-white px-4 py-2 font-medium hover:bg-wine-dark active:scale-[0.97] disabled:opacity-60 transition-colors"
+        <SubmitButton
+          className="rounded-md bg-wine text-white px-4 py-2 font-medium hover:bg-wine-dark transition-colors"
+          pendingText="Entrando..."
         >
           Entrar
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { crearDistribuidor } from "@/app/(app)/distribuidores/actions";
 import { ClientePicker } from "@/components/ClientePicker";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type ClienteOpcion = { id: string; nombre: string; codigo?: string | null };
 
@@ -68,9 +69,9 @@ export function NuevoDistribuidorForm({
         <input name="notas" className="rounded-md border border-border bg-surface px-3 py-2" />
       </label>
 
-      <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Creando...">
         {tipo === "EVENTO" ? "Crear evento" : "Crear distribuidor"}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

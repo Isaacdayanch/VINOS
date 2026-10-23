@@ -1,5 +1,6 @@
 import { eliminarDistribuidor, marcarListoEvento } from "@/app/(app)/distribuidores/actions";
 import { BotonEliminarConfirmado } from "@/components/BotonEliminarConfirmado";
+import { SubmitButton } from "@/components/SubmitButton";
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
@@ -87,16 +88,16 @@ export default async function DetalleDistribuidorPage({
             </p>
           </div>
           <form action={marcarListoEvento.bind(null, distribuidor.id, !distribuidor.listoEvento)}>
-            <button
-              type="submit"
+            <SubmitButton
               className={`rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap ${
                 distribuidor.listoEvento
                   ? "border border-border text-muted"
                   : "bg-wine text-white"
               }`}
+              pendingText="..."
             >
               {distribuidor.listoEvento ? "Marcar como no listo" : "Ya estoy listo"}
-            </button>
+            </SubmitButton>
           </form>
         </div>
       )}

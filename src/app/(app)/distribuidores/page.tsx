@@ -1,5 +1,6 @@
 import { calcularResumenDistribuidores, calcularEventosProximos } from "@/lib/consignacion";
 import { marcarListoEvento } from "@/app/(app)/distribuidores/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 import { formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
 
@@ -62,12 +63,12 @@ export default async function DistribuidoresPage({
                 </p>
               </div>
               <form action={marcarListoEvento.bind(null, e.id, true)}>
-                <button
-                  type="submit"
+                <SubmitButton
                   className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap"
+                  pendingText="..."
                 >
                   Ya estoy listo
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ))}

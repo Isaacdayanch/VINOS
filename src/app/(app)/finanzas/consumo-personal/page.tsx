@@ -1,4 +1,5 @@
 import { eliminarConsumoPersonal } from "@/app/(app)/finanzas/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 import { formatoMXN } from "@/lib/costeo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -74,9 +75,9 @@ export default async function ConsumoPersonalListaPage() {
                 </Link>
                 <form action={eliminarConsumoPersonal}>
                   <input type="hidden" name="salidaId" value={s.id} />
-                  <button type="submit" className="text-xs text-muted underline">
+                  <SubmitButton className="text-xs text-muted underline" pendingText="...">
                     Eliminar
-                  </button>
+                  </SubmitButton>
                 </form>
               </div>
             </div>

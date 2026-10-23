@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { calcularResumenInventario } from "@/lib/costeo";
 import { marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -97,12 +98,12 @@ function ListaLineas({ lineas }: { lineas: LineaPendiente[] }) {
             </p>
           </div>
           <form action={marcarLineaEntregada.bind(null, l.id, l.orden.id)}>
-            <button
-              type="submit"
-              className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap hover:bg-wine-dark active:scale-[0.97] transition-colors"
+            <SubmitButton
+              className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap hover:bg-wine-dark transition-colors"
+              pendingText="..."
             >
               Ya se la entregué
-            </button>
+            </SubmitButton>
           </form>
         </div>
       ))}

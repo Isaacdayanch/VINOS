@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { crearConsumoPersonal } from "@/app/(app)/finanzas/actions";
 import { DateField } from "@/components/DateField";
 import { ProductoPicker } from "@/components/ProductoPicker";
+import { SubmitButton } from "@/components/SubmitButton";
 import { formatoMXN } from "@/lib/costeo";
 
 type Producto = { id: string; nombre: string; fotoUrl: string | null; piezasPorCaja: number };
@@ -188,9 +189,9 @@ export function ConsumoPersonalForm({
         />
       </label>
 
-      <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Guardando...">
         {botonTexto}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

@@ -1,5 +1,6 @@
 import { crearPedido, siguienteFolio } from "@/app/(app)/pedidos/actions";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -64,9 +65,9 @@ export default async function NuevoPedidoPage() {
           </p>
         </div>
 
-        <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+        <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Guardando...">
           Guardar pedido
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

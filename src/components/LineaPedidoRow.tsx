@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 import { formatoMXN } from "@/lib/costeo";
 
 type Ubicacion = { id: string; nombre: string };
@@ -150,9 +151,9 @@ export function LineaPedidoRow({
             {totalLinea.toLocaleString("es-MX")} USD
           </p>
           <div className="flex gap-3">
-            <button type="submit" className="rounded-md bg-wine text-white px-3 py-2 text-sm font-medium">
+            <SubmitButton className="rounded-md bg-wine text-white px-3 py-2 text-sm font-medium" pendingText="Guardando...">
               Guardar cambios
-            </button>
+            </SubmitButton>
             <button
               type="button"
               onClick={() => setEditando(false)}
@@ -203,19 +204,19 @@ export function LineaPedidoRow({
           <>
             <span className="text-xs font-medium text-wine">✓ Recibido</span>
             <form action={desmarcarAction}>
-              <button type="submit" className="text-xs text-muted underline">
+              <SubmitButton className="text-xs text-muted underline" pendingText="...">
                 Deshacer
-              </button>
+              </SubmitButton>
             </form>
           </>
         ) : (
           <form action={marcarRecibidaAction}>
-            <button
-              type="submit"
+            <SubmitButton
               className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap"
+              pendingText="..."
             >
               Marcar recibido
-            </button>
+            </SubmitButton>
           </form>
         )}
         <div className="flex gap-2">
@@ -224,9 +225,9 @@ export function LineaPedidoRow({
           </button>
           {!recibida && (
             <form action={eliminarAction}>
-              <button type="submit" className="text-xs text-muted underline">
+              <SubmitButton className="text-xs text-muted underline" pendingText="...">
                 Quitar
-              </button>
+              </SubmitButton>
             </form>
           )}
         </div>

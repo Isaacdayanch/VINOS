@@ -1,4 +1,5 @@
 import { crearCliente } from "@/app/(app)/clientes/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 import Link from "next/link";
 
 export default function NuevoClientePage() {
@@ -38,9 +39,9 @@ export default function NuevoClientePage() {
           />
         </label>
 
-        <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+        <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Creando...">
           Crear cliente
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

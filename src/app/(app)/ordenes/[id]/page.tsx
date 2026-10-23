@@ -1,5 +1,6 @@
 import { crearCobro, marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 import { prisma } from "@/lib/prisma";
 import { calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
 import Link from "next/link";
@@ -115,12 +116,12 @@ export default async function DetalleOrdenPage({
               </span>
               {!l.entregado && (
                 <form action={marcarLineaEntregada.bind(null, l.id, orden.id)}>
-                  <button
-                    type="submit"
-                    className="rounded-md bg-wine text-white px-2.5 py-1 text-xs font-medium whitespace-nowrap hover:bg-wine-dark active:scale-[0.97] transition-colors"
+                  <SubmitButton
+                    className="rounded-md bg-wine text-white px-2.5 py-1 text-xs font-medium whitespace-nowrap hover:bg-wine-dark transition-colors"
+                    pendingText="..."
                   >
                     Ya se la entregué
-                  </button>
+                  </SubmitButton>
                 </form>
               )}
             </div>
@@ -228,9 +229,9 @@ export default async function DetalleOrdenPage({
                 className="rounded-md border border-border bg-surface px-3 py-2"
               />
             </label>
-            <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
+            <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm" pendingText="Guardando...">
               Registrar cobro
-            </button>
+            </SubmitButton>
           </form>
         </details>
       )}

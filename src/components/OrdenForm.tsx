@@ -6,6 +6,7 @@ import { crearClienteRapido } from "@/app/(app)/clientes/actions";
 import { ProductoPicker } from "@/components/ProductoPicker";
 import { ClientePicker } from "@/components/ClientePicker";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type Cliente = { id: string; nombre: string; codigo?: string | null };
 type Producto = { id: string; nombre: string; fotoUrl: string | null; piezasPorCaja: number };
@@ -406,9 +407,9 @@ export function OrdenForm({
         </div>
       </div>
 
-      <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Guardando...">
         {botonTexto}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

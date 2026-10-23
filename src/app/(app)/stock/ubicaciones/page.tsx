@@ -1,4 +1,4 @@
-import { asignarTodoStockAUbicacion } from "@/app/(app)/stock/actions";
+import { consolidarTodoEnUbicacion } from "@/app/(app)/stock/actions";
 import { BotonEliminarConfirmado } from "@/components/BotonEliminarConfirmado";
 import { prisma } from "@/lib/prisma";
 import { UbicacionesManager } from "@/components/UbicacionesManager";
@@ -11,6 +11,7 @@ export default async function UbicacionesPage({
 }: PageProps<"/stock/ubicaciones">) {
   const sp = await searchParams;
   const transferido = sp.transferido === "1";
+  const consolidado = sp.consolidado === "1";
   const ubicaciones = await prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } });
 
   return (
@@ -29,6 +30,12 @@ export default async function UbicacionesPage({
       {transferido && (
         <div className="rounded-lg border border-ok/40 bg-surface p-4 text-sm text-ok font-medium">
           ✓ Listo, ya quedó transferido el stock.
+        </div>
+      )}
+
+      {consolidado && (
+        <div className="rounded-lg border border-ok/40 bg-surface p-4 text-sm text-ok font-medium">
+          ✓ Listo, ya quedó todo tu stock junto en esa bodega.
         </div>
       )}
 
@@ -53,20 +60,21 @@ export default async function UbicacionesPage({
       {ubicaciones.length > 0 && (
         <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
           <div>
-            <p className="font-medium">Mandar todo tu stock actual a una bodega</p>
+            <p className="font-medium">Juntar todo tu stock actual en una bodega</p>
             <p className="text-xs text-muted mt-1">
-              Para empezar: pone todo lo que ya tienes en el sistema en la bodega que elijas, sin
-              cambiar para nada el total (Consolidado). De ahí, para pasar botellas a la otra
-              bodega, usa &quot;Ajustar&quot; en cada vino. Si un producto ya tiene algo puesto en
-              una bodega, esto no lo toca.
+              Para empezar: junta todo lo que tienes repartido (sin bodega asignada, o en
+              cualquier otra bodega, aunque ahí se vea en negativo por ventas viejas) en la
+              bodega que elijas, y deja las demás en cero. El total (Consolidado) nunca cambia,
+              solo dice en dónde está. De ahí, para pasar botellas a otra bodega, usa
+              &quot;Ajustar&quot; en cada vino, o la herramienta de transferencia.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {ubicaciones.map((u) => (
               <BotonEliminarConfirmado
                 key={u.id}
-                action={asignarTodoStockAUbicacion.bind(null, u.id)}
-                mensaje={`¿Mandar todo tu stock actual a "${u.nombre}"? Esto no cambia el Consolidado, solo dice en dónde está.`}
+                action={consolidarTodoEnUbicacion.bind(null, u.id)}
+                mensaje={`¿Juntar todo tu stock actual en "${u.nombre}" y dejar las demás bodegas en cero? Esto no cambia el Consolidado, solo dice en dónde está.`}
                 className="rounded-md bg-wine text-white px-3 py-2 text-sm font-medium"
               >
                 Todo a {u.nombre}

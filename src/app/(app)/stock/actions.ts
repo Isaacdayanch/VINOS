@@ -84,14 +84,16 @@ async function drenarSinAsignar(
   });
 }
 
-// Herramienta de un solo uso: manda todo el stock actual de cada producto a
-// UNA bodega (de donde después, a mano, se van transfiriendo botellas a la
-// otra con ajustarStock). Por cada producto crea un par de ajustes que se
-// cancelan entre sí en el Consolidado -- uno le quita exactamente lo mismo
-// al stock "sin bodega asignada" que lo que le da a la bodega elegida --
-// así nunca se duplica nada. Si un producto ya tiene algo puesto en esa
-// bodega, no le hace nada (para poder correrla más de una vez sin riesgo).
-export async function asignarTodoStockAUbicacion(ubicacionId: string) {
+// Herramienta de un solo uso: junta TODO el stock de cada producto -- esté
+// donde esté (sin bodega asignada, o repartido en cualquier otra bodega,
+// incluso si ahí quedó en negativo por ventas viejas marcadas a esa bodega
+// sin que nunca le hubiera entrado nada) -- en UNA sola bodega elegida, y
+// deja las demás en cero. Por cada producto, el total de ajustes que crea
+// siempre suma cero (lo que le quita a unas bodegas es exactamente lo que
+// le pone a la elegida), así que el Consolidado nunca cambia. Se puede
+// correr más de una vez sin riesgo: si un producto ya está así, no le
+// crea ningún ajuste de más.
+export async function consolidarTodoEnUbicacion(ubicacionId: string) {
   if (!ubicacionId) {
     throw new Error("Falta decir a cuál bodega");
   }
@@ -103,45 +105,65 @@ export async function asignarTodoStockAUbicacion(ubicacionId: string) {
   ]);
 
   const productoIdsAfectados: string[] = [];
+  const ajustes: {
+    productoId: string;
+    botellas: number;
+    costoUnitario: number;
+    motivo: string;
+    ubicacionId: string | null;
+  }[] = [];
 
   for (const p of productos) {
     const r = resumen.get(p.id);
     const consolidado = r?.stockActual ?? 0;
     if (consolidado <= 0) continue;
 
-    const yaTieneAqui = stockEnUbicacion(stockUbicaciones, p.id, ubicacionId);
-    if (yaTieneAqui !== 0) continue; // ya se repartió este producto, no lo tocamos de nuevo
+    const porUbicacion = stockUbicaciones.get(p.id);
+    if (!porUbicacion) continue; // no tiene ningún movimiento todavía, nada que juntar
 
     const costoUnitario = r?.costoPromedioPorBotella ?? 0;
+    let huboCambios = false;
 
-    await prisma.ajusteStock.create({
-      data: {
+    for (const [ubicId, actual] of porUbicacion) {
+      if (ubicId === ubicacionId || actual === 0) continue;
+      ajustes.push({
         productoId: p.id,
-        botellas: consolidado,
+        botellas: -actual,
         costoUnitario,
-        motivo: "Asignación inicial de todo el stock a una bodega",
+        motivo: "Consolidación de bodegas (se vacía de aquí)",
+        ubicacionId: ubicId,
+      });
+      huboCambios = true;
+    }
+
+    const actualEnDestino = porUbicacion.get(ubicacionId) ?? 0;
+    const faltante = consolidado - actualEnDestino;
+    if (faltante !== 0) {
+      ajustes.push({
+        productoId: p.id,
+        botellas: faltante,
+        costoUnitario,
+        motivo: "Consolidación de bodegas (se junta todo aquí)",
         ubicacionId,
-      },
-    });
-    await prisma.ajusteStock.create({
-      data: {
-        productoId: p.id,
-        botellas: -consolidado,
-        costoUnitario,
-        motivo: "Asignación inicial de todo el stock a una bodega (de stock sin bodega asignada)",
-        ubicacionId: null,
-      },
-    });
-    productoIdsAfectados.push(p.id);
+      });
+      huboCambios = true;
+    }
+
+    if (huboCambios) productoIdsAfectados.push(p.id);
+  }
+
+  if (ajustes.length > 0) {
+    await prisma.$transaction(ajustes.map((a) => prisma.ajusteStock.create({ data: a })));
   }
 
   await sincronizarActivoPorStockVarios(productoIdsAfectados);
 
   revalidatePath("/stock");
   revalidatePath("/stock/ubicaciones");
+  revalidatePath("/stock/movimientos");
   revalidatePath("/finanzas");
   revalidatePath("/");
-  redirect("/stock");
+  redirect("/stock/ubicaciones?consolidado=1");
 }
 
 // Mueve botellas de una bodega a otra: le resta a la bodega de origen

@@ -681,6 +681,114 @@ export async function calcularMovimientosStock(limite?: number): Promise<Movimie
   return limite ? movimientos.slice(0, limite) : movimientos;
 }
 
+export type MovimientoStockProducto = {
+  id: string;
+  fecha: Date;
+  tipo: "entrada" | "salida" | "ajuste";
+  signo: 1 | -1;
+  botellas: number;
+  detalle: string;
+  ubicacion: string | null;
+  href: string | null;
+};
+
+/**
+ * Historial de movimientos de UN producto, con más detalle que
+ * calcularMovimientosStock: en una venta dice a qué cliente, en una
+ * consignación a qué distribuidor/evento. Para la ficha del producto.
+ */
+export async function calcularMovimientosStockProducto(
+  productoId: string,
+): Promise<MovimientoStockProducto[]> {
+  const [entradas, salidas, ajustes] = await Promise.all([
+    prisma.entradaLinea.findMany({
+      where: { productoId, recibida: true },
+      include: { pedido: true, ubicacion: true },
+    }),
+    prisma.salida.findMany({ where: { productoId }, include: { ubicacion: true, socio: true } }),
+    prisma.ajusteStock.findMany({ where: { productoId }, include: { ubicacion: true, socio: true } }),
+  ]);
+
+  const ordenIds = [...new Set(salidas.map((s) => s.ordenId).filter((id): id is string => Boolean(id)))];
+  const notaIds = [
+    ...new Set(salidas.map((s) => s.notaConsignacionId).filter((id): id is string => Boolean(id))),
+  ];
+
+  const [ordenes, notas] = await Promise.all([
+    ordenIds.length
+      ? prisma.orden.findMany({ where: { id: { in: ordenIds } }, include: { cliente: true } })
+      : Promise.resolve([]),
+    notaIds.length
+      ? prisma.notaConsignacion.findMany({ where: { id: { in: notaIds } }, include: { distribuidor: true } })
+      : Promise.resolve([]),
+  ]);
+  const ordenPorId = new Map(ordenes.map((o) => [o.id, o]));
+  const notaPorId = new Map(notas.map((n) => [n.id, n]));
+
+  const movimientos: MovimientoStockProducto[] = [];
+
+  for (const e of entradas) {
+    movimientos.push({
+      id: `entrada-${e.id}`,
+      fecha: e.fecha,
+      tipo: "entrada",
+      signo: 1,
+      botellas: Math.round(e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra),
+      detalle: `Pedido ${e.pedido.folio}`,
+      ubicacion: e.ubicacion?.nombre ?? null,
+      href: `/pedidos/${e.pedidoId}`,
+    });
+  }
+
+  for (const s of salidas) {
+    let detalle = s.motivo;
+    let href: string | null = null;
+    if (s.motivo === "Venta" && s.ordenId) {
+      const orden = ordenPorId.get(s.ordenId);
+      detalle = orden
+        ? `Vendido a ${orden.cliente.nombre.replace("Cliente Especial - ", "")} (${orden.folio})`
+        : "Venta";
+      href = `/ordenes/${s.ordenId}`;
+    } else if (s.motivo === "Consignación" && s.notaConsignacionId) {
+      const nota = notaPorId.get(s.notaConsignacionId);
+      detalle = nota ? `Consignación — ${nota.distribuidor.nombre} (${nota.folio})` : "Consignación";
+      href = `/notas-consignacion/${s.notaConsignacionId}`;
+    } else if (s.motivo === "Consumo personal") {
+      detalle = s.socio
+        ? `Consumo personal — ${s.socio.nombre}`
+        : s.dividido
+          ? "Consumo personal — Isaac y Beto"
+          : "Consumo personal";
+    }
+    movimientos.push({
+      id: `salida-${s.id}`,
+      fecha: s.fecha,
+      tipo: "salida",
+      signo: -1,
+      botellas: s.botellas,
+      detalle,
+      ubicacion: s.ubicacion?.nombre ?? null,
+      href,
+    });
+  }
+
+  for (const a of ajustes) {
+    movimientos.push({
+      id: `ajuste-${a.id}`,
+      fecha: a.fecha,
+      tipo: "ajuste",
+      signo: a.botellas >= 0 ? 1 : -1,
+      botellas: Math.abs(a.botellas),
+      detalle: a.motivo || (a.socio ? `Se las llevó ${a.socio.nombre}` : "Ajuste de inventario"),
+      ubicacion: a.ubicacion?.nombre ?? null,
+      href: null,
+    });
+  }
+
+  movimientos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+  return movimientos;
+}
+
 export type MovimientoEstadoCuenta = {
   id: string;
   fecha: Date;

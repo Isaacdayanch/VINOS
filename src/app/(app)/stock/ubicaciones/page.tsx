@@ -21,6 +21,12 @@ export default async function UbicacionesPage() {
       </div>
 
       <UbicacionesManager ubicaciones={ubicaciones} />
+
+      {ubicaciones.length > 0 && (
+        <Link href="/stock/repartir" className="text-sm text-wine underline">
+          Repartir tu stock entre bodegas →
+        </Link>
+      )}
     </div>
   );
 }

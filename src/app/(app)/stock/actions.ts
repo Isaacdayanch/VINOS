@@ -1,7 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { calcularResumenInventario, calcularStockPorUbicacion, stockEnUbicacion, sincronizarActivoPorStock } from "@/lib/costeo";
+import {
+  calcularResumenInventario,
+  calcularStockPorUbicacion,
+  stockEnUbicacion,
+  sincronizarActivoPorStock,
+  sincronizarActivoPorStockVarios,
+} from "@/lib/costeo";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -47,6 +53,54 @@ export async function ajustarStock(productoId: string, formData: FormData) {
   revalidatePath("/finanzas");
   revalidatePath("/");
   redirect(`/stock?ubicacion=${ubicacionId}`);
+}
+
+// Pantalla sencilla para repartir de un jalón cuánto stock de cada producto
+// hay en cada bodega (en vez de ir producto por producto en "Ajustar").
+// Compara lo que escribe Isaac contra lo que el sistema ya tenía registrado
+// en esa bodega y crea un ajuste solo con la diferencia.
+export async function repartirStockUbicaciones(formData: FormData) {
+  const [productos, ubicaciones, resumen, stockUbicaciones] = await Promise.all([
+    prisma.producto.findMany({ select: { id: true } }),
+    prisma.ubicacion.findMany({ select: { id: true } }),
+    calcularResumenInventario(),
+    calcularStockPorUbicacion(),
+  ]);
+
+  const productoIdsAfectados = new Set<string>();
+
+  for (const p of productos) {
+    const costoUnitario = resumen.get(p.id)?.costoPromedioPorBotella ?? 0;
+    for (const u of ubicaciones) {
+      const campo = formData.get(`cantidad_${p.id}_${u.id}`);
+      if (campo === null || campo === "") continue;
+      const cantidadNueva = Number(campo);
+      if (Number.isNaN(cantidadNueva) || cantidadNueva < 0) continue;
+
+      const actual = stockEnUbicacion(stockUbicaciones, p.id, u.id);
+      const diferencia = cantidadNueva - actual;
+      if (diferencia === 0) continue;
+
+      await prisma.ajusteStock.create({
+        data: {
+          productoId: p.id,
+          botellas: diferencia,
+          costoUnitario,
+          motivo: "Reparto de stock por bodega",
+          ubicacionId: u.id,
+        },
+      });
+      productoIdsAfectados.add(p.id);
+    }
+  }
+
+  await sincronizarActivoPorStockVarios([...productoIdsAfectados]);
+
+  revalidatePath("/stock");
+  revalidatePath("/stock/ubicaciones");
+  revalidatePath("/finanzas");
+  revalidatePath("/");
+  redirect("/stock");
 }
 
 export async function crearUbicacion(formData: FormData) {

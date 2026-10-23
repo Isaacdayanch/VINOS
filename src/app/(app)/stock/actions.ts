@@ -46,6 +46,10 @@ export async function ajustarStock(productoId: string, formData: FormData) {
         socioId: diferencia < 0 ? socioId : null,
       },
     });
+    // Si la bodega sube, esas botellas se cubren primero con stock "sin
+    // bodega asignada" (de antes de que existieran las bodegas) en vez de
+    // sumar inventario nuevo de la nada -- si no, el Consolidado se duplica.
+    await drenarSinAsignar(productoId, diferencia, costoUnitario, motivo ?? "Ajuste de inventario", stockUbicaciones);
     await sincronizarActivoPorStock(productoId);
   }
 
@@ -55,26 +59,73 @@ export async function ajustarStock(productoId: string, formData: FormData) {
   redirect(`/stock?ubicacion=${ubicacionId}`);
 }
 
-// Crea el ajuste necesario para que el stock de un producto en una bodega
-// quede en "cantidadNueva" (compara contra lo que ya había ahí y solo
-// registra la diferencia). Usado por las dos pantallas de reparto de abajo.
-async function ajustarACantidad(
+// Si el stock de una bodega sube, primero se cubre con botellas "sin bodega
+// asignada" (las de antes de que existieran las bodegas) en vez de sumar
+// inventario nuevo de la nada -- así el Consolidado no se duplica.
+async function drenarSinAsignar(
   productoId: string,
-  ubicacionId: string,
-  cantidadNueva: number,
+  cuantoSubio: number,
   costoUnitario: number,
   motivo: string,
   stockUbicaciones: Map<string, Map<string | null, number>>,
 ) {
-  if (Number.isNaN(cantidadNueva) || cantidadNueva < 0) return false;
-  const actual = stockEnUbicacion(stockUbicaciones, productoId, ubicacionId);
-  const diferencia = cantidadNueva - actual;
-  if (diferencia === 0) return false;
-
+  if (cuantoSubio <= 0) return;
+  const sinAsignar = Math.max(0, stockEnUbicacion(stockUbicaciones, productoId, null));
+  const aDrenar = Math.min(cuantoSubio, sinAsignar);
+  if (aDrenar <= 0) return;
   await prisma.ajusteStock.create({
-    data: { productoId, botellas: diferencia, costoUnitario, motivo, ubicacionId },
+    data: {
+      productoId,
+      botellas: -aDrenar,
+      costoUnitario,
+      motivo: `${motivo} (de stock sin bodega asignada)`,
+      ubicacionId: null,
+    },
   });
-  return true;
+}
+
+// Pone el stock de un producto en varias bodegas a los valores pedidos de
+// un jalón, sin inflar el Consolidado: lo que se va agregando a cada
+// bodega se cubre primero con el stock "sin bodega asignada" que le quede
+// a ese producto (se va gastando conforme se reparte entre las bodegas de
+// esta misma pasada), antes de contarlo como inventario nuevo.
+async function repartirProducto(
+  productoId: string,
+  objetivos: { ubicacionId: string; cantidad: number }[],
+  costoUnitario: number,
+  motivo: string,
+  stockUbicaciones: Map<string, Map<string | null, number>>,
+) {
+  let huboCambio = false;
+  let sinAsignarDisponible = Math.max(0, stockEnUbicacion(stockUbicaciones, productoId, null));
+
+  for (const { ubicacionId, cantidad } of objetivos) {
+    if (Number.isNaN(cantidad) || cantidad < 0) continue;
+    const actual = stockEnUbicacion(stockUbicaciones, productoId, ubicacionId);
+    const diferencia = cantidad - actual;
+    if (diferencia === 0) continue;
+
+    await prisma.ajusteStock.create({
+      data: { productoId, botellas: diferencia, costoUnitario, motivo, ubicacionId },
+    });
+    huboCambio = true;
+
+    if (diferencia > 0 && sinAsignarDisponible > 0) {
+      const aDrenar = Math.min(diferencia, sinAsignarDisponible);
+      await prisma.ajusteStock.create({
+        data: {
+          productoId,
+          botellas: -aDrenar,
+          costoUnitario,
+          motivo: `${motivo} (de stock sin bodega asignada)`,
+          ubicacionId: null,
+        },
+      });
+      sinAsignarDisponible -= aDrenar;
+    }
+  }
+
+  return huboCambio;
 }
 
 // Pantalla sencilla para repartir de un jalón cuánto stock de cada producto
@@ -93,19 +144,23 @@ export async function repartirStockUbicaciones(formData: FormData) {
 
   for (const p of productos) {
     const costoUnitario = resumen.get(p.id)?.costoPromedioPorBotella ?? 0;
-    for (const u of ubicaciones) {
-      const campo = formData.get(`cantidad_${p.id}_${u.id}`);
-      if (campo === null || campo === "") continue;
-      const cambio = await ajustarACantidad(
-        p.id,
-        u.id,
-        Number(campo),
-        costoUnitario,
-        "Reparto de stock por bodega",
-        stockUbicaciones,
-      );
-      if (cambio) productoIdsAfectados.add(p.id);
-    }
+    const objetivos = ubicaciones
+      .map((u) => {
+        const campo = formData.get(`cantidad_${p.id}_${u.id}`);
+        if (campo === null || campo === "") return null;
+        return { ubicacionId: u.id, cantidad: Number(campo) };
+      })
+      .filter((o): o is { ubicacionId: string; cantidad: number } => o !== null);
+    if (objetivos.length === 0) continue;
+
+    const cambio = await repartirProducto(
+      p.id,
+      objetivos,
+      costoUnitario,
+      "Reparto de stock por bodega",
+      stockUbicaciones,
+    );
+    if (cambio) productoIdsAfectados.add(p.id);
   }
 
   await sincronizarActivoPorStockVarios([...productoIdsAfectados]);
@@ -150,23 +205,17 @@ export async function repartirRapidoUbicaciones(formData: FormData) {
     const consolidado = resumen.get(p.id)?.stockActual ?? 0;
     const cantidadResto = Math.max(0, consolidado - cantidadManual);
 
-    const cambio1 = await ajustarACantidad(
+    const cambio = await repartirProducto(
       p.id,
-      ubicacionManualId,
-      cantidadManual,
+      [
+        { ubicacionId: ubicacionManualId, cantidad: cantidadManual },
+        { ubicacionId: ubicacionRestoId, cantidad: cantidadResto },
+      ],
       costoUnitario,
       "Reparto de stock por bodega",
       stockUbicaciones,
     );
-    const cambio2 = await ajustarACantidad(
-      p.id,
-      ubicacionRestoId,
-      cantidadResto,
-      costoUnitario,
-      "Reparto de stock por bodega",
-      stockUbicaciones,
-    );
-    if (cambio1 || cambio2) productoIdsAfectados.add(p.id);
+    if (cambio) productoIdsAfectados.add(p.id);
   }
 
   await sincronizarActivoPorStockVarios([...productoIdsAfectados]);

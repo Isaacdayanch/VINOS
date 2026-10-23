@@ -220,6 +220,24 @@ export type SaldoEntreSocios = {
   monto: number;
 } | null;
 
+// Entre 2 socios, quién le debe a quién para que ambos queden igual en el
+// valor que se les pase (aportado, consumo personal, etc.): se divide la
+// diferencia a la mitad. Con más o menos de 2 socios no hay a quién
+// comparar, así que no hay saldo que calcular.
+function saldoEntrePorValor(
+  socios: ResumenSocio[],
+  valor: (s: ResumenSocio) => number,
+): SaldoEntreSocios {
+  if (socios.length !== 2) return null;
+  const [a, b] = socios;
+  const diferencia = valor(a) - valor(b);
+  const monto = Math.abs(diferencia) / 2;
+  if (monto < 1) return null;
+  return diferencia > 0
+    ? { deudorId: b.socioId, deudorNombre: b.nombre, acreedorId: a.socioId, acreedorNombre: a.nombre, monto }
+    : { deudorId: a.socioId, deudorNombre: a.nombre, acreedorId: b.socioId, acreedorNombre: b.nombre, monto };
+}
+
 export type ResumenFinanzas = {
   inversionTotal: number;
   totalInyeccionCapital: number;
@@ -235,7 +253,8 @@ export type ResumenFinanzas = {
   saldoCaja: number;
   saldoCuenta: number;
   socios: ResumenSocio[];
-  saldoEntreSocios: SaldoEntreSocios;
+  saldoAportaciones: SaldoEntreSocios; // quién le debe a quién por dinero puesto a proveedores (capital)
+  saldoConsumo: SaldoEntreSocios; // quién le debe a quién por botellas de consumo personal
   maaserDebido: number;
   maaserDado: number;
   saldoMaaser: number; // positivo = a favor, negativo = debe
@@ -251,6 +270,36 @@ const PORCENTAJE_MAASER = 0.1;
 
 export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: number | null) {
   return moneda === "USD" ? monto * (tipoCambio ?? 0) : monto;
+}
+
+export type PedidoSinCosto = { id: string; folio: string; botellas: number };
+
+/**
+ * Pedidos que ya recibiste pero a los que todavía no se les puede sacar un
+ * costo real -- no tienen tipo de cambio fijo, ni pagos en USD de dónde
+ * estimarlo (ver tipoCambioEstimadoDePagos). Mientras tanto, esas botellas
+ * entran casi gratis al costo promedio de su producto, lo que puede inflar
+ * la Ganancia que se ve en Dashboard/Finanzas y hacer que el Valor de
+ * inventario se vea más bajo de lo real -- hasta que se les ponga tipo de
+ * cambio o se les registre un pago en dólares.
+ */
+export async function calcularPedidosSinTipoCambio(): Promise<PedidoSinCosto[]> {
+  const pedidos = await prisma.pedido.findMany({
+    where: { entradas: { some: { recibida: true } } },
+    include: { entradas: { where: { recibida: true } }, pagos: true },
+  });
+
+  const resultado: PedidoSinCosto[] = [];
+  for (const p of pedidos) {
+    const tipoCambio = p.tipoCambio ?? tipoCambioEstimadoDePagos(p.pagos);
+    if (tipoCambio) continue;
+    const botellas = p.entradas.reduce(
+      (acc, e) => acc + e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra,
+      0,
+    );
+    if (botellas > 0) resultado.push({ id: p.id, folio: p.folio, botellas });
+  }
+  return resultado;
 }
 
 /**
@@ -441,18 +490,8 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     };
   });
 
-  let saldoEntreSocios: SaldoEntreSocios = null;
-  if (resumenSocios.length === 2) {
-    const [a, b] = resumenSocios;
-    const diferencia = a.neto - b.neto;
-    const monto = Math.abs(diferencia) / 2;
-    if (monto >= 1) {
-      saldoEntreSocios =
-        diferencia > 0
-          ? { deudorId: b.socioId, deudorNombre: b.nombre, acreedorId: a.socioId, acreedorNombre: a.nombre, monto }
-          : { deudorId: a.socioId, deudorNombre: a.nombre, acreedorId: b.socioId, acreedorNombre: b.nombre, monto };
-    }
-  }
+  const saldoAportaciones = saldoEntrePorValor(resumenSocios, (s) => s.aportado);
+  const saldoConsumo = saldoEntrePorValor(resumenSocios, (s) => s.consumoPersonal);
 
   const maaserDebido = gananciaTotal * PORCENTAJE_MAASER;
   const saldoMaaser = maaserDado - maaserDebido;
@@ -472,7 +511,8 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     saldoCaja,
     saldoCuenta,
     socios: resumenSocios,
-    saldoEntreSocios,
+    saldoAportaciones,
+    saldoConsumo,
     consumoCompartido: { botellas: compartidoBotellas, costo: compartidoCosto },
     regalosClientes: { botellas: regalosBotellas, costo: regalosCosto },
     perdidaAjusteInventario: { botellas: perdidaAjusteBotellas, costo: perdidaAjusteCosto },

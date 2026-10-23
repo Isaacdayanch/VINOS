@@ -3,8 +3,11 @@ import {
   calcularResumenInventario,
   calcularMovimientosStock,
   calcularMovimientosFinanzas,
+  calcularFinanzas,
+  calcularPedidosSinTipoCambio,
   formatoMXN,
 } from "@/lib/costeo";
+import { AvisoPedidosSinCosto } from "@/components/AvisoPedidosSinCosto";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -16,49 +19,29 @@ const ETIQUETA_TIPO_STOCK: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const [resumen, productos, cobros, abonosCliente, ordenes, movimientosStock, movimientosFinanzas] =
+  const [resumen, productos, ordenes, movimientosStock, movimientosFinanzas, finanzas, pedidosSinCosto] =
     await Promise.all([
       calcularResumenInventario(),
       prisma.producto.findMany(),
-      prisma.cobro.findMany(),
-      prisma.abonoCliente.findMany(),
       prisma.orden.findMany({
         include: { lineas: true, cliente: true },
         orderBy: { fecha: "desc" },
       }),
       calcularMovimientosStock(5),
       calcularMovimientosFinanzas(5),
+      calcularFinanzas(),
+      calcularPedidosSinTipoCambio(),
     ]);
 
-  let valorInventario = 0;
-  let totalBotellas = 0;
   const alertas: { nombre: string; stock: number; minimo: number }[] = [];
-
   for (const p of productos) {
     const r = resumen.get(p.id);
     if (!r) continue;
-    valorInventario += r.valorInventario;
-    totalBotellas += r.stockActual;
     const minimo = p.stockMinimo ?? 8;
     if (r.stockActual <= minimo) {
       alertas.push({ nombre: p.nombre, stock: r.stockActual, minimo });
     }
   }
-
-  let ventasTotales = 0;
-  let costoTotal = 0;
-  for (const o of ordenes) {
-    for (const l of o.lineas) {
-      ventasTotales += l.cantidadBotellas * l.precioUnitario;
-      costoTotal += l.cantidadBotellas * l.costoUnitario;
-    }
-  }
-  const gananciaTotal = ventasTotales - costoTotal;
-
-  const totalCobrado =
-    cobros.reduce((acc, c) => acc + c.monto, 0) +
-    abonosCliente.reduce((acc, a) => acc + a.monto, 0);
-  const totalPendiente = ventasTotales - totalCobrado;
 
   const topProductos = [...productos]
     .map((p) => ({ p, r: resumen.get(p.id) }))
@@ -74,17 +57,19 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon="💰" label="Valor del inventario" value={formatoMXN(valorInventario)} tono="text-wine" />
-        <StatCard icon="🍷" label="Botellas en stock" value={totalBotellas.toString()} tono="text-foreground" />
-        <StatCard icon="📈" label="Ganancia total" value={formatoMXN(gananciaTotal)} tono="text-ok" />
+        <StatCard icon="💰" label="Valor del inventario" value={formatoMXN(finanzas.valorInventario)} tono="text-wine" />
+        <StatCard icon="🍷" label="Botellas en stock" value={finanzas.botellasStock.toString()} tono="text-foreground" />
+        <StatCard icon="📈" label="Ganancia total" value={formatoMXN(finanzas.gananciaTotal)} tono="text-ok" />
         <StatCard
           icon="💵"
           label="Cobrado"
-          value={formatoMXN(totalCobrado)}
-          sub={`Pendiente: ${formatoMXN(totalPendiente)}`}
+          value={formatoMXN(finanzas.totalCobrado)}
+          sub={`Pendiente: ${formatoMXN(finanzas.totalPendiente)}`}
           tono="text-wine"
         />
       </div>
+
+      <AvisoPedidosSinCosto pedidos={pedidosSinCosto} />
 
       {alertas.length > 0 && (
         <div className="rounded-xl border border-warn/40 bg-warn-bg p-4">

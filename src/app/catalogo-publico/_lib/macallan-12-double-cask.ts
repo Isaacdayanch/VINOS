@@ -1,6 +1,6 @@
 import type { EditorialWine } from "./editorial-wine";
 
-// Front label and box from Isaac's photo; tasting notes and casks from the producer:
+// Front label and box from Isaac's photo (box cleaned: retailer badge removed, edge hidden by the bottle mirrored); tasting notes and casks from the producer:
 // https://www.themacallan.com/en/single-malt-scotch-whisky/double-cask-12-years-old
 // Distillery location: https://en.wikipedia.org/wiki/The_Macallan_distillery
 export const macallan12DoubleCask: EditorialWine = {
@@ -27,6 +27,6 @@ export const macallan12DoubleCask: EditorialWine = {
     ["Color", "Natural, según etiqueta"], ["Colección", "Double Cask Collection"],
     ["Alcohol", "40%"], ["Contenido", "700 ml"],
   ],
-  photos: ["/catalogo/macallan-12-double-cask-front.webp"],
-  captions: ["La botella, sobre blanco"],
+  photos: ["front", "box"].map(view => `/catalogo/macallan-12-double-cask-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El estuche de la Double Cask Collection"],
 };

@@ -41,21 +41,27 @@ simple. Mostrarle capturas y esperar su "va" antes de publicar.
   debe estar como `tipo = DESTILADO` y publicado en el catálogo (eso lo hace
   Isaac desde el CRM; no escribir a la base de datos).
 
-## 3. Fotos (6, en `public/catalogo/<slug>-<vista>.webp`, 960×1200)
+## 3. Fotos (5 o 6, en `public/catalogo/<slug>-<vista>.webp`, 960×1200)
 
-Orden en `photos`: `front`, `back` (estuche o reverso), `service`, `glass`,
-`pairing`, `table`, con sus `captions`.
+Isaac pidió menos que en vinos pero más que una sola. En destilados la galería
+respeta el orden del arreglo `photos` y acepta cualquier cantidad. Orden:
+`front`, `box` (estuche), `back` (etiqueta trasera), `glass` o `service`,
+`pairing` y, opcional, `table`. Los nombres `front/box/back` se muestran como
+botella sobre blanco; los demás como foto de ambiente.
 
 1. **front**: recortar la botella de la foto de Isaac con
    `python3 -I .claude/skills/ficha-destilado/recortar_botella.py foto salida.webp [desde_x]`
    (fondo blanco; `desde_x` para dejar fuera el estuche). Revisar con Read
    que no se cuele nada en los bordes.
-2. **back**: estuche o contraetiqueta si Isaac la manda; si no, omitir.
-3. **service / glass / pairing / table**: generar con IA:
-   `MARIDAJE="..." COLOR="..." python3 -I .claude/skills/ficha-destilado/generar_fotos.py <slug> public/catalogo/<slug>-front.webp "<descripción de la botella>"`
+2. **box / back**: de fotos **reales** (de Isaac, de preferencia de su
+   botella, porque la importada a México trae contraetiqueta en español con
+   importador y NOM). Si la foto trae marcas de tienda (números, sellos),
+   borrarlas y revisar con zoom. Nunca generar etiquetas con IA.
+3. **glass / service / pairing / table**: generar con IA:
+   `MARIDAJE="..." COLOR="..." python3 -I .claude/skills/ficha-destilado/generar_fotos.py <slug> public/catalogo/<slug>-front.webp "<descripción de la botella>" glass pairing`
    Requiere la variable `GEMINI_API_KEY` en el entorno (Isaac la guardó en
    la configuración del entorno; nunca pedirla en el chat). Si falta, decirle
-   y publicar solo con la foto frontal.
+   y publicar con las fotos reales.
    Revisar **cada** imagen con Read: botella idéntica (forma, etiqueta, color
    del líquido), recta, sin texto raro. Si sale mal, regenerar esa vista.
    Nunca sacar datos de una imagen generada.

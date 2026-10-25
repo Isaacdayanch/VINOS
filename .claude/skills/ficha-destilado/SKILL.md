@@ -59,8 +59,9 @@ botella sobre blanco; los demás como foto de ambiente.
    borrarlas y revisar con zoom. Nunca generar etiquetas con IA.
 3. **glass / service / pairing / table**: generar con IA:
    `MARIDAJE="..." COLOR="..." python3 -I .claude/skills/ficha-destilado/generar_fotos.py <slug> public/catalogo/<slug>-front.webp "<descripción de la botella>" glass pairing`
-   Requiere la variable `GEMINI_API_KEY` en el entorno (Isaac la guardó en
-   la configuración del entorno; nunca pedirla en el chat). Si falta, decirle
+   Requiere la llave de Google en el entorno: como variable `GEMINI_API_KEY`
+   o como "secreto de red" del dominio `generativelanguage.googleapis.com`
+   (encabezado `x-goog-api-key`); nunca pedirla en el chat. Si falta, decirle
    y publicar con las fotos reales.
    Revisar **cada** imagen con Read: botella idéntica (forma, etiqueta, color
    del líquido), recta, sin texto raro. Si sale mal, regenerar esa vista.

@@ -4,7 +4,9 @@ Uso:
   python3 -I generar_fotos.py <slug> <foto_frontal.webp> "<descripción de la botella>" [vistas...]
 
 Lee la llave de la variable de entorno GEMINI_API_KEY (nunca pegarla en el chat
-ni en el código). Guarda public/catalogo/<slug>-<vista>.webp a 960x1200.
+ni en el código). Si Isaac la guardó como "secreto de red" para
+generativelanguage.googleapis.com, la variable no existe y el proxy agrega la
+llave solo; en ese caso se manda la petición sin ella. Guarda public/catalogo/<slug>-<vista>.webp a 960x1200.
 Vistas: service, glass, pairing, table (por defecto, las cuatro).
 El modelo se puede cambiar con GEMINI_IMAGE_MODEL.
 """
@@ -41,7 +43,8 @@ def generate(prompt: str, ref: Image.Image) -> Image.Image:
     req = urllib.request.Request(
         f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent",
         data=json.dumps(body).encode(),
-        headers={"Content-Type": "application/json", "x-goog-api-key": os.environ["GEMINI_API_KEY"]},
+        headers={"Content-Type": "application/json",
+                 **({"x-goog-api-key": os.environ["GEMINI_API_KEY"]} if os.environ.get("GEMINI_API_KEY") else {})},
     )
     with urllib.request.urlopen(req, timeout=180) as res:
         data = json.load(res)

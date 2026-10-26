@@ -63,6 +63,14 @@ botella sobre blanco; los demás como foto de ambiente.
    o como "secreto de red" del dominio `generativelanguage.googleapis.com`
    (encabezado `x-goog-api-key`); nunca pedirla en el chat. Si falta, decirle
    y publicar con las fotos reales.
+   **Plan B (el que se usa hoy):** las llaves nuevas de AI Studio empiezan con
+   `AQ.` y la API las rechaza ("API key not valid"); solo sirven las `AIza`
+   de Google Cloud. Mientras no haya una, Isaac genera las fotos gratis en
+   gemini.google.com: mandarle la foto frontal en JPG y un prompt por vista
+   (botella idéntica a la referencia, vertical 4:5, sin texto añadido, paleta
+   crema/carbón/borgoña). Él regresa las imágenes; revisarlas, pasarlas a
+   960×1200 WebP con `fit()` de `generar_fotos.py` y guardarlas con el nombre
+   de la vista.
    Revisar **cada** imagen con Read: botella idéntica (forma, etiqueta, color
    del líquido), recta, sin texto raro. Si sale mal, regenerar esa vista.
    Nunca sacar datos de una imagen generada.

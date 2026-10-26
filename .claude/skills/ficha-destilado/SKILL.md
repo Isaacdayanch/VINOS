@@ -70,9 +70,11 @@ botella sobre blanco; los demás como foto de ambiente.
    o como "secreto de red" del dominio `generativelanguage.googleapis.com`
    (encabezado `x-goog-api-key`); nunca pedirla en el chat. Si falta, decirle
    y publicar con las fotos reales.
-   **Plan B (el que se usa hoy):** las llaves nuevas de AI Studio empiezan con
-   `AQ.` y la API las rechaza ("API key not valid"); solo sirven las `AIza`
-   de Google Cloud. Mientras no haya una, Isaac genera las fotos gratis en
+   **Plan B (el que se usa hoy):** desde el 26-oct-2026 la llave ya está como
+   secreto de red y Google la acepta, pero los modelos de imagen tienen cuota
+   gratis **0** (error 429 "limit: 0"): hace falta activar facturación en el
+   proyecto de Google (AI Studio → Billing). Probar con una sola petición
+   antes de usar el script. Mientras no haya facturación, Isaac genera las fotos gratis en
    gemini.google.com: mandarle la foto frontal en JPG y un prompt por vista
    (botella idéntica a la referencia, vertical 4:5, sin texto añadido, paleta
    crema/carbón/borgoña). Él regresa las imágenes; revisarlas, pasarlas a

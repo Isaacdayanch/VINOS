@@ -34,12 +34,15 @@ simple. Mostrarle capturas y esperar su "va" antes de publicar.
   Destilería, Origen, Estilo, Edad, Barricas, Color, Colección, Alcohol,
   Contenido (y Kosher solo si lo dice la etiqueta). Ejemplo completo:
   `_lib/macallan-12-double-cask.ts`.
-- Si **no hay ID del CRM** todavía: página de vista previa en
-  `seleccion/<slug>/page.tsx` (copiar la del Macallan).
-- Si **ya hay ID**: agregarlo a `profiles` en `_lib/wine-profiles.ts`; así la
-  ficha sale en `/catalogo-publico/<id>` con su precio publicado. El producto
-  debe estar como `tipo = DESTILADO` y publicado en el catálogo (eso lo hace
-  Isaac desde el CRM; no escribir a la base de datos).
+- Conectar la ficha al producto del CRM **por nombre** en
+  `_lib/spirit-profiles.ts` (una regla `match` por botella, excluyendo
+  ediciones hermanas, p. ej. Macallan 12 Sherry Oak). Así, en cuanto Isaac
+  publica el producto como `DESTILADO`, su página `/catalogo-publico/<id>` usa
+  la ficha con su precio, y la tarjeta de la Cava usa la foto frontal si el
+  producto no tiene foto propia. No hace falta pedirle el ID (desde el sandbox
+  no hay acceso a la base de datos ni a vercel.app).
+- Además, página de vista previa en `seleccion/<slug>/page.tsx` (copiar la
+  del Macallan) para enseñársela antes de que exista en el CRM.
 
 ## 3. Fotos (5 o 6, en `public/catalogo/<slug>-<vista>.webp`, 960×1200)
 

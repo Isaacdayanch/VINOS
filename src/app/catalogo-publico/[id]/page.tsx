@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: PageProps<"/catalogo-publico/[id]">): Promise<Metadata> {
   const product = await getPublicWine((await params).id);
   if (!product) return { title: "Botella no encontrada", robots: { index: false } };
-  const profile = wineProfile(product.id, product.anio);
+  const profile = wineProfile(product.id, product.anio, product.nombre, product.tipo);
   if (profile) return editorialMetadata(profile);
   const title = `${product.nombre}${product.anio ? ` · ${product.anio}` : ""}`;
   const noun = product.tipo === "DESTILADO" ? "destilado" : "vino";
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps<"/catalogo-publico/
 export default async function WinePage({ params }: PageProps<"/catalogo-publico/[id]">) {
   const product = await getPublicWine((await params).id);
   if (!product) notFound();
-  const profile = wineProfile(product.id, product.anio);
+  const profile = wineProfile(product.id, product.anio, product.nombre, product.tipo);
   if (profile) return <EditorialWinePage wine={profile} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
   const spirit = product.tipo === "DESTILADO";
   const collectionHref = spirit ? "/catalogo-publico/destilados" : "/catalogo-publico/catalogo";

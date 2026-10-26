@@ -110,7 +110,7 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   Studio empieza con `AQ.` y Google la rechaza ("API key not valid"); solo
   serviría una `AIza` de Google Cloud. Primer destilado: Macallan 12 Double
   Cask (vista previa en `/catalogo-publico/seleccion/macallan-12-double-cask`;
-  falta su ID del CRM para que salga en la Cava con precio).
+  se conecta solo por nombre en `_lib/spirit-profiles.ts` cuando el producto existe en el CRM como DESTILADO).
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →

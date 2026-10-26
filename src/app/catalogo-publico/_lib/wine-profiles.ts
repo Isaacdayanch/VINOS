@@ -7,6 +7,7 @@ import type { EditorialWine } from "./editorial-wine";
 import { dadahCabernet2023 } from "./dadah-cabernet-2023";
 import { tanyaLateHarvest2024 } from "./tanya-late-harvest-2024";
 import { tanyaEliya2021 } from "./tanya-eliya-2021";
+import { spiritProfile } from "./spirit-profiles";
 import { tanyaTchelet2021 } from "./tanya-tchelet-2021";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
@@ -21,9 +22,9 @@ const profiles: Record<string, EditorialWine> = {
   cmtssyq4b0004l4044dcpucfr: reserve2019,
   cmu4gy9h10000jp04frrjexo4: titoraReserve2023,
 };
-export function wineProfile(id: string, year: number | null) {
-  const profile = profiles[id];
-  return profile && (year === null || year === profile.year) ? profile : undefined;
+export function wineProfile(id: string, year: number | null, name = "", tipo?: string | null) {
+  const profile = profiles[id] ?? spiritProfile(name, tipo);
+  return profile && (year === null || profile.year === undefined || year === profile.year) ? profile : undefined;
 }
 
 // Tanya front label + supplied tasting notes. Exact-vintage technical source:

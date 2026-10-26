@@ -100,6 +100,17 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   `mix-blend-mode` ni filtros CSS para esto: en iPhone (Safari) no funciona y
   se ven cuadros blancos — Isaac lo reportó como lo menos profesional posible.
   Siempre revisar los cambios de diseño también en tamaño celular.
+- **Fichas de destilados (Cava de destilados)**: proceso en el skill
+  `.claude/skills/ficha-destilado/` y registro en `CATALOG-SPIRITS.md`. Isaac
+  manda una botella a la vez; la ficha lleva nariz/boca/final (notas oficiales),
+  cómo servirlo, maridaje de bocados/sobremesa y destilería, con 4–5 fotos:
+  frente y estuche (fotos reales), etiqueta trasera (foto de SU botella) y
+  vaso + maridaje (IA). Las fotos de IA las hace Isaac en gemini.google.com
+  con prompts que le pasamos: la llave de la API de Google que sacó en AI
+  Studio empieza con `AQ.` y Google la rechaza ("API key not valid"); solo
+  serviría una `AIza` de Google Cloud. Primer destilado: Macallan 12 Double
+  Cask (vista previa en `/catalogo-publico/seleccion/macallan-12-double-cask`;
+  falta su ID del CRM para que salga en la Cava con precio).
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →

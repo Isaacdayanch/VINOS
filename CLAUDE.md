@@ -254,7 +254,8 @@ de red del entorno VINOS para `lwekyvwfrmgzmavwveji.supabase.co`, encabezado
 de Isaac.** Publicar el catálogo = insertar una fila en `CatalogoPublicado`
 con los productos activos (`id,nombre,fotoUrl,tipo,categoria,anio,precioLista`,
 orden por nombre), igual que `publicarCatalogo()`; antes comparar contra la
-última publicación y avisar qué cambia. Los `id` se generan a mano (no hay
+última publicación y avisar qué cambia. **Isaac pidió (26-oct): al publicar,
+siempre incluir TODO lo activo en el CRM** (no filtrar productos). Los `id` se generan a mano (no hay
 default en la base): texto que empiece con `c`.
 
 Las dos apps comparten la misma base de datos de Supabase (proyecto

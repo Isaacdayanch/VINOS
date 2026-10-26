@@ -1,11 +1,13 @@
 """Recorta una botella de una foto con fondo blanco y la pone en lienzo 960x1200.
 
-Uso: python3 -I recortar_botella.py foto.webp salida.webp [desde_x]
+Uso: python3 -I recortar_botella.py foto.webp salida.webp [desde_x] [espejo_px]
 
 La botella debe ser el objeto más a la derecha. `desde_x` es la columna a
 partir de la cual solo hay botella (útil si el estuche queda detrás, a la
 izquierda). Como las botellas son simétricas, el borde izquierdo se calcula
 reflejando el derecho sobre el eje del cuello, así el estuche no se cuela.
+`espejo_px` (opcional): si el estuche se ve a través del vidrio en la orilla
+izquierda, copia en espejo esa franja desde la orilla derecha, que está limpia.
 """
 import sys
 import numpy as np
@@ -13,6 +15,7 @@ from PIL import Image, ImageDraw, ImageFilter
 
 src, out = sys.argv[1], sys.argv[2]
 start = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+mirror = int(sys.argv[4]) if len(sys.argv) > 4 else 0
 im = Image.open(src).convert("RGB")
 a = np.asarray(im).astype(int)
 H, W, _ = a.shape
@@ -37,9 +40,13 @@ for y in range(top + 5, top + int((bot - top) * .15)):
 axis = float(np.median(axes))
 
 mask = np.zeros((H, W), np.uint8)
+pix = a.copy()
 for y, r in rows.items():
     l = int(round(2 * axis - r)) + 4
     mask[y, max(l, 0):r + 1] = 255
+    for x in range(max(l, 0), min(l + mirror, W)):
+        pix[y, x] = a[y, min(int(round(2 * axis - x)), W - 1)]
+im = Image.fromarray(pix.astype(np.uint8))
 m = Image.fromarray(mask).filter(ImageFilter.GaussianBlur(1.2))
 right = max(rows.values()) + 4
 left = int(2 * axis - right)

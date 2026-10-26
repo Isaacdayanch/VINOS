@@ -54,8 +54,12 @@ botella sobre blanco; los demás como foto de ambiente.
 
 1. **front**: recortar la botella de la foto de Isaac con
    `python3 -I .claude/skills/ficha-destilado/recortar_botella.py foto salida.webp [desde_x]`
-   (fondo blanco; `desde_x` para dejar fuera el estuche). Revisar con Read
+   (fondo blanco; `desde_x` para dejar fuera el estuche; `espejo_px` si el
+   estuche se ve a través del vidrio en la orilla izquierda). Revisar con Read
    que no se cuele nada en los bordes.
+   Estuche: `recortar_estuche.py foto salida.webp xl xr espejo_desde desde_botella`
+   (medir columnas con una cuadrícula; ver ejemplo del Macallan 18 en
+   CATALOG-SPIRITS.md). Si la foto trae un marco gris, recortarlo antes.
 2. **box / back**: de fotos **reales** (de Isaac, de preferencia de su
    botella, porque la importada a México trae contraetiqueta en español con
    importador y NOM). Si la foto trae marcas de tienda (números, sellos),

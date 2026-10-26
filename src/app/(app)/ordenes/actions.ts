@@ -2,17 +2,15 @@
 
 import { prisma } from "@/lib/prisma";
 import { calcularResumenInventario, sincronizarActivoPorStockVarios } from "@/lib/costeo";
+import { generarFolioAlAzar } from "@/lib/folio";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 async function siguienteFolio() {
-  const ordenes = await prisma.orden.findMany({ select: { folio: true } });
-  let maxNumero = 0;
-  for (const o of ordenes) {
-    const match = o.folio.match(/ORD-(\d+)/);
-    if (match) maxNumero = Math.max(maxNumero, parseInt(match[1], 10));
-  }
-  return `ORD-${String(maxNumero + 1).padStart(3, "0")}`;
+  return generarFolioAlAzar("ORD", async (folio) => {
+    const existente = await prisma.orden.findUnique({ where: { folio }, select: { id: true } });
+    return existente !== null;
+  });
 }
 
 type LineaForm = {

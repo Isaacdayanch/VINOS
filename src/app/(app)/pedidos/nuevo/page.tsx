@@ -1,4 +1,4 @@
-import { crearPedido, siguienteFolio } from "@/app/(app)/pedidos/actions";
+import { crearPedido, generarFolioPedido } from "@/app/(app)/pedidos/actions";
 import { DateField } from "@/components/DateField";
 import { SubmitButton } from "@/components/SubmitButton";
 import Link from "next/link";
@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NuevoPedidoPage() {
   const hoy = new Date().toISOString().slice(0, 10);
-  const folio = await siguienteFolio();
+  const folio = await generarFolioPedido();
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -24,6 +24,7 @@ export default async function NuevoPedidoPage() {
       </div>
 
       <form action={crearPedido} className="flex flex-col gap-4">
+        <input type="hidden" name="folio" value={folio} />
         <Campo label="Proveedor" name="proveedor" placeholder="Ej. Rashbi Wines Corp" />
         <DateField name="fecha" label="Fecha del pedido" defaultValue={hoy} />
 

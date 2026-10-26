@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { calcularResumenInventario, sincronizarActivoPorStockVarios } from "@/lib/costeo";
+import { generarFolioAlAzar } from "@/lib/folio";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -61,13 +62,10 @@ export async function eliminarDistribuidor(distribuidorId: string) {
 }
 
 async function siguienteFolioConsignacion() {
-  const notas = await prisma.notaConsignacion.findMany({ select: { folio: true } });
-  let maxNumero = 0;
-  for (const n of notas) {
-    const match = n.folio.match(/NC-(\d+)/);
-    if (match) maxNumero = Math.max(maxNumero, parseInt(match[1], 10));
-  }
-  return `NC-${String(maxNumero + 1).padStart(3, "0")}`;
+  return generarFolioAlAzar("NC", async (folio) => {
+    const existente = await prisma.notaConsignacion.findUnique({ where: { folio }, select: { id: true } });
+    return existente !== null;
+  });
 }
 
 type LineaForm = { productoId: string; cantidadBotellas: number; precioUnitario: number };

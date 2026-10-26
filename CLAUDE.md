@@ -244,6 +244,19 @@ ramas (con permiso de Isaac), para que no se vuelvan a separar. Trabajar en
 una rama `claude/...` y, al final, hacer push de ese mismo commit a
 `catalog-redesign` y a `claude/wine-crm-setup-13v2ux` (ambos fast-forward).
 
+**Acceso de Claude a los datos (desde el 26-oct-2026)**: Isaac creó una llave
+secreta de Supabase (`sb_secret_…`, nombre "claude") y la guardó como secreto
+de red del entorno VINOS para `lwekyvwfrmgzmavwveji.supabase.co`, encabezado
+`apikey`. Con eso Claude usa la API REST de Supabase por HTTPS
+(`https://lwekyvwfrmgzmavwveji.supabase.co/rest/v1/<Tabla>`, p. ej.
+`/Producto`, `/CatalogoPublicado`); Postgres directo sigue bloqueado.
+**Regla acordada: leer, sí; escribir o borrar datos reales, solo con "va"
+de Isaac.** Publicar el catálogo = insertar una fila en `CatalogoPublicado`
+con los productos activos (`id,nombre,fotoUrl,tipo,categoria,anio,precioLista`,
+orden por nombre), igual que `publicarCatalogo()`; antes comparar contra la
+última publicación y avisar qué cambia. Los `id` se generan a mano (no hay
+default en la base): texto que empiece con `c`.
+
 Las dos apps comparten la misma base de datos de Supabase (proyecto
 `lwekyvwfrmgzmavwveji`). Los cambios de esquema se corren a mano en el SQL
 Editor: `https://supabase.com/dashboard/project/lwekyvwfrmgzmavwveji/sql/new`

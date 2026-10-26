@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { sincronizarActivoPorStock } from "@/lib/costeo";
+import { generarFolioAlAzar } from "@/lib/folio";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -11,14 +12,11 @@ function numeroOpcional(valor: FormDataEntryValue | null) {
   return Number.isNaN(n) ? null : n;
 }
 
-export async function siguienteFolio() {
-  const pedidos = await prisma.pedido.findMany({ select: { folio: true } });
-  let max = 0;
-  for (const p of pedidos) {
-    const m = /^P(\d+)$/i.exec(p.folio.trim());
-    if (m) max = Math.max(max, parseInt(m[1], 10));
-  }
-  return `P${String(max + 1).padStart(3, "0")}`;
+export async function generarFolioPedido() {
+  return generarFolioAlAzar("P", async (folio) => {
+    const existente = await prisma.pedido.findUnique({ where: { folio }, select: { id: true } });
+    return existente !== null;
+  });
 }
 
 export async function crearPedido(formData: FormData) {
@@ -33,7 +31,13 @@ export async function crearPedido(formData: FormData) {
     throw new Error("La fecha es obligatoria");
   }
 
-  const folio = await siguienteFolio();
+  // Usa el folio que ya se le mostró en pantalla (para que sea el mismo que
+  // ve antes de guardar); si por algo no vino o ya se usó, genera uno nuevo.
+  const folioPropuesto = String(formData.get("folio") ?? "").trim();
+  const folioYaUsado =
+    folioPropuesto &&
+    (await prisma.pedido.findUnique({ where: { folio: folioPropuesto }, select: { id: true } }));
+  const folio = folioPropuesto && !folioYaUsado ? folioPropuesto : await generarFolioPedido();
 
   const pedido = await prisma.pedido.create({
     data: {

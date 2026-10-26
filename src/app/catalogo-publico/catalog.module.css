@@ -353,7 +353,7 @@
 .shopPage .productImage { background: #fff; aspect-ratio: 3/4; }
 .shopPage .productImage > img { padding: 16px; transition: none; }
 .shopPage .card:hover .productImage > img { transform: none; }
-/* Hover only grows the bottle. The whole frame scales (not the photo alone) so Safari keeps blending it with the paper. */
+/* Hover only grows the bottle. */
 .shopPage .productImage { transition: transform .5s ease; }
 .shopPage .card:hover .productImage { transform: scale(1.04); }
 .shopPage .cardDetails { padding-top: 25px; text-align: center; }
@@ -394,7 +394,7 @@
   .shopPage .productImage { aspect-ratio: 2/3; }
   .shopPage .productImage > img { padding: 10px 2px; }
   .shopPage .cardDetails { padding-top: 18px; }
-  .shopPage .cardDetails h2 { font-size: 24px; }
+  .shopPage .cardDetails h2 { font-size: 19px; line-height: 1.15; }
   .shopPage .cardPrice { font-size: 13px; }
   .shopFilterDialog { inset: auto 0 0; margin: 0 auto; width: 100%; height: auto; max-height: 90dvh; border-radius: 18px 18px 0 0; }
   .filterPanelHeading { padding: 26px 24px 22px; }
@@ -427,13 +427,11 @@
 @media print { .orderPill, .orderDialog { display: none !important; } }
 
 /* Wines and spirits: the shop layout on warm cream paper. */
-.creamShop { --cream: #f7f2e8; --paper: #f7f2e8; --line: #ddd4c4; --muted: #5f574b; background: var(--cream); }
+.creamShop { --cream: #f6f2eb; --paper: #f6f2eb; --line: #ddd4c4; --muted: #5f574b; background: var(--cream); }
 .creamShop .collection, .creamShop .shopDiscovery, .creamShop .productImage, .creamShop .categoryRail button, .creamShop .activeFilters button, .creamShop .shopFilterDialog, .creamShop .filterPanelFooter { background: var(--cream); }
 .creamShop .categoryRail button:is(:hover,[aria-pressed="true"]) { background: var(--burgundy); }
-/* Bottle photos are shot on white: multiply melts that white into the cream paper, so no white box shows. The slight lift turns near-white (254) into pure white first. */
-.creamShop .productImage { isolation: isolate; }
-.creamShop .productImage > img { mix-blend-mode: multiply; filter: brightness(1.06) contrast(1.05); }
-@media print { .creamShop { background: white; } .creamShop .collection, .creamShop .productImage { background: white; } .creamShop .productImage > img { mix-blend-mode: normal; filter: none; } }
+/* Bottle photos arrive already repainted in this cream (foto-crema route), so they need no blending. */
+@media print { .creamShop { background: white; } .creamShop .collection, .creamShop .productImage { background: white; } }
 
 .showcaseBottleLink { position: absolute; inset: 0; z-index: 2; }
 .showcaseBottleLink:focus-visible { outline: 2px solid var(--wine, #602e3b); outline-offset: -6px; }

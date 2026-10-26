@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { sugerirMaridaje } from "@/lib/maridaje";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type ProductoDefaults = {
   nombre?: string;
@@ -146,9 +147,9 @@ export function ProductoForm({
         </div>
       )}
 
-      <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Guardando...">
         {botonTexto}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

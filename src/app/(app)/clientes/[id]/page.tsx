@@ -1,5 +1,6 @@
 import { PreciosClienteTabla } from "@/components/PreciosClienteTabla";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 import { calcularEstadoCuentaCliente, calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
 import { asegurarCodigoCliente } from "@/lib/clienteCodigo";
 import { prisma } from "@/lib/prisma";
@@ -21,7 +22,7 @@ export default async function DetalleClientePage({
 }: PageProps<"/clientes/[id]">) {
   const { id } = await params;
 
-  const [cliente, ordenes, productos, preciosGuardados, abonos, estadoCuenta, saldosOrdenes] =
+  const [cliente, ordenes, productos, preciosGuardados, abonos, estadoCuenta, saldosOrdenes, distribuidoresVinculados] =
     await Promise.all([
       prisma.cliente.findUnique({ where: { id } }),
       prisma.orden.findMany({
@@ -34,6 +35,11 @@ export default async function DetalleClientePage({
       prisma.abonoCliente.findMany({ where: { clienteId: id }, orderBy: { fecha: "desc" } }),
       calcularEstadoCuentaCliente(id),
       calcularSaldosOrdenes(id),
+      prisma.distribuidor.findMany({
+        where: { clienteId: id },
+        include: { notasConsignacion: { include: { lineas: true, cobros: true }, orderBy: { fecha: "desc" } } },
+        orderBy: { createdAt: "desc" },
+      }),
     ]);
   if (!cliente) notFound();
   const codigo = await asegurarCodigoCliente(cliente);
@@ -176,9 +182,12 @@ export default async function DetalleClientePage({
                 className="rounded-md border border-border bg-surface px-3 py-2"
               />
             </label>
-            <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
+            <SubmitButton
+              className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm"
+              pendingText="Registrando..."
+            >
               Registrar abono
-            </button>
+            </SubmitButton>
           </form>
         </details>
       </div>
@@ -206,12 +215,12 @@ export default async function DetalleClientePage({
                   </p>
                 </div>
                 <form action={marcarLineaEntregada.bind(null, l.id, l.ordenId)}>
-                  <button
-                    type="submit"
-                    className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap hover:bg-wine-dark active:scale-[0.97] transition-colors"
+                  <SubmitButton
+                    className="rounded-md bg-wine text-white px-3 py-1.5 text-xs font-medium whitespace-nowrap hover:bg-wine-dark transition-colors"
+                    pendingText="..."
                   >
                     Ya se la entregué
-                  </button>
+                  </SubmitButton>
                 </form>
               </div>
             ))}
@@ -231,7 +240,70 @@ export default async function DetalleClientePage({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold">Historial de recibos</h2>
+          <h2 className="font-semibold">Eventos y consignación</h2>
+          <Link
+            href={`/distribuidores/nuevo?clienteId=${cliente.id}&volver=${encodeURIComponent(`/clientes/${cliente.id}`)}`}
+            className="text-xs text-wine underline whitespace-nowrap"
+          >
+            + Nuevo
+          </Link>
+        </div>
+        <p className="text-xs text-muted -mt-1">
+          Lo que le has dado en consignación, aparte de sus compras personales de abajo.
+        </p>
+        {distribuidoresVinculados.length === 0 ? (
+          <p className="p-6 text-center text-muted text-sm rounded-lg border border-border bg-surface">
+            Todavía no tiene ningún evento ni consignación ligada.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {distribuidoresVinculados.map((d) => {
+              const esEvento = d.tipo === "EVENTO";
+              const total = d.notasConsignacion.reduce(
+                (acc, n) => acc + n.lineas.reduce((a, l) => a + l.cantidadBotellas * l.precioUnitario, 0),
+                0,
+              );
+              const pendiente = d.notasConsignacion.reduce(
+                (acc, n) =>
+                  acc +
+                  n.lineas.reduce(
+                    (a, l) => a + (l.cantidadBotellas - l.botellasPagadas - l.botellasDevueltas) * l.precioUnitario,
+                    0,
+                  ),
+                0,
+              );
+              return (
+                <Link
+                  key={d.id}
+                  href={`/distribuidores/${d.id}`}
+                  className="rounded-lg border border-border bg-surface p-4 flex items-center justify-between gap-3 hover:bg-wine-light/40"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">
+                      {esEvento ? "🎉 " : "🤝 "}
+                      {d.nombre}
+                    </p>
+                    <p className="text-xs text-muted">
+                      {esEvento ? "Evento" : "Distribuidor"}
+                      {esEvento && d.fechaEvento ? ` · ${d.fechaEvento.toLocaleDateString("es-MX")}` : ""}
+                      {" · "}
+                      {d.notasConsignacion.length} nota{d.notasConsignacion.length === 1 ? "" : "s"}
+                    </p>
+                  </div>
+                  <div className="text-right whitespace-nowrap">
+                    <p className="font-semibold text-wine">{formatoMXN(total)}</p>
+                    {pendiente > 0.5 && <p className="text-xs text-warn">{formatoMXN(pendiente)} pendiente</p>}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold">Compras personales</h2>
           <Link href="/ordenes/nueva" className="text-xs text-wine underline whitespace-nowrap">
             + Nueva orden
           </Link>

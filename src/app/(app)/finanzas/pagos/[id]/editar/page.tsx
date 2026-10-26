@@ -1,5 +1,6 @@
 import { actualizarPago } from "@/app/(app)/finanzas/actions";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -155,9 +156,9 @@ export default async function EditarPagoPage({
         />
         <Campo label="Notas (opcional)" name="notas" defaultValue={pago.notas ?? undefined} />
 
-        <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+        <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Guardando...">
           Guardar cambios
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

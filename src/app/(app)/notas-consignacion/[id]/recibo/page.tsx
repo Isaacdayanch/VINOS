@@ -29,7 +29,10 @@ export default async function ReciboNotaConsignacionPage({
 
   const total = nota.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
   const cobrado = nota.cobros.reduce((acc, c) => acc + c.monto, 0);
-  const pendiente = total - cobrado;
+  const pendiente = nota.lineas.reduce(
+    (acc, l) => acc + (l.cantidadBotellas - l.botellasPagadas - l.botellasDevueltas) * l.precioUnitario,
+    0,
+  );
 
   return (
     <div className="flex flex-col gap-6 bg-background print:bg-background">

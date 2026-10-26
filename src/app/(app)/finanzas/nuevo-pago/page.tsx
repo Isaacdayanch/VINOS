@@ -1,5 +1,6 @@
 import { crearPago } from "@/app/(app)/finanzas/actions";
 import { DateField } from "@/components/DateField";
+import { SubmitButton } from "@/components/SubmitButton";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -103,9 +104,9 @@ export default async function NuevoPagoPage() {
         <Campo label="Método de pago (opcional)" name="metodoPago" placeholder="Ej. Transferencia" />
         <Campo label="Notas (opcional)" name="notas" />
 
-        <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium">
+        <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Guardando...">
           Guardar
-        </button>
+        </SubmitButton>
       </form>
     </div>
   );

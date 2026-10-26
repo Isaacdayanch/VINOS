@@ -220,6 +220,24 @@ export type SaldoEntreSocios = {
   monto: number;
 } | null;
 
+// Entre 2 socios, quién le debe a quién para que ambos queden igual en el
+// valor que se les pase (aportado, consumo personal, etc.): se divide la
+// diferencia a la mitad. Con más o menos de 2 socios no hay a quién
+// comparar, así que no hay saldo que calcular.
+function saldoEntrePorValor(
+  socios: ResumenSocio[],
+  valor: (s: ResumenSocio) => number,
+): SaldoEntreSocios {
+  if (socios.length !== 2) return null;
+  const [a, b] = socios;
+  const diferencia = valor(a) - valor(b);
+  const monto = Math.abs(diferencia) / 2;
+  if (monto < 1) return null;
+  return diferencia > 0
+    ? { deudorId: b.socioId, deudorNombre: b.nombre, acreedorId: a.socioId, acreedorNombre: a.nombre, monto }
+    : { deudorId: a.socioId, deudorNombre: a.nombre, acreedorId: b.socioId, acreedorNombre: b.nombre, monto };
+}
+
 export type ResumenFinanzas = {
   inversionTotal: number;
   totalInyeccionCapital: number;
@@ -235,7 +253,8 @@ export type ResumenFinanzas = {
   saldoCaja: number;
   saldoCuenta: number;
   socios: ResumenSocio[];
-  saldoEntreSocios: SaldoEntreSocios;
+  saldoAportaciones: SaldoEntreSocios; // quién le debe a quién por dinero puesto a proveedores (capital)
+  saldoConsumo: SaldoEntreSocios; // quién le debe a quién por botellas de consumo personal
   maaserDebido: number;
   maaserDado: number;
   saldoMaaser: number; // positivo = a favor, negativo = debe
@@ -243,6 +262,8 @@ export type ResumenFinanzas = {
   regalosClientes: { botellas: number; costo: number }; // botellas regaladas a clientes (marketing)
   perdidaAjusteInventario: { botellas: number; costo: number }; // faltantes sin dueño (pérdida del negocio)
   gananciaAjusteInventario: { botellas: number; costo: number }; // sobrantes encontrados (ganancia extra)
+  ventaConsignacionReconocida: number; // solo la parte de consignación ya cobrada (ver gananciaConsignacion)
+  gananciaConsignacion: number; // ganancia de consignación, incluida ya en gananciaTotal
 };
 
 const PORCENTAJE_MAASER = 0.1;
@@ -251,12 +272,42 @@ export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: num
   return moneda === "USD" ? monto * (tipoCambio ?? 0) : monto;
 }
 
+export type PedidoSinCosto = { id: string; folio: string; botellas: number };
+
+/**
+ * Pedidos que ya recibiste pero a los que todavía no se les puede sacar un
+ * costo real -- no tienen tipo de cambio fijo, ni pagos en USD de dónde
+ * estimarlo (ver tipoCambioEstimadoDePagos). Mientras tanto, esas botellas
+ * entran casi gratis al costo promedio de su producto, lo que puede inflar
+ * la Ganancia que se ve en Dashboard/Finanzas y hacer que el Valor de
+ * inventario se vea más bajo de lo real -- hasta que se les ponga tipo de
+ * cambio o se les registre un pago en dólares.
+ */
+export async function calcularPedidosSinTipoCambio(): Promise<PedidoSinCosto[]> {
+  const pedidos = await prisma.pedido.findMany({
+    where: { entradas: { some: { recibida: true } } },
+    include: { entradas: { where: { recibida: true } }, pagos: true },
+  });
+
+  const resultado: PedidoSinCosto[] = [];
+  for (const p of pedidos) {
+    const tipoCambio = p.tipoCambio ?? tipoCambioEstimadoDePagos(p.pagos);
+    if (tipoCambio) continue;
+    const botellas = p.entradas.reduce(
+      (acc, e) => acc + e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra,
+      0,
+    );
+    if (botellas > 0) resultado.push({ id: p.id, folio: p.folio, botellas });
+  }
+  return resultado;
+}
+
 /**
  * Junta todos los números de Finanzas: inversión, stock, cobros, ganancia,
  * saldo de Caja/Cuenta, y el saldo entre socios (quién le debe a quién).
  */
 export async function calcularFinanzas(): Promise<ResumenFinanzas> {
-  const [resumenInventario, socios, pagos, cobros, abonosCliente, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock] =
+  const [resumenInventario, socios, pagos, cobros, abonosCliente, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock, lineasConsignacion] =
     await Promise.all([
       calcularResumenInventario(),
       prisma.socio.findMany(),
@@ -267,6 +318,7 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
       prisma.orden.findMany({ include: { lineas: true } }),
       prisma.salida.findMany({ where: { motivo: "Consumo personal" } }),
       prisma.ajusteStock.findMany(),
+      prisma.notaConsignacionLinea.findMany(),
     ]);
 
   let valorInventario = 0;
@@ -290,7 +342,18 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
       }
     }
   }
-  const gananciaTotal = ventasTotales - costoVentas;
+  // La consignación solo se vuelve "venta" de verdad hasta que el distribuidor
+  // (o quien recibió el evento) paga esas botellas -- lo que se le regresa a
+  // Isaac sin vender nunca cuenta como venta ni ganancia, solo vuelve al stock.
+  let ventaConsignacionReconocida = 0;
+  let costoConsignacionReconocido = 0;
+  for (const l of lineasConsignacion) {
+    ventaConsignacionReconocida += l.botellasPagadas * l.precioUnitario;
+    costoConsignacionReconocido += l.botellasPagadas * l.costoUnitario;
+  }
+  const gananciaConsignacion = ventaConsignacionReconocida - costoConsignacionReconocido;
+
+  const gananciaTotal = ventasTotales - costoVentas + gananciaConsignacion;
 
   const totalCobrado =
     cobros.reduce((acc, c) => acc + c.monto, 0) +
@@ -391,6 +454,11 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   let gananciaAjusteBotellas = 0;
   let gananciaAjusteCosto = 0;
   for (const a of ajustesStock) {
+    // Las devoluciones de consignación no son un sobrante misterioso -- ya se
+    // contabilizan solas al no sumarse como venta/ganancia de consignación
+    // (ver gananciaConsignacion arriba), así que aquí se ignoran para no
+    // contarlas dos veces como "ganancia extra".
+    if (a.motivo?.startsWith("Devolución de consignación")) continue;
     if (a.botellas < 0) {
       const botellas = Math.abs(a.botellas);
       const costoBruto = a.costoUnitario * botellas;
@@ -422,18 +490,8 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     };
   });
 
-  let saldoEntreSocios: SaldoEntreSocios = null;
-  if (resumenSocios.length === 2) {
-    const [a, b] = resumenSocios;
-    const diferencia = a.neto - b.neto;
-    const monto = Math.abs(diferencia) / 2;
-    if (monto >= 1) {
-      saldoEntreSocios =
-        diferencia > 0
-          ? { deudorId: b.socioId, deudorNombre: b.nombre, acreedorId: a.socioId, acreedorNombre: a.nombre, monto }
-          : { deudorId: a.socioId, deudorNombre: a.nombre, acreedorId: b.socioId, acreedorNombre: b.nombre, monto };
-    }
-  }
+  const saldoAportaciones = saldoEntrePorValor(resumenSocios, (s) => s.aportado);
+  const saldoConsumo = saldoEntrePorValor(resumenSocios, (s) => s.consumoPersonal);
 
   const maaserDebido = gananciaTotal * PORCENTAJE_MAASER;
   const saldoMaaser = maaserDado - maaserDebido;
@@ -453,11 +511,14 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     saldoCaja,
     saldoCuenta,
     socios: resumenSocios,
-    saldoEntreSocios,
+    saldoAportaciones,
+    saldoConsumo,
     consumoCompartido: { botellas: compartidoBotellas, costo: compartidoCosto },
     regalosClientes: { botellas: regalosBotellas, costo: regalosCosto },
     perdidaAjusteInventario: { botellas: perdidaAjusteBotellas, costo: perdidaAjusteCosto },
     gananciaAjusteInventario: { botellas: gananciaAjusteBotellas, costo: gananciaAjusteCosto },
+    ventaConsignacionReconocida,
+    gananciaConsignacion,
     maaserDebido,
     maaserDado,
     saldoMaaser,
@@ -658,6 +719,114 @@ export async function calcularMovimientosStock(limite?: number): Promise<Movimie
 
   movimientos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
   return limite ? movimientos.slice(0, limite) : movimientos;
+}
+
+export type MovimientoStockProducto = {
+  id: string;
+  fecha: Date;
+  tipo: "entrada" | "salida" | "ajuste";
+  signo: 1 | -1;
+  botellas: number;
+  detalle: string;
+  ubicacion: string | null;
+  href: string | null;
+};
+
+/**
+ * Historial de movimientos de UN producto, con más detalle que
+ * calcularMovimientosStock: en una venta dice a qué cliente, en una
+ * consignación a qué distribuidor/evento. Para la ficha del producto.
+ */
+export async function calcularMovimientosStockProducto(
+  productoId: string,
+): Promise<MovimientoStockProducto[]> {
+  const [entradas, salidas, ajustes] = await Promise.all([
+    prisma.entradaLinea.findMany({
+      where: { productoId, recibida: true },
+      include: { pedido: true, ubicacion: true },
+    }),
+    prisma.salida.findMany({ where: { productoId }, include: { ubicacion: true, socio: true } }),
+    prisma.ajusteStock.findMany({ where: { productoId }, include: { ubicacion: true, socio: true } }),
+  ]);
+
+  const ordenIds = [...new Set(salidas.map((s) => s.ordenId).filter((id): id is string => Boolean(id)))];
+  const notaIds = [
+    ...new Set(salidas.map((s) => s.notaConsignacionId).filter((id): id is string => Boolean(id))),
+  ];
+
+  const [ordenes, notas] = await Promise.all([
+    ordenIds.length
+      ? prisma.orden.findMany({ where: { id: { in: ordenIds } }, include: { cliente: true } })
+      : Promise.resolve([]),
+    notaIds.length
+      ? prisma.notaConsignacion.findMany({ where: { id: { in: notaIds } }, include: { distribuidor: true } })
+      : Promise.resolve([]),
+  ]);
+  const ordenPorId = new Map(ordenes.map((o) => [o.id, o]));
+  const notaPorId = new Map(notas.map((n) => [n.id, n]));
+
+  const movimientos: MovimientoStockProducto[] = [];
+
+  for (const e of entradas) {
+    movimientos.push({
+      id: `entrada-${e.id}`,
+      fecha: e.fecha,
+      tipo: "entrada",
+      signo: 1,
+      botellas: Math.round(e.cajasRecibidas * e.piezasPorCaja + e.botellasExtra),
+      detalle: `Pedido ${e.pedido.folio}`,
+      ubicacion: e.ubicacion?.nombre ?? null,
+      href: `/pedidos/${e.pedidoId}`,
+    });
+  }
+
+  for (const s of salidas) {
+    let detalle = s.motivo;
+    let href: string | null = null;
+    if (s.motivo === "Venta" && s.ordenId) {
+      const orden = ordenPorId.get(s.ordenId);
+      detalle = orden
+        ? `Vendido a ${orden.cliente.nombre.replace("Cliente Especial - ", "")} (${orden.folio})`
+        : "Venta";
+      href = `/ordenes/${s.ordenId}`;
+    } else if (s.motivo === "Consignación" && s.notaConsignacionId) {
+      const nota = notaPorId.get(s.notaConsignacionId);
+      detalle = nota ? `Consignación — ${nota.distribuidor.nombre} (${nota.folio})` : "Consignación";
+      href = `/notas-consignacion/${s.notaConsignacionId}`;
+    } else if (s.motivo === "Consumo personal") {
+      detalle = s.socio
+        ? `Consumo personal — ${s.socio.nombre}`
+        : s.dividido
+          ? "Consumo personal — Isaac y Beto"
+          : "Consumo personal";
+    }
+    movimientos.push({
+      id: `salida-${s.id}`,
+      fecha: s.fecha,
+      tipo: "salida",
+      signo: -1,
+      botellas: s.botellas,
+      detalle,
+      ubicacion: s.ubicacion?.nombre ?? null,
+      href,
+    });
+  }
+
+  for (const a of ajustes) {
+    movimientos.push({
+      id: `ajuste-${a.id}`,
+      fecha: a.fecha,
+      tipo: "ajuste",
+      signo: a.botellas >= 0 ? 1 : -1,
+      botellas: Math.abs(a.botellas),
+      detalle: a.motivo || (a.socio ? `Se las llevó ${a.socio.nombre}` : "Ajuste de inventario"),
+      ubicacion: a.ubicacion?.nombre ?? null,
+      href: null,
+    });
+  }
+
+  movimientos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+  return movimientos;
 }
 
 export type MovimientoEstadoCuenta = {

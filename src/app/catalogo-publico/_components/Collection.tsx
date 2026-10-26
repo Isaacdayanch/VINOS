@@ -8,6 +8,7 @@ import { BUDGETS, FACETS_BY_KIND, filterCollection, type FacetKey } from "../_li
 import styles from "../catalog.module.css";
 import { OrderNotice } from "./OrderNotice";
 import { publicPhotograph } from "../_lib/public-photography";
+import { creamPhoto } from "../_lib/cream-photo";
 
 const money = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 });
 function CloseIcon() { return <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" /></svg>; }
@@ -129,7 +130,7 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
 function WineCard({ wine }: { wine: PublicWine }) {
   const photo = publicPhotograph(wine.id, wine.fotoUrl);
   const content = <>
-    <div className={styles.productImage}>{photo ? <Image src={photo} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill sizes="(max-width: 700px) 45vw, 29vw" className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}</div>
+    <div className={styles.productImage}>{photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill unoptimized className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}</div>
     <div className={styles.cardDetails}><p className={styles.eyebrow}>{[wine.categoria, wine.anio].filter(Boolean).join(" · ")}</p><h2>{wine.nombre}</h2>{wine.region && <p className={styles.cardRegion}>{wine.region}</p>}<p className={styles.cardPrice}>{wine.precioLista !== null ? money.format(wine.precioLista) : "Precio por confirmar"}</p></div>
   </>;
   return <article className={styles.card}>{wine.id ? <Link href={`/catalogo-publico/${wine.id}`} prefetch={false}>{content}</Link> : <div>{content}</div>}</article>;

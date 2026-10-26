@@ -11,6 +11,7 @@ import { AgregarLineaPedidoForm } from "@/components/AgregarLineaPedidoForm";
 import { CostosPedidoForm } from "@/components/CostosPedidoForm";
 import { DateField } from "@/components/DateField";
 import { LineaPedidoRow } from "@/components/LineaPedidoRow";
+import { SubmitButton } from "@/components/SubmitButton";
 import { calcularCostosPedido, montoEnMXN, formatoMXN, tipoCambioEstimadoDePagos } from "@/lib/costeo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -435,9 +436,9 @@ export default async function DetallePedidoPage({
               </div>
             </details>
 
-            <button type="submit" className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm">
+            <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium text-sm" pendingText="Guardando...">
               Registrar abono
-            </button>
+            </SubmitButton>
           </form>
         </details>
       </div>

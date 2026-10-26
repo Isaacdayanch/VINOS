@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { creamPhoto } from "../_lib/cream-photo";
 import { useRef, useState, type ReactNode } from "react";
 import styles from "../catalog.module.css";
 
@@ -50,7 +51,9 @@ export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name
           }}
           onPointerCancel={(event) => { drag.current = null; delete event.currentTarget.dataset.dragging; }}>
           {photos.map((item, index) => <div key={`${item.url}-${index}`} className={`${styles.photoSlide} ${!item.ambient ? styles.immersiveBottle : ""}`} role="group" aria-roledescription="diapositiva" aria-label={`${index + 1} de ${photos.length}: ${item.caption}`}>
-            <Image src={item.url} alt={`${name}: ${item.caption}`} fill preload={index === 0} draggable={false} sizes="(max-width: 700px) 100vw, 57vw" />
+            {item.ambient
+              ? <Image src={item.url} alt={`${name}: ${item.caption}`} fill preload={index === 0} draggable={false} sizes="(max-width: 700px) 100vw, 57vw" />
+              : <Image src={creamPhoto(item.url)} alt={`${name}: ${item.caption}`} fill preload={index === 0} draggable={false} unoptimized />}
           </div>)}
         </div>
         {photo.ambient && <div className={styles.photoDissolve} aria-hidden="true" />}

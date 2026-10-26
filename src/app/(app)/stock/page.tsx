@@ -87,9 +87,11 @@ export default async function StockPage({ searchParams }: PageProps<"/stock">) {
             </Link>
           ))}
         </div>
-        <Link href="/stock/ubicaciones" className="text-xs text-wine underline whitespace-nowrap">
-          Editar ubicaciones
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/stock/ubicaciones" className="text-xs text-wine underline whitespace-nowrap">
+            Editar ubicaciones
+          </Link>
+        </div>
       </div>
 
       {!consolidado && (

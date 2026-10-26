@@ -1,17 +1,19 @@
-import { calcularFinanzas, formatoMXN } from "@/lib/costeo";
+import { calcularFinanzas, calcularPedidosSinTipoCambio, formatoMXN } from "@/lib/costeo";
+import { AvisoPedidosSinCosto } from "@/components/AvisoPedidosSinCosto";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function FinanzasPage() {
-  const [finanzas, pagos] = await Promise.all([
+  const [finanzas, pagos, pedidosSinCosto] = await Promise.all([
     calcularFinanzas(),
     prisma.pago.findMany({
       include: { pedido: true, socio: true },
       orderBy: { fecha: "desc" },
       take: 15,
     }),
+    calcularPedidosSinTipoCambio(),
   ]);
 
   return (
@@ -40,6 +42,8 @@ export default async function FinanzasPage() {
         </div>
       </div>
 
+      <AvisoPedidosSinCosto pedidos={pedidosSinCosto} />
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <StatCard label="Inversión total" value={formatoMXN(finanzas.inversionTotal)} />
         <StatCard label="Valor en stock" value={formatoMXN(finanzas.valorInventario)} />
@@ -62,7 +66,7 @@ export default async function FinanzasPage() {
         </Link>
       </div>
 
-      <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
+      <div className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-3">
         <h2 className="font-semibold">Desglose de lo que se ha pagado</h2>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
@@ -84,62 +88,82 @@ export default async function FinanzasPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-warn/40 bg-warn-bg p-4 flex flex-col gap-3">
-        <h2 className="font-semibold text-warn">Maaser</h2>
+      <div className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-3">
+        <h2 className="font-semibold">Maaser</h2>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <p className="text-muted text-xs">Debido (10% de la ganancia)</p>
-            <p className="font-semibold text-foreground">{formatoMXN(finanzas.maaserDebido)}</p>
+            <p className="font-semibold">{formatoMXN(finanzas.maaserDebido)}</p>
           </div>
           <div>
             <p className="text-muted text-xs">Dado</p>
-            <p className="font-semibold text-foreground">{formatoMXN(finanzas.maaserDado)}</p>
+            <p className="font-semibold">{formatoMXN(finanzas.maaserDado)}</p>
           </div>
         </div>
-        <p className="text-sm text-foreground">
+        <p className="text-sm">
           {finanzas.saldoMaaser >= 0 ? (
             <>
               Maaser a favor:{" "}
-              <span className="font-bold text-warn">{formatoMXN(finanzas.saldoMaaser)}</span>
+              <span className="font-bold text-wine">{formatoMXN(finanzas.saldoMaaser)}</span>
             </>
           ) : (
             <>
               Debes de Maaser:{" "}
-              <span className="font-bold text-warn">{formatoMXN(-finanzas.saldoMaaser)}</span>
+              <span className="font-bold text-wine">{formatoMXN(-finanzas.saldoMaaser)}</span>
             </>
           )}
         </p>
       </div>
 
-      <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
-        <h2 className="font-semibold">Saldo entre socios</h2>
-        {finanzas.saldoEntreSocios ? (
+      <div className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-3">
+        <div>
+          <h2 className="font-semibold">💳 Saldo de aportaciones</h2>
+          <p className="text-xs text-muted mt-0.5">
+            Dinero que cada quién ha puesto para pagar a proveedores (ya pasado a pesos, con su
+            tipo de cambio).
+          </p>
+        </div>
+        {finanzas.saldoAportaciones ? (
           <p className="text-sm">
-            <span className="font-semibold text-wine">{finanzas.saldoEntreSocios.deudorNombre}</span>{" "}
+            <span className="font-semibold text-wine">{finanzas.saldoAportaciones.deudorNombre}</span>{" "}
             le debe a{" "}
-            <span className="font-semibold text-wine">{finanzas.saldoEntreSocios.acreedorNombre}</span>:{" "}
-            <span className="font-bold">{formatoMXN(finanzas.saldoEntreSocios.monto)}</span>
+            <span className="font-semibold text-wine">{finanzas.saldoAportaciones.acreedorNombre}</span>:{" "}
+            <span className="font-bold">{formatoMXN(finanzas.saldoAportaciones.monto)}</span>
           </p>
         ) : (
           <p className="text-sm text-muted">Están a mano.</p>
         )}
         <div className="grid grid-cols-2 gap-3 text-sm">
           {finanzas.socios.map((s) => (
-            <div key={s.socioId} className="rounded-md border border-border p-3">
+            <div key={s.socioId} className="rounded-lg border border-border p-3">
               <p className="font-medium">{s.nombre}</p>
-              <p className="text-xs text-muted mt-1">Aportado: {formatoMXN(s.aportado)}</p>
-              <p className="text-xs text-muted">Consumo personal: {formatoMXN(s.consumoPersonal)}</p>
+              <p className="text-xs text-muted mt-1">{formatoMXN(s.aportado)} aportado</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
-        <h2 className="font-semibold">Cuánto se ha llevado cada quién</h2>
-        <p className="text-xs text-muted -mt-2">Botellas para consumo propio (no ventas), a costo.</p>
+      <div className="rounded-xl border border-border bg-surface p-5 flex flex-col gap-3">
+        <div>
+          <h2 className="font-semibold">🍾 Saldo de botellas</h2>
+          <p className="text-xs text-muted mt-0.5">
+            Botellas que cada quién se llevó para consumo propio (no ventas), a costo — y lo que
+            se deben entre ellos por la diferencia.
+          </p>
+        </div>
+        {finanzas.saldoConsumo ? (
+          <p className="text-sm">
+            <span className="font-semibold text-wine">{finanzas.saldoConsumo.deudorNombre}</span>{" "}
+            le debe a{" "}
+            <span className="font-semibold text-wine">{finanzas.saldoConsumo.acreedorNombre}</span>:{" "}
+            <span className="font-bold">{formatoMXN(finanzas.saldoConsumo.monto)}</span>
+          </p>
+        ) : (
+          <p className="text-sm text-muted">Están a mano.</p>
+        )}
         <div className="grid grid-cols-2 gap-3 text-sm">
           {finanzas.socios.map((s) => (
-            <div key={s.socioId} className="rounded-md border border-border p-3">
+            <div key={s.socioId} className="rounded-lg border border-border p-3">
               <p className="font-medium">{s.nombre}</p>
               <p className="text-xs text-muted mt-1">
                 {s.botellasPersonal} botella{s.botellasPersonal === 1 ? "" : "s"}
@@ -147,7 +171,7 @@ export default async function FinanzasPage() {
               <p className="text-xs text-muted">{formatoMXN(s.costoPersonalBruto)}</p>
             </div>
           ))}
-          <div className="rounded-md border border-border p-3">
+          <div className="rounded-lg border border-border p-3">
             <p className="font-medium">Entre los dos</p>
             <p className="text-xs text-muted mt-1">
               {finanzas.consumoCompartido.botellas} botella
@@ -162,7 +186,7 @@ export default async function FinanzasPage() {
       </div>
 
       {finanzas.regalosClientes.botellas > 0 && (
-        <div className="rounded-lg border border-border bg-surface p-4 flex items-center justify-between">
+        <div className="rounded-xl border border-border bg-surface p-5 flex items-center justify-between">
           <div>
             <h2 className="font-semibold">🎁 Regalos a clientes</h2>
             <p className="text-xs text-muted mt-1">
@@ -181,7 +205,7 @@ export default async function FinanzasPage() {
       )}
 
       {finanzas.perdidaAjusteInventario.botellas > 0 && (
-        <div className="rounded-lg border border-warn/40 bg-warn-bg p-4 flex items-center justify-between">
+        <div className="rounded-xl border border-warn/40 bg-warn-bg p-5 flex items-center justify-between">
           <div>
             <h2 className="font-semibold text-warn">📉 Pérdida por ajuste de inventario</h2>
             <p className="text-xs text-warn/80 mt-1">
@@ -200,7 +224,7 @@ export default async function FinanzasPage() {
       )}
 
       {finanzas.gananciaAjusteInventario.botellas > 0 && (
-        <div className="rounded-lg border border-ok/40 bg-surface p-4 flex items-center justify-between">
+        <div className="rounded-xl border border-ok/40 bg-surface p-5 flex items-center justify-between">
           <div>
             <h2 className="font-semibold text-ok">📈 Ganancia extra por ajuste de inventario</h2>
             <p className="text-xs text-muted mt-1">
@@ -218,7 +242,23 @@ export default async function FinanzasPage() {
         </div>
       )}
 
-      <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
+      {finanzas.ventaConsignacionReconocida > 0 && (
+        <div className="rounded-xl border border-ok/40 bg-surface p-5 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-ok">🤝 Ganancia por consignación ya cobrada</h2>
+            <p className="text-xs text-muted mt-1">
+              Solo la parte que ya te pagaron en Consignación — lo que todavía no te pagan no
+              cuenta como venta ni ganancia. Ya está sumada a la ganancia total.
+            </p>
+          </div>
+          <div className="text-right whitespace-nowrap">
+            <p className="font-bold text-ok">{formatoMXN(finanzas.gananciaConsignacion)}</p>
+            <p className="text-xs text-muted">de {formatoMXN(finanzas.ventaConsignacionReconocida)} vendido</p>
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-xl border border-border bg-surface divide-y divide-border overflow-hidden">
         <div className="p-4">
           <h2 className="font-semibold">Pagos y gastos recientes</h2>
         </div>
@@ -258,7 +298,7 @@ export default async function FinanzasPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-4">
+    <div className="rounded-xl border border-border bg-surface p-4">
       <p className="text-xs text-muted">{label}</p>
       <p className="text-lg font-bold text-wine mt-1">{value}</p>
     </div>

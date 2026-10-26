@@ -12,6 +12,11 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+enum TipoDistribuidor {
+  DISTRIBUIDOR
+  EVENTO
+}
+
 enum CategoriaPrecio {
   LISTA
   DESCUENTO_CHICO
@@ -125,6 +130,7 @@ model Cliente {
   ordenes         Orden[]
   preciosProducto PrecioClienteProducto[]
   abonos          AbonoCliente[]
+  distribuidores  Distribuidor[]
 }
 
 // Pago del cliente a cuenta general, sin ligarlo a una orden específica
@@ -288,12 +294,17 @@ model Pago {
 }
 
 model Distribuidor {
-  id        String   @id @default(cuid())
-  nombre    String
-  telefono  String?
-  notas     String?
-  createdAt DateTime @default(now())
+  id          String           @id @default(cuid())
+  nombre      String
+  telefono    String?
+  notas       String?
+  tipo        TipoDistribuidor @default(DISTRIBUIDOR)
+  clienteId   String? // opcional: liga este distribuidor/evento con un cliente de compra directa
+  fechaEvento DateTime? // solo si tipo = EVENTO
+  listoEvento Boolean          @default(false) // Isaac marca si ya está listo para cuadrar el evento
+  createdAt   DateTime         @default(now())
 
+  cliente           Cliente?           @relation(fields: [clienteId], references: [id])
   notasConsignacion NotaConsignacion[]
 }
 
@@ -318,6 +329,8 @@ model NotaConsignacionLinea {
   cantidadBotellas   Int
   precioUnitario     Float
   costoUnitario      Float // costo por botella al momento de entregarla (para calcular margen)
+  botellasPagadas    Int    @default(0) // cuántas de esta línea ya se cobraron (venta/ganancia reconocida)
+  botellasDevueltas  Int    @default(0) // cuántas de esta línea regresaron sin venderse (vuelven al stock)
 
   notaConsignacion NotaConsignacion @relation(fields: [notaConsignacionId], references: [id])
   producto         Producto         @relation(fields: [productoId], references: [id])

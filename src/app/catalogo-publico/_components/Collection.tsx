@@ -140,8 +140,12 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
 
 function WineCard({ wine }: { wine: PublicWine }) {
   const photo = publicPhotograph(wine.id, wine.fotoUrl) ?? spiritPhoto(wine.nombre, wine.tipo);
+  const agotado = wine.activo === false;
   const content = <>
-    <div className={styles.productImage}>{photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill unoptimized className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}</div>
+    <div className={`${styles.productImage} ${agotado ? styles.productImageAgotado : ""}`}>
+      {photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill unoptimized className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}
+      {agotado && <span className={styles.agotadoBadge}>Muy pronto en tu mesa</span>}
+    </div>
     <div className={styles.cardDetails}><p className={styles.eyebrow}>{[wine.categoria, wine.anio].filter(Boolean).join(" · ")}</p><h2>{wine.nombre}</h2>{wine.region && <p className={styles.cardRegion}>{wine.region}</p>}<p className={styles.cardPrice}>{wine.precioLista !== null ? money.format(wine.precioLista) : "Precio por confirmar"}</p></div>
   </>;
   return <article className={styles.card}>{wine.id ? <Link href={`/catalogo-publico/${wine.id}`} prefetch={false}>{content}</Link> : <div>{content}</div>}</article>;

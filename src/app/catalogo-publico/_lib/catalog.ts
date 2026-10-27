@@ -17,6 +17,7 @@ export type PublicWine = {
   cuerpo?: string | null;
   alcohol?: number | null;
   maridaje?: string | null;
+  activo?: boolean;
 };
 
 // Legacy publications may not have IDs or a product kind. Never expose private product fields.
@@ -51,7 +52,7 @@ const getShopProducts = cache(async () => {
   const ids = publication.wines.flatMap(wine => wine.id ? [wine.id] : []);
   const products = ids.length ? await prisma.producto.findMany({
     where: { id: { in: ids } },
-    select: { id: true, nombre: true, anio: true, fotoUrl: true, tipo: true, varietal: true, region: true, cuerpo: true, alcohol: true, maridaje: true },
+    select: { id: true, nombre: true, anio: true, fotoUrl: true, tipo: true, varietal: true, region: true, cuerpo: true, alcohol: true, maridaje: true, activo: true },
   }) : [];
   const metadata = new Map(products.map(product => [product.id, product]));
   return { ...publication, wines: publication.wines.map(wine => ({

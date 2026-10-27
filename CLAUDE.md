@@ -120,6 +120,12 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   Cabernet Franc, Chardonnay), agregarla ahí. Isaac quedó en capturar la uva
   de los vinos que no la dicen en el nombre (Romi, Grand Rivallon, Jerusalem
   Hills Gold/Silver Blend, Titora Grand/Red Seal, Noah 1-3).
+- **Maridajes aptos para kosher sin que se note (27-oct-2026)**: el mercado
+  principal de Isaac es kosher. En textos y fotos de maridaje: sin cerdo ni
+  mariscos; carnes solo de res, cordero, pollo o pato; nunca carne y lácteos
+  en la misma foto ni en la misma frase (quesos en una foto, carne en otra);
+  nunca sellos kosher en la comida ni mencionar kosher en el maridaje.
+  Detalle en el skill `publicar-botella`.
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →

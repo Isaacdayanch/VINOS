@@ -98,6 +98,24 @@ dependa de eso.
   naranja; turbado → ahumados, quesos azules; bourbon → caramelo, nuez pecana;
   18+ años → solo, sin hielo, con puro). Maridaje y servicio se marcan como
   **sugerencia editorial**.
+- **Maridaje apto para kosher (regla de Isaac, 27-oct-2026; su mercado
+  principal es kosher, pero NO debe notarse)**, para vinos y destilados, en
+  texto y en fotos de IA:
+  - Nada de cerdo (jamón serrano, prosciutto, tocino, chorizo, salami de
+    cerdo) ni mariscos (camarón, pulpo, langosta, cangrejo). Pescado con
+    escamas sí (salmón, atún).
+  - Carnes: solo cortes de res o cordero (rib eye, cecina, pastrami,
+    cordero), pollo o pato; sin decir que son kosher.
+  - **Nunca carne y lácteos juntos** en el mismo texto ni en la misma foto:
+    o quesos/crema/mantequilla, o carne. Si se quieren las dos, van en fotos
+    distintas (p. ej. `pairing` con quesos y `table` con carne) y en frases
+    separadas. Un plato de carne se describe "sin lácteos" o "con aceite de
+    oliva" cuando lleve salsa o postre.
+  - **Nunca** sellos ni símbolos kosher en la comida, ni mencionar kosher en
+    el maridaje. Lo único kosher que se escribe es lo que diga la etiqueta
+    del vino (regla de Vinos, más abajo).
+  - Revisar las fotos de Gemini con esto en mente: si aparece jamón, tocino o
+    mariscos, o queso junto a carne, descartar y regenerar.
 - **Vinos**: seguir `CATALOG-WINES.md` (protocolo) y `CATALOG-DESIGN.md`.
   Datos verificables de la etiqueta y contraetiqueta: uva, crianza, región,
   alcohol, servicio, kosher/mevushal **solo si se lee**. Maridaje con un

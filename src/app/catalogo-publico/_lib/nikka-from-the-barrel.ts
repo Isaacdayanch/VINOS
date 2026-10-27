@@ -20,7 +20,7 @@ export const nikkaFromTheBarrel: EditorialWine = {
     finish: "Amaderado y amargo. Notas de Nikka para From the Barrel.",
   },
   serve: "Nuestra sugerencia: solo, en vaso corto, en sorbos pequeños por su graduación, o con un hielo grande, que lo abre sin apagarlo. También en highball, con la proporción estándar de Nikka de una parte de whisky por tres de agua mineral muy fría, ajustada al gusto, y en coctel: la casa propone un Boulevardier con From the Barrel, licor amargo y vermut dulce a partes iguales.",
-  pairing: "Pide bocados intensos que aguanten su fuerza. Proponemos chocolate amargo con naranja, nueces garapiñadas, higos secos, un trozo de queso gouda añejo o manchego curado y, de salado, jamón serrano o almendras ahumadas. Son sugerencias editoriales, no indicaciones de la casa.",
+  pairing: "Pide bocados intensos que aguanten su fuerza. Proponemos chocolate amargo con naranja, nueces garapiñadas, higos secos, almendras ahumadas y, de salado, un trozo de queso gouda añejo o manchego curado. Son sugerencias editoriales, no indicaciones de la casa.",
   wineryStory: "Nikka la fundó Masataka Taketsuru, el padre del whisky japonés, en 1934 en Yoichi, Hokkaido, después de aprender el oficio en Escocia; en 1969 abrió su segunda destilería, Miyagikyo, en Sendai. From the Barrel reúne las dos casas en una sola botella y ha sido nombrado mejor blended japonés en los World Whiskies Awards siete veces, de 2007 a 2012 y en 2014, y ganó el trofeo del International Spirits Challenge 2015 además de varios oros. Las escenas de la galería son ambientaciones creadas para el catálogo, no fotografías de la destilería.",
   facts: [
     ["Casa", "Nikka Whisky · fundada en 1934"], ["Origen", "Japón"],
@@ -36,6 +36,6 @@ export const nikkaFromTheBarrel: EditorialWine = {
   captions: [
     "La botella cuadrada, sobre blanco",
     "Con un hielo grande, en vaso corto",
-    "Maridaje sugerido: chocolate amargo con naranja, nueces garapiñadas, higos secos y gouda añejo",
+    "Maridaje sugerido: chocolate amargo con naranja, nueces garapiñadas, higos secos, almendras ahumadas y gouda añejo",
   ],
 };

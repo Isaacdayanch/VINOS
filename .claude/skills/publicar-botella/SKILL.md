@@ -243,12 +243,14 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   Authorization), sin prefijo, host `lwekyvwfrmgzmavwveji.supabase.co`, en el
   entorno **VINOS**; luego sesión nueva. Diagnóstico rápido: mandar
   `apikey: dummy` cambia el error a "Invalid API key" → el proxy no inyecta.
-- Los cinco Macallan (12, 15, 18, 25 y 30) y el Glenmorangie Lasanta 12 ya
-  están en el CRM, publicados y conectados por ID en `wine-profiles.ts` (IDs
-  en `CATALOG-SPIRITS.md`).
-- Macallan 12, 15, 18, 25 y 30 y Lasanta 12: falta la foto de la etiqueta
+- Los cinco Macallan (12, 15, 18, 25 y 30) y los Glenmorangie Lasanta 12 y
+  Elementa 14 ya están en el CRM, publicados y conectados por ID en
+  `wine-profiles.ts` (IDs en `CATALOG-SPIRITS.md`).
+- Todos los destilados publicados: falta la foto de la etiqueta
   trasera y el precio (Isaac: "luego lo ponemos"). Del Lasanta conviene una
   foto más grande (la que mandó era de 480 px).
+- Gemini a veces graba el nombre de la botella en el vaso: descartar esa
+  foto (es texto añadido).
 - Fotos chicas (menos de ~900 px): escalar con LANCZOS a ~1200 px antes de
   recortar; queda un poco suave pero sirve. Avisarle a Isaac y pedir una
   más grande sin detener la publicación.

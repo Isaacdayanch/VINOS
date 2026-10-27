@@ -436,34 +436,48 @@
 .showcaseBottleLink { position: absolute; inset: 0; z-index: 2; }
 .showcaseBottleLink:focus-visible { outline: 2px solid var(--wine, #602e3b); outline-offset: -6px; }
 
-/* Spirits: large shelf buttons and the search open the page, before the title. */
-.shelfTop { margin: -20px 0 70px; }
-.shelves { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.shelves button { display: grid; justify-items: center; gap: 8px; padding: 30px 12px 26px; border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--ink); position: relative; transition: color .25s ease; }
+/* Collection top (wines and spirits), kept compact so bottles show on the first screen:
+ * one-line title, large shelf buttons (grape or spirit type) and an elegant search. */
+.shopPage .shopIntro { align-items: center; padding-bottom: 28px; }
+.shopPage .shopIntro h1 { font-size: clamp(42px,4.6vw,68px); line-height: 1; margin-top: 0; }
+.shopPage .shopIntroAside { display: flex; align-items: center; gap: 28px; padding-bottom: 0; }
+.shelfTop { margin-bottom: 26px; }
+.shelves { display: flex; overflow-x: auto; scrollbar-width: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.shelves::-webkit-scrollbar { display: none; }
+.shelves button { flex: 1 0 auto; display: grid; justify-items: center; gap: 6px; padding: 20px 22px 18px; border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--ink); position: relative; white-space: nowrap; transition: color .25s ease; }
 .shelves button:first-child { border-left: 0; }
-.shelves button::after { content: ""; position: absolute; left: 50%; bottom: -1px; width: 0; height: 2px; background: var(--burgundy); transform: translateX(-50%); transition: width .3s ease; }
+.shelves button::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 0; height: 2px; background: var(--burgundy); transform: translateX(-50%); transition: width .3s ease; }
 .shelves button:is(:hover,[aria-pressed="true"]) { color: var(--burgundy); }
 .shelves button[aria-pressed="true"]::after { width: 64%; }
-.shelfName { font: 400 clamp(30px,3vw,44px)/1 var(--serif); letter-spacing: -.01em; }
+.shelfName { font: 400 clamp(24px,2.1vw,32px)/1 var(--serif); letter-spacing: -.01em; }
 .shelfCount { font-size: 10px; letter-spacing: .19em; text-transform: uppercase; color: var(--muted); }
-.bigSearch { display: flex; align-items: center; gap: 18px; max-width: 760px; margin: 44px auto 0; border-bottom: 1px solid var(--ink); padding: 0 4px; }
-.bigSearch > svg { flex-shrink: 0; width: 24px; height: 24px; color: var(--ink); }
-.bigSearch input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); padding: 16px 0; font: italic 400 clamp(22px,2.2vw,30px)/1.2 var(--serif); border-radius: 0; }
+.bigSearch { display: flex; align-items: center; gap: 16px; max-width: 720px; margin: 22px auto 0; border-bottom: 1px solid var(--ink); padding: 0 4px; }
+.bigSearch > svg { flex-shrink: 0; width: 22px; height: 22px; color: var(--ink); }
+.bigSearch input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); padding: 12px 0; font: italic 400 clamp(21px,2vw,27px)/1.2 var(--serif); border-radius: 0; }
 .bigSearch input::placeholder { color: var(--muted); opacity: .75; }
 .bigSearch input:focus-visible { outline: none; }
 .bigSearch:focus-within { border-bottom-color: var(--burgundy); }
-.shopPage .toolbarCompact { justify-content: space-between; }
+.shopPage .toolbarCompact { justify-content: space-between; padding: 8px 0; border-top: 0; }
 @media (max-width: 700px) {
-  .shelfTop { margin: -16px 0 44px; }
-  .shelves { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .shelves button { padding: 20px 8px 18px; border-left: 0; border-top: 1px solid var(--line); }
-  .shelves button:nth-child(2n+1):not(:first-child) { border-left: 0; }
-  .shelves button:nth-child(2n) { border-left: 1px solid var(--line); }
-  .shelves button:first-child { grid-column: 1 / -1; border-top: 0; }
-  .shelves button:first-child ~ button:nth-child(2n) { border-left: 0; }
-  .shelves button:first-child ~ button:nth-child(2n+1) { border-left: 1px solid var(--line); }
-  .shelfName { font-size: 30px; }
-  .bigSearch { margin-top: 30px; gap: 12px; }
-  .bigSearch input { font-size: 20px; padding: 13px 0; }
+  .shopPage .collection { padding-top: 22px; }
+  .shopPage .shopIntro { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-bottom: 16px; }
+  .shopPage .shopIntro h1 { font-size: clamp(30px,8.6vw,38px); }
+  .shopPage .shopIntroAside { margin-top: 0; }
+  .shopPage .shopIntroAside > p { display: none; }
+  .shopPage .shopIntroAside .orderPill { min-height: 44px; padding: 7px 14px; gap: 1px; font-size: 11px; flex-direction: column; flex-wrap: nowrap; line-height: 1.2; white-space: nowrap; }
+  .shopPage .shopIntroAside .orderPill > span:last-child { font-size: 9.5px; }
+  .shopPage .header { height: 72px; }
+  .shelfTop { margin: 0 calc(var(--gutter) * -1) 14px; }
+  .shelves { border-left: 0; border-right: 0; padding: 0 calc(var(--gutter) - 14px); }
+  .shelves button { padding: 15px 18px 13px; gap: 5px; }
+  .shelfName { font-size: 25px; }
+  .shelfCount { font-size: 9px; letter-spacing: .16em; }
+  .bigSearch { margin: 14px var(--gutter) 0; gap: 12px; }
+  .bigSearch input { font-size: 19px; padding: 10px 0; }
+  .shopPage .toolbarCompact { padding: 4px 0; }
+  .shopPage .toolbarCompact .filterButton { min-height: 44px; padding: 8px 16px; }
+  /* The shelf buttons already show the count; kept for screen readers only. */
+  .shopPage .resultSummary { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+  .shopPage .productGrid { margin-top: 10px; }
 }
 @media print { .shelfTop { display: none !important; } }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ProductKind, PublicWine } from "../_lib/catalog";
-import { BUDGETS, FACETS_BY_KIND, SPIRIT_TYPES, filterCollection, spiritType, type FacetKey } from "../_lib/collection-filters";
+import { BUDGETS, FACETS_BY_KIND, filterCollection, shelfList, type FacetKey } from "../_lib/collection-filters";
 import styles from "../catalog.module.css";
 import { OrderNotice } from "./OrderNotice";
 import { publicPhotograph } from "../_lib/public-photography";
@@ -18,10 +18,9 @@ function CloseIcon() { return <svg width="14" height="14" viewBox="0 0 16 16" fi
 const COPY = {
   VINO: {
     noun: "vino", plural: "vinos", yearLabel: "Añada", yearAll: "Todas las añadas",
-    eyebrow: "LA SELECCIÓN",
-    title: <>Cava<br /><em>de vinos</em></>,
+    title: <>Cava <em>de vinos</em></>,
     lead: <>Para compartir, para descubrir,<br />para abrir algo especial.</>,
-    all: "Todos los vinos", railLabel: "Filtrar por tipo de vino",
+    all: "Todos los vinos", railLabel: "Filtrar por uva",
     searchLabel: "Buscar por vino, uva, región, añada o maridaje", searchPlaceholder: "Busca un vino, uva o región…",
     filterTitle: <>Encuentra <br />tu vino.</>,
     emptyTitle: "Tu vino está por descubrir.", emptyHint: "Prueba otra búsqueda o retira algún filtro.",
@@ -30,8 +29,7 @@ const COPY = {
   },
   DESTILADO: {
     noun: "destilado", plural: "destilados", yearLabel: "Año", yearAll: "Todos los años",
-    eyebrow: "LA SELECCIÓN",
-    title: <>Cava<br /><em>de destilados</em></>,
+    title: <>Cava <em>de destilados</em></>,
     lead: <>Arak, whisky y algo más.<br />Para abrir la noche o cerrarla.</>,
     all: "Todos los destilados", railLabel: "Filtrar por tipo de destilado",
     searchLabel: "Buscar por destilado, tipo, país o materia prima", searchPlaceholder: "Busca un destilado, tipo o país…",
@@ -47,6 +45,7 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
   const facetList = FACETS_BY_KIND[kind];
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
+  const [shelf, setShelf] = useState("");
   const [year, setYear] = useState("");
   const [budget, setBudget] = useState(0);
   const [sort, setSort] = useState("name");
@@ -55,11 +54,13 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
   const drawer = useRef<HTMLDialogElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const spirits = kind === "DESTILADO";
-  const categories = spirits ? SPIRIT_TYPES.map(type => type.label) : [...new Set(wines.flatMap(wine => wine.categoria ? [wine.categoria] : []))].sort();
+  // Spirit types already are the shelves, so the drawer only offers wine types (Tinto, Postre…).
+  const categories = spirits ? [] : [...new Set(wines.flatMap(wine => wine.categoria ? [wine.categoria] : []))].sort();
+  const shelves = useMemo(() => [{ label: "", name: "Todos", count: wines.length }, ...shelfList(wines, kind).map(item => ({ ...item, name: item.label }))], [wines, kind]);
   const years = [...new Set(wines.flatMap(wine => wine.anio ? [wine.anio] : []))].sort((a, b) => b - a);
-  const filtered = useMemo(() => filterCollection(wines, { query, category, year, budget, facets, sort, kind }), [wines, query, category, year, budget, facets, sort, kind]);
+  const filtered = useMemo(() => filterCollection(wines, { query, category, year, budget, facets, sort, shelf, kind }), [wines, query, category, year, budget, facets, sort, shelf, kind]);
   const activeCount = Number(Boolean(category)) + Number(Boolean(year)) + Number(Boolean(budget)) + Object.values(facets).filter(Boolean).length;
-  const active = Boolean(query || activeCount);
+  const active = Boolean(query || shelf || activeCount);
   const facetOptions = facetList.map(([key, label]) => ({ key, label, options: [...new Set(wines.flatMap(wine => wine[key] != null && wine[key] !== "" ? [String(wine[key])] : []))].sort((a, b) => a.localeCompare(b, "es", { numeric: true })) }));
   const count = (n: number) => `${n} ${n === 1 ? copy.noun : copy.plural}`;
 
@@ -69,12 +70,12 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = previous; };
   }, [filtersOpen]);
-  function reset() { setQuery(""); setCategory(""); setYear(""); setBudget(0); setFacets({}); }
+  function reset() { setQuery(""); setShelf(""); setCategory(""); setYear(""); setBudget(0); setFacets({}); }
   function openFilters() { drawer.current?.showModal(); setFiltersOpen(true); }
   function clearFacet(key: FacetKey) { setFacets(current => ({ ...current, [key]: "" })); }
   const chips = [
     ...(query ? [{ label: `Búsqueda: ${query}`, clear: () => setQuery("") }] : []),
-    ...(category && !spirits ? [{ label: category, clear: () => setCategory("") }] : []),
+    ...(category ? [{ label: category, clear: () => setCategory("") }] : []),
     ...(year ? [{ label: `${copy.yearLabel} ${year}`, clear: () => setYear("") }] : []),
     ...(budget ? [{ label: BUDGETS[budget].label, clear: () => setBudget(0) }] : []),
     ...facetList.flatMap(([key, label]) => facets[key] ? [{ label: `${label}: ${facets[key]}${key === "alcohol" ? "%" : ""}`, clear: () => clearFacet(key) }] : []),
@@ -85,31 +86,26 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
     <span className={styles.srOnly}>{copy.searchLabel}</span>
     <input ref={searchInput} type="search" placeholder={copy.searchPlaceholder} value={query} onChange={event => setQuery(event.target.value)} />
   </label>;
-  const shelfCount = (label: string) => wines.filter(wine => spiritType(wine) === label).length;
 
+  // Compact top: title, then the large shelf buttons and the search, so bottles show on the first screen.
   return <section id="seleccion" className={styles.collection} aria-labelledby="selection-heading">
-    {spirits && <div className={styles.shelfTop}>
+    <div className={styles.shopIntro}>
+      <h1 id="selection-heading">{copy.title}</h1>
+      <div className={styles.shopIntroAside}><p>{copy.lead}</p><OrderNotice /></div>
+    </div>
+    <div className={styles.shelfTop}>
       <div className={styles.shelves} role="group" aria-label={copy.railLabel}>
-        {[{ label: "", name: "Todos", count: wines.length }, ...categories.map(label => ({ label, name: label, count: shelfCount(label) }))].map(shelf =>
-          <button type="button" key={shelf.name} aria-pressed={category === shelf.label} onClick={() => setCategory(shelf.label)}>
-            <span className={styles.shelfName}>{shelf.name}</span>
-            <span className={styles.shelfCount}>{shelf.count ? `${shelf.count} ${shelf.count === 1 ? "botella" : "botellas"}` : "Próximamente"}</span>
+        {shelves.map(item =>
+          <button type="button" key={item.name} aria-pressed={shelf === item.label} onClick={() => setShelf(item.label)}>
+            <span className={styles.shelfName}>{item.name}</span>
+            <span className={styles.shelfCount}>{item.count ? `${item.count} ${item.count === 1 ? "botella" : "botellas"}` : "Próximamente"}</span>
           </button>)}
       </div>
       {searchBox(styles.bigSearch)}
-    </div>}
-    <div className={styles.shopIntro}>
-      <div><p className={styles.eyebrow}>{copy.eyebrow}</p><h1 id="selection-heading">{copy.title}</h1></div>
-      <div className={styles.shopIntroAside}><p>{copy.lead}</p><OrderNotice /></div>
     </div>
 
     <div className={styles.shopDiscovery}>
-      {!spirits && categories.length > 0 && <div className={styles.categoryRail} role="group" aria-label={copy.railLabel}>
-        <button type="button" aria-pressed={!category} onClick={() => setCategory("")}>{copy.all}</button>
-        {categories.map(type => <button type="button" key={type} aria-pressed={category === type} onClick={() => setCategory(type)}>{type}</button>)}
-      </div>}
-      <div className={`${styles.toolbar} ${spirits ? styles.toolbarCompact : ""}`}>
-        {!spirits && searchBox(styles.search)}
+      <div className={`${styles.toolbar} ${styles.toolbarCompact}`}>
         <button className={styles.filterButton} type="button" aria-haspopup="dialog" onClick={openFilters}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 17h16M9 4v6m6 4v6" stroke="currentColor" strokeWidth="1.4" /></svg>
           Filtrar{activeCount > 0 && <span className={styles.filterCount}>{activeCount}</span>}

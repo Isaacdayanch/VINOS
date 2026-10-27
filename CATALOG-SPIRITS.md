@@ -1,6 +1,6 @@
 # Registro de destilados (Cava de destilados)
 
-Proceso paso a paso: `.claude/skills/ficha-destilado/SKILL.md`.
+Proceso paso a paso: `.claude/skills/publicar-botella/SKILL.md`.
 
 | Destilado | Estado | Pendiente | Ruta |
 |---|---|---|---|

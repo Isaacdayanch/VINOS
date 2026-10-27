@@ -101,7 +101,7 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   se ven cuadros blancos — Isaac lo reportó como lo menos profesional posible.
   Siempre revisar los cambios de diseño también en tamaño celular.
 - **Fichas de destilados (Cava de destilados)**: proceso en el skill
-  `.claude/skills/ficha-destilado/` y registro en `CATALOG-SPIRITS.md`. Isaac
+  `.claude/skills/publicar-botella/` (vinos y destilados: de la foto al CRM y a la página) y registro en `CATALOG-SPIRITS.md`. Isaac
   manda una botella a la vez; la ficha lleva nariz/boca/final (notas oficiales),
   cómo servirlo, maridaje de bocados/sobremesa y destilería, con 4–5 fotos:
   frente y estuche (fotos reales), etiqueta trasera (foto de SU botella) y

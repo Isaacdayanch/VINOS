@@ -1,6 +1,7 @@
 # Registro de vinos y protocolo editorial
 
 Este archivo es el seguimiento compartido entre Isaac, Codex y Claude Code.
+Proceso completo de la foto al CRM y a la página (también destilados): `.claude/skills/publicar-botella/SKILL.md`.
 No considerar un vino terminado hasta abrir su URL en Preview, comprobar sus imágenes y entregar el enlace a Isaac.
 
 ## Encargo estándar por vino

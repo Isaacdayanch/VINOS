@@ -8,6 +8,7 @@ ni en el código). Si Isaac la guardó como "secreto de red" para
 generativelanguage.googleapis.com, la variable no existe y el proxy agrega la
 llave solo; en ese caso se manda la petición sin ella. Guarda public/catalogo/<slug>-<vista>.webp a 960x1200.
 Vistas: service, glass, pairing, table (por defecto, las cuatro).
+Con TIPO=VINO usa escenas de vino (copa, servicio, mesa); por defecto, destilado.
 El modelo se puede cambiar con GEMINI_IMAGE_MODEL.
 """
 import base64
@@ -25,6 +26,12 @@ BASE = ("Fotografía editorial realista y cinematográfica para el catálogo de 
         "Formato vertical 4:5. La botella debe verse idéntica a la foto de referencia: "
         "misma forma, cápsula, etiqueta, color del líquido y textos; recta y sin deformar. "
         "Sin manos con dedos raros, sin personas de frente, sin texto ni logos añadidos.")
+WINE_SCENES = {
+    "service": "El vino sirviéndose desde la botella de referencia hacia una copa de cristal fino, sobre una mesa de madera. Vino color {color}.",
+    "glass": "Primer plano de una copa de vino color {color} a la luz de una ventana, con la botella de referencia desenfocada al fondo.",
+    "pairing": "Maridaje: {pairing}, servido en vajilla sencilla junto a una copa de vino color {color} y la botella de referencia.",
+    "table": "Una mesa para compartir al anochecer: mantel crema, velas, dos copas con vino color {color} y la botella de referencia como protagonista.",
+}
 SCENES = {
     "service": "Whisky sirviéndose desde la botella hacia un vaso de cata tipo Glencairn sobre una barra de madera oscura. La botella de referencia es la que sirve.",
     "glass": "Primer plano de un vaso corto de cristal con el whisky (color {color}) y un solo hielo grande, sobre mesa de piedra, luz de ventana lateral. La botella de referencia desenfocada al fondo.",
@@ -67,12 +74,13 @@ def fit(img: Image.Image) -> Image.Image:
 
 if __name__ == "__main__":
     slug, front, desc = sys.argv[1], sys.argv[2], sys.argv[3]
-    views = sys.argv[4:] or list(SCENES)
+    scenes = WINE_SCENES if os.environ.get("TIPO") == "VINO" else SCENES
+    views = sys.argv[4:] or list(scenes)
     color = os.environ.get("COLOR", "ámbar dorado")
     pairing = os.environ.get("MARIDAJE", "chocolate semiamargo con naranja, nueces tostadas y queso manchego añejo")
     ref = Image.open(front)
     for view in views:
-        prompt = f"{BASE}\nBotella: {desc}.\nEscena: {SCENES[view].format(color=color, pairing=pairing)}"
+        prompt = f"{BASE}\nBotella: {desc}.\nEscena: {scenes[view].format(color=color, pairing=pairing)}"
         out = f"public/catalogo/{slug}-{view}.webp"
         fit(generate(prompt, ref)).save(out, "WEBP", quality=88)
         print("listo:", out)

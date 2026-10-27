@@ -242,6 +242,25 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   sin prefijo, y que la llave exista en Supabase (la del 26-oct quedó escrita
   en el chat y había que rotarla). Hasta que el paso 0 dé 200, no se puede dar
   de alta ni publicar nada.
+  **Tercera sesión (27-oct, madrugada)**: ahora el proxy SÍ lista el secreto
+  de Supabase ("Permitir + inyectar") y en la respuesta aparece
+  `X-Proxy-Error: upstream auth failed`, pero Supabase sigue diciendo "No
+  `apikey` request header": el proxy manda la llave en **otro encabezado**
+  (seguramente `Authorization`). Diagnóstico rápido: mandar `apikey: dummy`
+  cambia el error a "Invalid API key" → el proxy no está inyectando `apikey`.
+  Arreglo: en el secreto de red, el campo de encabezado debe decir
+  exactamente `apikey` (no Authorization), sin prefijo; luego sesión nueva.
+- Macallan 25 Sherry Oak: ficha, fotos y vista previa listas y en ambas ramas
+  (commit `9dcc8cf`); **falta darlo de alta en el CRM y publicar**. Producto
+  listo para `crm.py crear`: `{"nombre": "The Macallan 25 Años Sherry Oak",
+  "sku": "MAC-25SO", "piezasPorCaja": 6, "tipo": "DESTILADO", "categoria":
+  "Whisky", "proveedor": "The Macallan", "region": "Speyside, Escocia",
+  "alcohol": 43, "fotoUrl": "/catalogo/macallan-25-sherry-oak-front.webp"}`
+  (sin precio; Isaac no lo ha dado). Se conecta por nombre en
+  `spirit-profiles.ts`; al tener el ID, agregarlo a `wine-profiles.ts` y a
+  `CATALOG-SPIRITS.md`. Si Isaac lo da de alta él mismo en el CRM (Productos →
+  Nuevo), basta Tipo Destilado + ese nombre, sin foto: la lista pública usa la
+  foto de la ficha por nombre (`spiritPhoto`).
 - Macallan 15: ficha, fotos y vista previa listas y en ambas ramas (commit
   `68d2d72`); **falta darlo de alta en el CRM (MAC-15DC, DESTILADO, mismo
   estilo que MAC-12DC y MAC-18DC, sin precio) y publicar el catálogo**. Se

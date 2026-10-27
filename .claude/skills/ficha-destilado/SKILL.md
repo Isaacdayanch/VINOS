@@ -1,9 +1,12 @@
 ---
 name: ficha-destilado
-description: Úsalo cuando Isaac mande una botella de whisky u otro destilado (nombre, foto o link del CRM) para agregarla a la "Cava de destilados" del catálogo público con ficha, notas de cata, maridaje y fotos.
+description: Detalle técnico de la ficha y las fotos de un destilado (archivos, recortes, fotos con IA). El proceso completo, de la foto a publicado, está en el skill publicar-botella; empezar por ese.
 ---
 
 # Ficha de destilado para la Cava de destilados
+
+> Proceso completo (alta en el CRM, publicar catálogo y verificar): `.claude/skills/publicar-botella/SKILL.md`.
+> Este archivo solo detalla la ficha y las fotos.
 
 Isaac manda **una botella a la vez**: nombre exacto + foto (frente/estuche) y,
 si ya existe, el link del producto en el CRM. Hablarle en español mexicano,

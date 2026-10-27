@@ -100,6 +100,11 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   `mix-blend-mode` ni filtros CSS para esto: en iPhone (Safari) no funciona y
   se ven cuadros blancos — Isaac lo reportó como lo menos profesional posible.
   Siempre revisar los cambios de diseño también en tamaño celular.
+- **Publicar una botella (vino o destilado)**: cuando Isaac mande una foto,
+  seguir el skill `.claude/skills/publicar-botella/` de principio a fin: ficha,
+  fotos, capturas, un solo "va" (con precio) y luego Claude sube el código, da
+  de alta el producto en el CRM, publica el catálogo y verifica en la página
+  real. No dejarle a Isaac pasos a medias.
 - **Fichas de destilados (Cava de destilados)**: proceso en el skill
   `.claude/skills/ficha-destilado/` y registro en `CATALOG-SPIRITS.md`. Isaac
   manda una botella a la vez; la ficha lleva nariz/boca/final (notas oficiales),

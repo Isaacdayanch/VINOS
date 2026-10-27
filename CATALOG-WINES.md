@@ -8,7 +8,7 @@ No considerar un vino terminado hasta abrir su URL en Preview, comprobar sus im�
 Isaac envía una sola vez: nombre/añada o enlace del producto del CRM, foto frontal, contraetiqueta legible y, si existe, estuche. No volver a pedir material que ya está en el repositorio. Preguntar únicamente por un dato o imagen realmente ausente.
 
 Cada encargo incluye:
-1. Vincular el ID exacto del producto publicado y distinguir añadas. Precios y disponibilidad vienen del catálogo existente; no inventarlos ni escribir al CRM.
+1. Vincular el ID exacto del producto publicado y distinguir añadas. Precios y disponibilidad vienen del catálogo existente; no inventarlos. Escribir al CRM (alta, precio, publicar catálogo) solo con el "va" de Isaac, siguiendo `.claude/skills/publicar-botella/SKILL.md`.
 2. Extraer datos verificables de las etiquetas; separar sugerencias de maridaje de afirmaciones del productor. No inventar certificaciones ni crianza.
 3. Seis imágenes: frontal y reverso sobre blanco, servicio, copa, maridaje y escena editorial. Diferenciar escenas entre vinos; botella recta, etiqueta alineada, color del vino y luz coherentes. Conservar originales para consultar letras/sellos.
 4. Una ficha completa, enlazada desde inicio y catálogo al mismo producto cuando tenga ID confirmado. Galería navegable, datos, descripción, maridaje, bodega/origen y aviso de pedidos próximamente.

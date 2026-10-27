@@ -12,6 +12,26 @@ así se atoró el Macallan 15 el 27-oct. No decir "listo" hasta ver la botella
 en la página real (paso 7). Hablarle en español mexicano, simple, sin jerga. Él no
 programa: no pedirle nada técnico que se pueda resolver aquí.
 
+**Una botella está lista solo cuando existe en el CRM y sale en la página
+real.** Lección del 27-oct: el Macallan 18 sí apareció porque ya existía como
+producto en el CRM y el catálogo se publicó después; el Macallan 15 solo tenía
+ficha y fotos en el código, y una ficha sin producto no sale en ningún lado
+(la página lista lo que está en `CatalogoPublicado`; la ficha solo la viste).
+
+## Flujo desde el celular (lo normal)
+
+1. Isaac abre una **sesión nueva** en el entorno **VINOS** desde claude.ai/code
+   en el celular (flechita junto al título → entorno). Nueva, porque las
+   sesiones ya abiertas no toman secretos de red nuevos.
+2. Manda la foto de la botella y escribe algo como "Publica esta botella,
+   precio $X" (o sin precio).
+3. El skill detecta si es vino o destilado (etiqueta: uva/añada → vino;
+   whisky, arak, tequila, años de añejamiento → destilado), arma la ficha y
+   las fotos, le enseña capturas en celular y computadora y pregunta el precio
+   si no lo dio.
+4. Con un solo "va" se publica todo: código a las dos ramas, alta en el CRM,
+   publicar catálogo y verificar en la página real. Se le manda el link directo.
+
 ## Lo que Isaac ya decidió (no volver a preguntar)
 
 - **Publicar el catálogo = todo lo activo del CRM**, siempre (26-oct-2026).
@@ -25,15 +45,39 @@ programa: no pedirle nada técnico que se pueda resolver aquí.
 
 ## Pasos
 
-### 0. Revisar accesos al empezar (1 minuto, antes de trabajar)
+### 0. Revisar entorno y accesos al empezar (1 minuto, antes de trabajar)
+
+**a) ¿Estamos en el entorno VINOS?** Isaac tiene dos entornos de nube en la
+misma cuenta: **VINOS** (`env_01KseztzZ8dm6rMpBeacVHUt`, con los secretos y
+dominios de este proyecto) y **Daymart** (`env_01Vo6F7TVLa8r2UtegSFbFSr`, su
+otro negocio, sin nada de vinos). Si la sesión abrió en Daymart, Supabase y
+`vinos-catalogo.vercel.app` responden "CONNECT ... 403" y no hay nada que hacer
+desde ahí. Revisar con la herramienta `get_session` (sin `session_id`; el
+`environment_id` debe ser el de VINOS) o con:
 ```bash
-python3 -I .claude/skills/publicar-botella/crm.py buscar macallan     # CRM
+curl -sS -o /dev/null -w "%{http_code}\n" https://lwekyvwfrmgzmavwveji.supabase.co/rest/v1/
+# 000 + "CONNECT tunnel failed, response 403" = entorno equivocado (Daymart)
+# 401 = entorno VINOS pero sin la llave (ver b)
+# 200 = todo bien
+```
+Si no es VINOS: **parar** y decirle a Isaac, en una línea, que abra una sesión
+nueva escogiendo el entorno VINOS (flechita junto al título → entorno) y
+repita su mensaje. No intentar el resto del trabajo desde Daymart.
+
+**b) ¿Sirve la llave de Supabase?** Antes de cualquier trabajo:
+```bash
+python3 -I .claude/skills/publicar-botella/crm.py buscar macallan     # CRM: debe listar MAC-12DC, MAC-15DC, MAC-18DC
 curl -sS -o /dev/null -w "%{http_code}\n" https://vinos-catalogo.vercel.app/catalogo-publico/destilados   # 200
 curl -sS "https://generativelanguage.googleapis.com/v1beta/models?pageSize=1" | head -c 80                 # Gemini
 ```
-Si algo falla, avisarle a Isaac **al inicio** (ver "Accesos") y seguir con lo
-que no dependa de eso. Desde el 27-oct los dominios de Supabase y de
-`vinos-catalogo.vercel.app` están permitidos en el entorno.
+Un **401 "No API key found"** significa que al entorno VINOS le falta el
+secreto de red de Supabase (o la llave ya se borró/rotó en Supabase). Las
+sesiones **ya abiertas no toman secretos nuevos**: después de agregarlo hay
+que abrir una sesión nueva. En ese caso parar, decirle a Isaac cómo arreglarlo
+(ver "Accesos") y no insistir; se puede avanzar ficha y fotos mientras, pero
+dejar claro que la botella **no está lista** hasta darla de alta y publicar.
+Si lo que falla es Gemini o la página, avisar al inicio y seguir con lo que no
+dependa de eso.
 
 ### 1. Identificar la botella
 - Leer en la foto: nombre, añada o edad, edición (p. ej. "2025 Release"),
@@ -147,7 +191,9 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   el CRM y publicar. En el mismo mensaje de las capturas, preguntar el precio.
 
 ### 7. Verificar en la página real (antes de decir "listo")
-Esperar el despliegue de Vercel (1–3 min) y revisar con `curl`:
+Si hubo cambios de código, esperar el despliegue de Vercel (1–3 min); si solo
+fue alta + publicar, la página lee los datos en vivo (si no sale, esperar 1–2
+min por caché y reintentar). Revisar con `curl`:
 - el nombre aparece en `https://vinos-catalogo.vercel.app/catalogo-publico/destilados`
   (o `/catalogo` para vinos);
 - `/catalogo-publico/<id>` responde 200 y trae las fotos de la ficha
@@ -165,12 +211,18 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
 
 - **Supabase (CRM)**: `crm.py` necesita el secreto de red del entorno para
   `lwekyvwfrmgzmavwveji.supabase.co`, encabezado `apikey`, sin prefijo, valor
-  la llave `sb_secret_…` "claude". Si dice "Sin conexión a Supabase", falta el
-  secreto (o el host). Si conecta pero responde 401 "No API key", el secreto
-  no está mandando la llave: pasarla solo en el comando con
-  `SUPABASE_SECRET_KEY=…` si Isaac la dio en el chat, nunca guardarla en
-  archivos. Guiarlo para arreglarlo en claude.ai/code → flechita junto al
-  título → Editar entorno de nube → Secretos de red (en iPhone, por Safari).
+  la llave `sb_secret_…` "claude". Si dice "Sin conexión a Supabase" con
+  "CONNECT ... 403", la sesión está en el entorno equivocado (Daymart): sesión
+  nueva en VINOS. Si conecta pero responde 401 "No API key", al entorno VINOS
+  le falta el secreto (o la llave se borró en Supabase). Cómo lo arregla
+  Isaac, clic por clic: (1) en supabase.com, proyecto de vinos → Project
+  Settings → API Keys → crear una **Secret key** llamada "claude" y copiarla;
+  (2) en claude.ai/code (en iPhone, por Safari) → flechita junto al título →
+  Editar entorno de nube **VINOS** → Secretos de red → dominio
+  `lwekyvwfrmgzmavwveji.supabase.co`, encabezado `apikey`, sin prefijo, pegar
+  la llave; (3) abrir una **sesión nueva** en VINOS. Nunca pedirle que pegue la
+  llave en el chat (si la pega, usarla solo en el comando con
+  `SUPABASE_SECRET_KEY=…`, nunca guardarla en archivos, y pedirle que la rote).
 - **Google (fotos automáticas)**: secreto de red para
   `generativelanguage.googleapis.com`, encabezado `x-goog-api-key`, sin
   prefijo. Funciona desde el 26-oct-2026 (con facturación activa). Errores:
@@ -181,8 +233,19 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
 - **Sin acceso desde aquí**: vercel.app (la página publicada), Postgres
   directo, y casi todas las páginas de productores (usar WebSearch).
 
-## Pendientes conocidos (26-oct-2026)
-- La llave secreta de Supabase quedó escrita en el chat del 26-oct: Isaac debe crear otra,
-  ponerla en el secreto y borrar esa.
-- Macallan 12, 15 y 18: falta la foto de la etiqueta trasera y el precio.
-- Macallan 15: falta darlo de alta en el CRM y publicar (ver `CATALOG-SPIRITS.md`).
+## Pendientes conocidos (27-oct-2026)
+- **Secreto de Supabase en el entorno VINOS no funciona**: el 27-oct dos
+  sesiones nuevas en VINOS recibieron 401 "No API key found"; en la lista de
+  credenciales que inyecta el proxy solo aparece Gemini. Isaac dijo que ya lo
+  puso: revisar que esté en el entorno **VINOS** (no Daymart), con host exacto
+  `lwekyvwfrmgzmavwveji.supabase.co` (sin `https://`), encabezado `apikey`,
+  sin prefijo, y que la llave exista en Supabase (la del 26-oct quedó escrita
+  en el chat y había que rotarla). Hasta que el paso 0 dé 200, no se puede dar
+  de alta ni publicar nada.
+- Macallan 15: ficha, fotos y vista previa listas y en ambas ramas (commit
+  `68d2d72`); **falta darlo de alta en el CRM (MAC-15DC, DESTILADO, mismo
+  estilo que MAC-12DC y MAC-18DC, sin precio) y publicar el catálogo**. Se
+  conecta solo por nombre en `spirit-profiles.ts`; al tener el ID, agregarlo
+  también a `wine-profiles.ts` y actualizar `CATALOG-SPIRITS.md`.
+- Macallan 12, 15 y 18: falta la foto de la etiqueta trasera y el precio
+  (Isaac: "luego lo ponemos").

@@ -4,6 +4,17 @@ Uso:
   python3 -I crm.py buscar <texto>             # productos cuyo nombre o SKU contiene <texto>
   python3 -I crm.py crear <producto.json>      # alta de un producto (falla si ya existe)
   python3 -I crm.py publicar [--ver]           # publica TODO lo activo; --ver solo muestra qué cambia
+  python3 -I crm.py foto <archivo> [nombre]    # sube una foto al storage (bucket fotos-productos) y da su URL pública
+  python3 -I crm.py actualizar <id> <json>     # cambia campos de un producto (descripcion, notas, maridaje, fotoUrl...)
+  python3 -I crm.py imagen-extra <id> <url> [orden]   # agrega una foto extra a la ficha pública del producto
+
+Camino "solo CRM" (sin código, acordado con Isaac el 27-oct-2026): la ficha pública
+`/catalogo-publico/<id>` se arma sola con fotoUrl + imágenes extra + descripcion /
+notas / maridaje del producto. Así una botella nueva se publica sin tocar la página:
+  1. `foto` por cada imagen (frente, estuche, etiqueta, copa, maridaje) → URLs
+  2. `crear` el producto con fotoUrl = URL del frente y los textos
+  3. `imagen-extra` con las demás URLs (orden 0, 1, 2...)
+  4. Isaac da clic en "Publicar catálogo" en el CRM (o `publicar` con su "va").
 
 La llave: si el entorno tiene el secreto de red de Supabase (encabezado `apikey`),
 el proxy la agrega solo. Si no, se lee de la variable SUPABASE_SECRET_KEY, que se
@@ -23,18 +34,22 @@ import time
 import urllib.parse
 import urllib.request
 
-BASE = os.environ.get("CRM_REST_URL", "https://lwekyvwfrmgzmavwveji.supabase.co/rest/v1")
+HOST = os.environ.get("CRM_HOST", "https://lwekyvwfrmgzmavwveji.supabase.co")
+BASE = os.environ.get("CRM_REST_URL", HOST + "/rest/v1")
+BUCKET = "fotos-productos"  # el mismo que usa el CRM (src/lib/supabaseStorage.ts)
 PUBLIC_FIELDS = ("id", "nombre", "fotoUrl", "tipo", "categoria", "anio", "precioLista")
 REQUIRED = ("nombre", "sku", "piezasPorCaja")
+MIME = {".webp": "image/webp", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png"}
 
 
-def call(method: str, path: str, body=None):
-    headers = {"Content-Type": "application/json", "Prefer": "return=representation"}
+def call(method: str, path: str, body=None, raw_body: bytes | None = None, content_type="application/json"):
+    headers = {"Content-Type": content_type, "Prefer": "return=representation"}
     key = os.environ.get("SUPABASE_SECRET_KEY")
     if key:
         headers["apikey"] = key
-    data = json.dumps(body).encode() if body is not None else None
-    req = urllib.request.Request(BASE + path, data=data, method=method, headers=headers)
+    data = raw_body if raw_body is not None else (json.dumps(body).encode() if body is not None else None)
+    url = path if path.startswith("https://") else BASE + path
+    req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=30) as res:
             raw = res.read()
@@ -97,12 +112,57 @@ def publicar(solo_ver: bool):
     print(f"Publicado: {len(activos)} productos.")
 
 
+def foto(path: str, nombre: str | None = None):
+    """Sube una imagen al bucket público y regresa la URL que va en fotoUrl / imagen extra."""
+    ext = os.path.splitext(path)[1].lower()
+    if ext not in MIME:
+        sys.exit(f"Formato no soportado ({ext}); usar .webp, .jpg o .png")
+    nombre = nombre or f"{os.path.splitext(os.path.basename(path))[0]}-{secrets.token_hex(4)}{ext}"
+    with open(path, "rb") as f:
+        contenido = f.read()
+    call("POST", f"{HOST}/storage/v1/object/{BUCKET}/{urllib.parse.quote(nombre)}",
+         raw_body=contenido, content_type=MIME[ext])
+    url = f"{HOST}/storage/v1/object/public/{BUCKET}/{urllib.parse.quote(nombre)}"
+    print(url)
+    return url
+
+
+def actualizar(producto_id: str, path_or_json: str):
+    cambios = json.load(open(path_or_json)) if os.path.exists(path_or_json) else json.loads(path_or_json)
+    cambios.pop("id", None)
+    rows = call("PATCH", f"/Producto?id=eq.{urllib.parse.quote(producto_id)}", cambios)
+    if not rows:
+        sys.exit(f"No existe el producto {producto_id}")
+    print(json.dumps(rows[0], ensure_ascii=False))
+
+
+def imagen_extra(producto_id: str, url: str, orden: int | None = None):
+    pid = urllib.parse.quote(producto_id)
+    if not call("GET", f"/Producto?select=id&id=eq.{pid}"):
+        sys.exit(f"No existe el producto {producto_id}")
+    actuales = call("GET", f"/ProductoImagenExtra?select=id,orden&productoId=eq.{pid}&order=orden.asc")
+    if len(actuales) >= 7:
+        sys.exit("Ese producto ya tiene el máximo de 7 fotos extra")
+    fecha = datetime.datetime.now(datetime.UTC).replace(tzinfo=None).isoformat(timespec="milliseconds")
+    fila = {"id": new_id(), "productoId": producto_id, "url": url,
+            "orden": len(actuales) if orden is None else orden, "createdAt": fecha}
+    print(json.dumps(call("POST", "/ProductoImagenExtra", fila)[0], ensure_ascii=False))
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or sys.argv[1] not in ("buscar", "crear", "publicar"):
+    comandos = ("buscar", "crear", "publicar", "foto", "actualizar", "imagen-extra")
+    if len(sys.argv) < 2 or sys.argv[1] not in comandos:
         sys.exit(__doc__)
-    if sys.argv[1] == "buscar":
-        buscar(sys.argv[2])
-    elif sys.argv[1] == "crear":
-        crear(sys.argv[2])
+    cmd, args = sys.argv[1], sys.argv[2:]
+    if cmd == "buscar":
+        buscar(args[0])
+    elif cmd == "crear":
+        crear(args[0])
+    elif cmd == "publicar":
+        publicar("--ver" in args)
+    elif cmd == "foto":
+        foto(args[0], args[1] if len(args) > 1 else None)
+    elif cmd == "actualizar":
+        actualizar(args[0], args[1])
     else:
-        publicar("--ver" in sys.argv)
+        imagen_extra(args[0], args[1], int(args[2]) if len(args) > 2 else None)

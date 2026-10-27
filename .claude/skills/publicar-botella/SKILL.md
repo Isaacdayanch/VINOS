@@ -32,6 +32,32 @@ ficha y fotos en el código, y una ficha sin producto no sale en ningún lado
 4. Con un solo "va" se publica todo: código a las dos ramas, alta en el CRM,
    publicar catálogo y verificar en la página real. Se le manda el link directo.
 
+## Camino "solo CRM" (acordado con Isaac el 27-oct-2026, chat "Publica botella 2")
+
+Isaac pidió publicar **sin tocar código ni la página**: Claude investiga, arma
+textos y fotos, y lo sube **directo al CRM como producto nuevo con todas sus
+imágenes**; él solo da clic en **"Publicar catálogo"** y la página lo muestra.
+La ficha pública `/catalogo-publico/<id>` ya se arma sola con los datos del
+producto (`fotoUrl` + imágenes extra + `descripcion` / `notas` / `maridaje`),
+así que no hace falta `_lib/<slug>.ts` ni vista previa ni push a ramas.
+
+Pasos (con `crm.py`, ver su ayuda):
+1. Paso 0 de siempre (entorno VINOS, llave de Supabase con 200, Gemini).
+2. Identificar la botella y sacar datos (pasos 1 y 2 de abajo, igual).
+3. Fotos como en el paso 4 (recorte + Gemini), pero guardarlas en el
+   scratchpad, no en `public/catalogo/`.
+4. `crm.py foto <archivo>` por cada imagen → URLs públicas del storage.
+5. Enseñarle a Isaac las fotos (SendUserFile) y los textos; preguntar precio.
+6. Con su "va": `crm.py crear` (fotoUrl = frente; `descripcion` = qué es,
+   `notas` = nariz/boca/final, `maridaje` = cómo servirlo + bocados),
+   `crm.py imagen-extra <id> <url> <orden>` para las demás (estuche, etiqueta,
+   copa, maridaje), y revisar `/catalogo-publico/<id>` con curl.
+7. Decirle: "ya está en tu CRM, dale Publicar catálogo" y pasarle el link de la
+   ficha. Si él prefiere, `crm.py publicar` con su "va".
+
+Las fichas editoriales en código (Macallan) siguen funcionando igual; el
+camino de abajo (código) queda solo si Isaac pide ese formato especial.
+
 ## Lo que Isaac ya decidió (no volver a preguntar)
 
 - **Publicar el catálogo = todo lo activo del CRM**, siempre (26-oct-2026).
@@ -234,9 +260,13 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   directo, y casi todas las páginas de productores (usar WebSearch).
 
 ## Pendientes conocidos (27-oct-2026)
-- **Secreto de Supabase en el entorno VINOS no funciona**: el 27-oct dos
-  sesiones nuevas en VINOS recibieron 401 "No API key found"; en la lista de
-  credenciales que inyecta el proxy solo aparece Gemini. Isaac dijo que ya lo
+- **Secreto de Supabase en el entorno VINOS no funciona**: el 27-oct tres
+  sesiones nuevas en VINOS recibieron 401 "No API key found". En la tercera
+  el proxy ya listaba el host de Supabase como "Permitir + inyectar", pero al
+  mandar `apikey: placeholder` llegó el placeholder tal cual (401 "Invalid API
+  key"): el secreto existe pero **no se inyecta en el encabezado `apikey`**;
+  lo más probable es que el encabezado esté escrito distinto (p. ej.
+  `Authorization`) o la llave vacía. Isaac dijo que ya lo
   puso: revisar que esté en el entorno **VINOS** (no Daymart), con host exacto
   `lwekyvwfrmgzmavwveji.supabase.co` (sin `https://`), encabezado `apikey`,
   sin prefijo, y que la llave exista en Supabase (la del 26-oct quedó escrita

@@ -5,6 +5,7 @@ import { macallan18DoubleCask } from "./macallan-18-double-cask";
 import { macallan25SherryOak } from "./macallan-25-sherry-oak";
 import { macallan30DoubleCask } from "./macallan-30-double-cask";
 import { glenmorangieLasanta12 } from "./glenmorangie-lasanta-12";
+import { glenmorangieElementa14 } from "./glenmorangie-elementa-14";
 
 // Spirits connect by CRM name instead of ID, so a ficha goes live as soon as
 // Isaac publishes the product as DESTILADO. Exclude sibling bottlings.
@@ -15,6 +16,7 @@ const spirits: { match: (name: string) => boolean; profile: EditorialWine }[] = 
   { match: name => /macallan/i.test(name) && /\b25\b/.test(name) && !/double\s*cask|triple|fine\s*oak|colou?r/i.test(name), profile: macallan25SherryOak },
   { match: name => /macallan/i.test(name) && /\b30\b/.test(name) && !/sherry\s*oak|triple|fine\s*oak|colou?r/i.test(name), profile: macallan30DoubleCask },
   { match: name => /glenmorangie/i.test(name) && /lasanta/i.test(name) && !/\b1[5-9]\b|\b2\d\b/.test(name), profile: glenmorangieLasanta12 },
+  { match: name => /glenmorangie/i.test(name) && /elementa/i.test(name), profile: glenmorangieElementa14 },
 ];
 
 export function spiritProfile(name: string, tipo: string | null | undefined) {

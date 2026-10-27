@@ -30,6 +30,7 @@ Cada encargo incluye:
 | Titora Réserve Spéciale 2021 | Botella y datos de etiqueta en inicio | Vincular ID exacto y completar galería/ficha | `#descubre-titora-special-2021` |
 | Givat Titora Grande Réserve 2021 | Botella y datos de etiqueta en inicio | Vincular ID exacto y completar galería/ficha | `#descubre-titora-grand-2021` |
 | Tanya Enosh 2018, Petit Verdot 2021 y cosecha tardía 2024 | Botellas en inicio | Vincular IDs exactos y completar fichas/galerías | Ver `_lib/showcase.ts` |
+| Dalton Matatia 2018 | Ficha completa y siete imágenes (frente, contraetiqueta, servicio, copa, maridaje, mesa y estuche), preparadas el 27-oct-2026 con la API de Gemini (`gemini-3-pro-image`): frente y estuche extraídos de la foto de Isaac (botella + estuche); contraetiqueta = packshot trasero de Gemini con la etiqueta REAL de la foto de Isaac pegada encima (sin letras inventadas); maridaje de res sin lácteos y mesa sin queso ni carne (regla kosher). Originales guardados como `dalton-matatia-2018-front-original.jpeg` y `-label-original.jpeg` | Precio; dar de alta en el CRM (VINO, Tinto, año 2018, uva no impresa en etiqueta) y publicar; conectar el ID en `wine-profiles.ts` | Vista previa: `/catalogo-publico/seleccion/dalton-matatia-2018` |
 
 ## Organización técnica
 

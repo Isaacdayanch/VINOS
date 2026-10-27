@@ -10,7 +10,8 @@ export function EditorialWinePage({ wine, commerce }: { wine: EditorialWine; com
   const ambient = (index: number) => spirit ? !/-(front|box|back)\.webp$/.test(wine.photos[index]) : index >= 2;
   const indexes = wine.photos.map((_, index) => index);
   const scenes = indexes.filter(ambient);
-  const order = spirit ? [...scenes.slice(-1), ...scenes.slice(0, -1), ...indexes.filter(index => !ambient(index))] : [5, 2, 3, 4, 0, 1];
+  // Wines: table, service, glass, pairing, front, back, then any extra packshot (e.g. a box).
+  const order = spirit ? [...scenes.slice(-1), ...scenes.slice(0, -1), ...indexes.filter(index => !ambient(index))] : [5, 2, 3, 4, 0, 1, ...indexes.slice(6)];
   const stories = spirit ? [
     ...(wine.tasting ? [{ title: "Nariz", text: wine.tasting.nose }, { title: "Boca", text: wine.tasting.palate }, { title: "Final", text: wine.tasting.finish }] : []),
     ...(wine.serve ? [{ title: "Cómo servirlo", text: wine.serve }] : []),

@@ -151,6 +151,17 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   `table` sola; la de destilado abre sola con `pairing`, luego `glass` y al
   final las de botella/estuche — Isaac quiere que la primera foto sea la
   ambientada). `front` va primero en la lista porque es la foto de la tarjeta.
+- **Vinos con foto de celular (no packshot)**: `recortar_botella.py` solo
+  sirve con fondo blanco. Si la foto es sobre mesa/pared (Dalton Matatia,
+  27-oct), generar `front`, `back` y `box` con Gemini a partir de la foto
+  (prompt de packshot: fondo blanco, botella idéntica, sin cambiar letras),
+  2 opciones y elegir la de etiqueta más fiel. La contraetiqueta de Gemini
+  SIEMPRE trae letras inventadas: pegar encima la etiqueta REAL recortada de
+  la foto de Isaac (medir la caja blanca de la etiqueta en el packshot y en
+  la foto, redimensionar, subir brillo ~1.2 y bajar saturación ~0.8, pegar
+  con borde difuminado). Ver el script en el historial del 27-oct.
+  Guardar las fotos originales como `<slug>-front-original.jpeg` y
+  `<slug>-label-original.jpeg` en `public/catalogo/`.
 - **Recortar la botella**:
   `python3 -I .claude/skills/publicar-botella/recortar_botella.py foto salida.webp [desde_x] [espejo_px]`
   `desde_x` = columna desde la que solo hay botella (deja fuera el estuche);

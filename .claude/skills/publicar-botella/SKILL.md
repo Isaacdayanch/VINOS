@@ -223,6 +223,15 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   la llave; (3) abrir una **sesión nueva** en VINOS. Nunca pedirle que pegue la
   llave en el chat (si la pega, usarla solo en el comando con
   `SUPABASE_SECRET_KEY=…`, nunca guardarla en archivos, y pedirle que la rote).
+  **Llave equivocada (27-oct, cuarta sesión)**: si `buscar macallan` dice
+  "(ninguno)" aunque la página pública sí liste los Macallan, y
+  `curl https://lwekyvwfrmgzmavwveji.supabase.co/rest/v1/` responde
+  `"Secret API key required"`, la llave que inyecta el proxy es la
+  **publishable** (`sb_publishable_…` / anon), no la secreta: conecta, pero la
+  seguridad por filas (RLS) le esconde todo y no puede crear ni publicar.
+  Arreglo: en Supabase → Project Settings → API Keys → pestaña **Secret
+  keys** (no "Publishable") → crear "claude" → pegar esa (`sb_secret_…`) en
+  el secreto de red del entorno VINOS → sesión nueva.
 - **Google (fotos automáticas)**: secreto de red para
   `generativelanguage.googleapis.com`, encabezado `x-goog-api-key`, sin
   prefijo. Funciona desde el 26-oct-2026 (con facturación activa). Errores:
@@ -250,6 +259,12 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   cambia el error a "Invalid API key" → el proxy no está inyectando `apikey`.
   Arreglo: en el secreto de red, el campo de encabezado debe decir
   exactamente `apikey` (no Authorization), sin prefijo; luego sesión nueva.
+  **Cuarta sesión (27-oct)**: el encabezado ya está bien (`apikey: dummy` ya
+  no cambia nada) y Supabase responde 200, pero `Producto` regresa `[]` y la
+  raíz `/rest/v1/` dice "Secret API key required": la llave pegada es la
+  **publishable**, no la secreta (ver "Accesos"). Falta que Isaac cree una
+  Secret key y la pegue en el secreto de red; mientras, él puede dar de alta
+  la botella en el CRM (Productos → Nuevo) y publicar el catálogo él mismo.
 - Macallan 25 Sherry Oak: ficha, fotos y vista previa listas y en ambas ramas
   (commit `9dcc8cf`); **falta darlo de alta en el CRM y publicar**. Producto
   listo para `crm.py crear`: `{"nombre": "The Macallan 25 Años Sherry Oak",
@@ -261,10 +276,9 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   `CATALOG-SPIRITS.md`. Si Isaac lo da de alta él mismo en el CRM (Productos →
   Nuevo), basta Tipo Destilado + ese nombre, sin foto: la lista pública usa la
   foto de la ficha por nombre (`spiritPhoto`).
-- Macallan 15: ficha, fotos y vista previa listas y en ambas ramas (commit
-  `68d2d72`); **falta darlo de alta en el CRM (MAC-15DC, DESTILADO, mismo
-  estilo que MAC-12DC y MAC-18DC, sin precio) y publicar el catálogo**. Se
-  conecta solo por nombre en `spirit-profiles.ts`; al tener el ID, agregarlo
-  también a `wine-profiles.ts` y actualizar `CATALOG-SPIRITS.md`.
+- Macallan 15: Isaac lo dio de alta él mismo en el CRM y publicó; desde el
+  27-oct ya sale en `/catalogo-publico/destilados` (conectado por nombre).
+  Falta anotar su ID en `wine-profiles.ts` y `CATALOG-SPIRITS.md` cuando
+  `crm.py buscar` vuelva a funcionar.
 - Macallan 12, 15 y 18: falta la foto de la etiqueta trasera y el precio
   (Isaac: "luego lo ponemos").

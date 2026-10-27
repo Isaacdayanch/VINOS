@@ -10,6 +10,7 @@ import { glenmorangieCadboll15 } from "./glenmorangie-cadboll-15";
 import { hibikiHarmony } from "./hibiki-harmony";
 import { nikkaCoffeyGrain } from "./nikka-coffey-grain";
 import { nikkaCoffeyMalt } from "./nikka-coffey-malt";
+import { nikkaFromTheBarrel } from "./nikka-from-the-barrel";
 
 // Spirits connect by CRM name instead of ID, so a ficha goes live as soon as
 // Isaac publishes the product as DESTILADO. Exclude sibling bottlings.
@@ -25,6 +26,7 @@ const spirits: { match: (name: string) => boolean; profile: EditorialWine }[] = 
   { match: name => /hibiki/i.test(name) && !/\b(17|21|30)\b|blossom|blender/i.test(name), profile: hibikiHarmony },
   { match: name => /nikka/i.test(name) && /coffey/i.test(name) && /grain/i.test(name), profile: nikkaCoffeyGrain },
   { match: name => /nikka/i.test(name) && /coffey/i.test(name) && /malt/i.test(name), profile: nikkaCoffeyMalt },
+  { match: name => /nikka/i.test(name) && /from\s*the\s*barrel/i.test(name), profile: nikkaFromTheBarrel },
 ];
 
 export function spiritProfile(name: string, tipo: string | null | undefined) {

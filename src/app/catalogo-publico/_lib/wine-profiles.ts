@@ -9,9 +9,18 @@ import { tanyaLateHarvest2024 } from "./tanya-late-harvest-2024";
 import { tanyaEliya2021 } from "./tanya-eliya-2021";
 import { spiritProfile } from "./spirit-profiles";
 import { tanyaTchelet2021 } from "./tanya-tchelet-2021";
+import { macallan12DoubleCask } from "./macallan-12-double-cask";
+import { macallan15DoubleCask } from "./macallan-15-double-cask";
+import { macallan18DoubleCask } from "./macallan-18-double-cask";
+import { macallan25SherryOak } from "./macallan-25-sherry-oak";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
+  // Spirits (CRM IDs; spirit-profiles.ts also matches them by name as a fallback).
+  c6adedb93be91f6dedc8a9b51: macallan12DoubleCask,
+  c6ae00d97efe58da5d95dfe23: macallan15DoubleCask,
+  c6adf8abf229f4f0769251295: macallan18DoubleCask,
+  c6ae03474c27b323df6534c5e: macallan25SherryOak,
   cmtssyq530007l404ab37xcal: tanyaTchelet2021,
   cmtssyq4u0006l404sytto49b: tanyaEliya2021,
   cmtssyq3t0002l404jdevszsb: reserve2018,

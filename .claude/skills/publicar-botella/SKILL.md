@@ -130,7 +130,9 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
 
 - Orden en `photos`: destilados `front, box, back, glass, pairing`; vinos
   `front, back, service, glass, pairing, table` (la galería de vino abre con
-  `table` sola).
+  `table` sola; la de destilado abre sola con `pairing`, luego `glass` y al
+  final las de botella/estuche — Isaac quiere que la primera foto sea la
+  ambientada). `front` va primero en la lista porque es la foto de la tarjeta.
 - **Recortar la botella**:
   `python3 -I .claude/skills/publicar-botella/recortar_botella.py foto salida.webp [desde_x] [espejo_px]`
   `desde_x` = columna desde la que solo hay botella (deja fuera el estuche);

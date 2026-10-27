@@ -32,7 +32,10 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
   if (profile) return <EditorialWinePage wine={profile} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
   const spirit = product.tipo === "DESTILADO";
   const collectionHref = spirit ? "/catalogo-publico/destilados" : "/catalogo-publico/catalogo";
-  const photos = [publicPhotograph(product.id, product.fotoUrl), ...product.imagenesExtra.map((p) => p.url)].filter((p): p is string => Boolean(p));
+  // Spirits open on their ambient photos, like the wines; the bottle comes after.
+  const front = publicPhotograph(product.id, product.fotoUrl);
+  const extras = product.imagenesExtra.map((p) => p.url);
+  const photos = (spirit ? [...extras, front] : [front, ...extras]).filter((p): p is string => Boolean(p));
   const details = (spirit
     ? [["Año", product.anio], ["Región", product.region], ["Hecho de", product.varietal], ["Alcohol", product.alcohol != null ? `${product.alcohol}%` : null]]
     : [["Añada", product.anio], ["Región", product.region], ["Uva", product.varietal], ["Cuerpo", product.cuerpo], ["Alcohol", product.alcohol != null ? `${product.alcohol}%` : null]]
@@ -55,7 +58,6 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
     const ambient: WinePhoto[] = gallery.map((photo, index) => ({ url: photo.url, caption: `Ambientación ${index + 1}`, ambient: true }));
     // Approved Tanya opening scene: the sunset table is its last uploaded image.
     if (product.id === "cmtssyq4u0006l404sytto49b" && ambient.length === 4) ambient.unshift(ambient.pop()!);
-    const front = publicPhotograph(product.id, product.fotoUrl);
     const tanya = product.id === "cmtssyq4u0006l404sytto49b" && product.anio === 2021;
     const enosh = product.id === "cmtssyq4l0005l4047nx3t1lc" && product.anio === 2018;
     const dadahBlend = product.id === "cmtssyq3k0001l404n0341dmg" && product.anio === 2023;

@@ -244,11 +244,15 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   entorno **VINOS**; luego sesión nueva. Diagnóstico rápido: mandar
   `apikey: dummy` cambia el error a "Invalid API key" → el proxy no inyecta.
 - Los cinco Macallan (12, 15, 18, 25 y 30), los Glenmorangie Lasanta 12,
-  Elementa 14 y Cadboll Estate 15, y el Hibiki Japanese Harmony ya están en el CRM, publicados y conectados por ID en
+  Elementa 14 y Cadboll Estate 15, el Hibiki Japanese Harmony y el Nikka
+  Coffey Grain ya están en el CRM, publicados y conectados por ID en
   `wine-profiles.ts` (IDs en `CATALOG-SPIRITS.md`).
 - Todos los destilados publicados: falta la foto de la etiqueta
   trasera y el precio (Isaac: "luego lo ponemos"). Del Lasanta conviene una
   foto más grande (la que mandó era de 480 px).
+- Notas oficiales que vienen como IMAGEN en la página del productor (p. ej.
+  Nikka, `table01.gif` en su página japonesa): bajar la imagen con curl,
+  agrandarla y leerla con Read; traducir y citar la página.
 - Estuche muy claro (blanco/crema, p. ej. Hibiki): detectarlo con umbral
   `< 250` en vez de `< 235`, si no el script no lo ve.
 - Botella a la IZQUIERDA del estuche: voltear la imagen (`ImageOps.mirror`),

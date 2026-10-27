@@ -6,7 +6,10 @@ description: Úsalo cuando Isaac mande la foto o el nombre de un vino o de un de
 # Publicar una botella (vino o destilado): de la foto al CRM y a la página
 
 Isaac manda **una foto** (y a veces solo el nombre). Todo lo demás lo hace
-Claude con este skill. Hablarle en español mexicano, simple, sin jerga. Él no
+Claude con este skill. Su parte es solo: **foto, precio y un "va"**. Nunca
+terminar en "vista previa" ni dejarle pasos a medias (dar de alta, publicar):
+así se atoró el Macallan 15 el 27-oct. No decir "listo" hasta ver la botella
+en la página real (paso 7). Hablarle en español mexicano, simple, sin jerga. Él no
 programa: no pedirle nada técnico que se pueda resolver aquí.
 
 ## Lo que Isaac ya decidió (no volver a preguntar)
@@ -21,6 +24,16 @@ programa: no pedirle nada técnico que se pueda resolver aquí.
 - Fotos de botella sobre crema: las hace el servidor solo; no usar CSS.
 
 ## Pasos
+
+### 0. Revisar accesos al empezar (1 minuto, antes de trabajar)
+```bash
+python3 -I .claude/skills/publicar-botella/crm.py buscar macallan     # CRM
+curl -sS -o /dev/null -w "%{http_code}\n" https://vinos-catalogo.vercel.app/catalogo-publico/destilados   # 200
+curl -sS "https://generativelanguage.googleapis.com/v1beta/models?pageSize=1" | head -c 80                 # Gemini
+```
+Si algo falla, avisarle a Isaac **al inicio** (ver "Accesos") y seguir con lo
+que no dependa de eso. Desde el 27-oct los dominios de Supabase y de
+`vinos-catalogo.vercel.app` están permitidos en el entorno.
 
 ### 1. Identificar la botella
 - Leer en la foto: nombre, añada o edad, edición (p. ej. "2025 Release"),
@@ -85,6 +98,16 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   Ejemplos con sus números reales en `CATALOG-SPIRITS.md`.
 - **Revisar cada imagen con Read y con zoom en las orillas** (que no se cuele
   estuche, marcos ni rayitas). Isaac nota todo.
+  Para el zoom usar `resize(..., Image.LANCZOS)`: con NEAREST aparecen
+  costuras que no existen.
+- **Estuche tapado por la botella**: no reflejar zonas con texto (salen letras
+  al revés). Reconstruir la franja con el mismo patrón del estuche desplazado
+  una repetición (medir el periodo comparando columnas) y la orilla de la
+  etiqueta copiándola de más arriba. Ejemplo: Macallan 15 en `CATALOG-SPIRITS.md`.
+- **Fotos de IA, descartar** si: etiqueta de otra edición o diseño viejo,
+  dos botellas, color del líquido distinto, botella chueca o letras raras. Si
+  la ficha dice "sin hielo", la foto va sin hielo. Conviene sacar 2–3
+  opciones en paralelo y escoger.
 - **Fotos con IA automáticas (camino principal desde el 26-oct-2026)**: la
   llave de Google está como secreto de red e Isaac activó la facturación.
   `GEMINI_IMAGE_MODEL=gemini-3-pro-image MARIDAJE="…" COLOR="…" python3 -I .claude/skills/publicar-botella/generar_fotos.py <slug> public/catalogo/<slug>-front.webp "<descripción de la botella>" glass pairing`
@@ -120,8 +143,23 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
 - Commit y push a la rama de trabajo y a las dos ramas publicadas (si alguna
   avanzó, `git merge` de ella primero, `tsc`, y luego push).
 - Actualizar `CATALOG-SPIRITS.md` (destilados) o `CATALOG-WINES.md` (vinos).
-- Decirle a Isaac dónde verlo (`vinos-catalogo.vercel.app/catalogo-publico/<id>`)
-  y pedirle que lo revise él: desde aquí no se puede abrir vercel.app.
+- Pedir **un solo "va"** que cubra todo: subir la página, alta/cambios en
+  el CRM y publicar. En el mismo mensaje de las capturas, preguntar el precio.
+
+### 7. Verificar en la página real (antes de decir "listo")
+Esperar el despliegue de Vercel (1–3 min) y revisar con `curl`:
+- el nombre aparece en `https://vinos-catalogo.vercel.app/catalogo-publico/destilados`
+  (o `/catalogo` para vinos);
+- `/catalogo-publico/<id>` responde 200 y trae las fotos de la ficha
+  (`grep -o "/catalogo/<slug>-[a-z]*.webp"`).
+Solo entonces decirle que quedó, con el link directo.
+
+### Si "no aparece"
+Revisarlo uno mismo con `crm.py` antes de pedirle algo a Isaac, en orden:
+¿existe el producto? ¿`tipo` correcto (si quedó VINO sale en vinos)?
+¿`activo`? ¿la última publicación lo incluye (se publicó **después** del
+alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
+`spirit-profiles.ts`)? ¿ya terminó el despliegue?
 
 ## Accesos (lo que puede fallar y cómo se ve)
 

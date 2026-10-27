@@ -169,7 +169,6 @@
 .cardDetails h3 { font: 500 25px/1.08 var(--serif); margin: 9px 0; }
 .cardPrice { font-size: 13px; margin-top: 14px !important; }
 .noImage { display: grid; place-items: center; height: 100%; font-size: 11px; color: var(--muted); padding: 20px; text-align: center; }
-.productImageAgotado > img { opacity: .5; filter: grayscale(.2); }
 .agotadoBadge {
   position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
   background: var(--cream); color: var(--burgundy); border: 1px solid var(--line);

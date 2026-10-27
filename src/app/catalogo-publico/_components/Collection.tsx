@@ -142,7 +142,7 @@ function WineCard({ wine }: { wine: PublicWine }) {
   const photo = publicPhotograph(wine.id, wine.fotoUrl) ?? spiritPhoto(wine.nombre, wine.tipo);
   const agotado = wine.activo === false;
   const content = <>
-    <div className={`${styles.productImage} ${agotado ? styles.productImageAgotado : ""}`}>
+    <div className={styles.productImage}>
       {photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill unoptimized className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}
       {agotado && <span className={styles.agotadoBadge}>Muy pronto en tu mesa</span>}
     </div>

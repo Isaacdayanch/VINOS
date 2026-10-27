@@ -27,6 +27,11 @@ export const macallan18DoubleCask: EditorialWine = {
     ["Color", "Ámbar dorado"], ["Colección", "Double Cask Collection"], ["Edición", "2025 Release, según etiqueta"],
     ["Alcohol", "43%"], ["Contenido", "700 ml"],
   ],
-  photos: ["front", "box"].map(view => `/catalogo/macallan-18-double-cask-${view}.webp`),
-  captions: ["La botella, sobre blanco", "El estuche de la edición 2025"],
+  // glass/pairing: generated with the Gemini API from the front packshot; never read facts from them.
+  photos: ["front", "box", "glass", "pairing"].map(view => `/catalogo/macallan-18-double-cask-${view}.webp`),
+  captions: [
+    "La botella, sobre blanco", "El estuche de la edición 2025",
+    "Solo, sin hielo, en vaso de cata",
+    "Maridaje sugerido: chocolate amargo, higos, dátiles con nuez, naranja confitada y manchego",
+  ],
 };

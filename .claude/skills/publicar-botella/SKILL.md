@@ -85,14 +85,20 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   Ejemplos con sus números reales en `CATALOG-SPIRITS.md`.
 - **Revisar cada imagen con Read y con zoom en las orillas** (que no se cuele
   estuche, marcos ni rayitas). Isaac nota todo.
-- **Fotos con IA (camino que funciona hoy)**: mandarle a Isaac la foto
-  frontal como JPG (SendUserFile) y las instrucciones listas para pegar en
-  gemini.google.com, armadas con `prompts-gemini.md`. Él regresa las fotos;
-  revisarlas (botella correcta; avisarle si las letras chicas salen raras) y
+- **Fotos con IA automáticas (camino principal desde el 26-oct-2026)**: la
+  llave de Google está como secreto de red e Isaac activó la facturación.
+  `GEMINI_IMAGE_MODEL=gemini-3-pro-image MARIDAJE="…" COLOR="…" python3 -I .claude/skills/publicar-botella/generar_fotos.py <slug> public/catalogo/<slug>-front.webp "<descripción de la botella>" glass pairing`
+  (`TIPO=VINO` y vistas `service glass pairing table` para vino). Variar las
+  escenas entre botellas (ver `prompts-gemini.md`). Con la botella nítida la
+  letra chica de la etiqueta sale deformada: pedir la botella un poco
+  desenfocada en segundo plano y revisar con zoom; regenerar la vista que
+  salga mal. Error 429 ("limit: 0") = se acabó el saldo o la facturación:
+  avisarle a Isaac.
+- **Plan B (sin API)**: mandarle a Isaac la foto frontal como JPG
+  (SendUserFile) y las instrucciones listas para pegar en gemini.google.com,
+  armadas con `prompts-gemini.md`. Él regresa las fotos; revisarlas y
   pasarlas a 960×1200 con `fit()` de `generar_fotos.py`:
   `python3 -c "import importlib.util as u; s=u.spec_from_file_location('g','.claude/skills/publicar-botella/generar_fotos.py'); g=u.module_from_spec(s); s.loader.exec_module(g); from PIL import Image; g.fit(Image.open('ENTRADA')).save('public/catalogo/<slug>-<vista>.webp','WEBP',quality=88)"`
-- **Fotos con IA automáticas** (`generar_fotos.py`, `TIPO=VINO` para vino):
-  solo si hay llave de Google que funcione (ver Accesos). Probar primero.
 
 ### 5. Revisar y enseñar
 - `npm run dev` y capturas con Playwright de la vista previa, **en celular y
@@ -128,16 +134,17 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   archivos. Guiarlo para arreglarlo en claude.ai/code → flechita junto al
   título → Editar entorno de nube → Secretos de red (en iPhone, por Safari).
 - **Google (fotos automáticas)**: secreto de red para
-  `generativelanguage.googleapis.com`, encabezado `x-goog-api-key`. Las llaves
-  nuevas de AI Studio y de Google Cloud salen con `AQ.` y Google las rechaza
-  ("API key not valid"); "unregistered callers" = no llegó ninguna llave. Si
-  no funciona a la primera, no insistir: usar el camino de gemini.google.com.
+  `generativelanguage.googleapis.com`, encabezado `x-goog-api-key`, sin
+  prefijo. Funciona desde el 26-oct-2026 (con facturación activa). Errores:
+  "unregistered callers" = no llegó ninguna llave (el secreto no está o el
+  chat no lo tomó: probar en un chat nuevo); "API key not valid" = llave mal
+  copiada; 429 "limit: 0" = sin saldo o sin facturación. Si falla, no
+  insistir: plan B con gemini.google.com.
 - **Sin acceso desde aquí**: vercel.app (la página publicada), Postgres
   directo, y casi todas las páginas de productores (usar WebSearch).
 
 ## Pendientes conocidos (26-oct-2026)
 - La llave secreta de Supabase quedó escrita en el chat del 26-oct: Isaac debe crear otra,
   ponerla en el secreto y borrar esa.
-- Macallan 18: faltan sus fotos de Gemini (vaso junto a chimenea y maridaje con
-  chocolate, dátiles, parmesano y puro; instrucciones ya enviadas).
-- Macallan 12 y 18: falta la foto de la etiqueta trasera y el precio.
+- Macallan 12, 15 y 18: falta la foto de la etiqueta trasera y el precio.
+- Macallan 15: falta darlo de alta en el CRM y publicar (ver `CATALOG-SPIRITS.md`).

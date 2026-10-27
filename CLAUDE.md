@@ -105,10 +105,11 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   manda una botella a la vez; la ficha lleva nariz/boca/final (notas oficiales),
   cómo servirlo, maridaje de bocados/sobremesa y destilería, con 4–5 fotos:
   frente y estuche (fotos reales), etiqueta trasera (foto de SU botella) y
-  vaso + maridaje (IA). Las fotos de IA las hace Isaac en gemini.google.com
-  con prompts que le pasamos: la llave de la API de Google que sacó en AI
-  Studio empieza con `AQ.` y Google la rechaza ("API key not valid"); solo
-  serviría una `AIza` de Google Cloud. Primer destilado: Macallan 12 Double
+  vaso + maridaje (IA). Las fotos de IA se generan con la API de Gemini
+  (secreto de red + facturación activa desde el 26-oct; modelo
+  `gemini-3-pro-image`); si falla, Isaac las hace en gemini.google.com con
+  las instrucciones de `prompts-gemini.md` del skill. **Cuando Isaac mande la
+  foto de cualquier vino o destilado, usar el skill `publicar-botella`.** Primer destilado: Macallan 12 Double
   Cask (vista previa en `/catalogo-publico/seleccion/macallan-12-double-cask`;
   se conecta solo por nombre en `_lib/spirit-profiles.ts` cuando el producto existe en el CRM como DESTILADO).
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se

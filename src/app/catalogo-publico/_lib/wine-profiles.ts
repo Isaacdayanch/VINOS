@@ -20,6 +20,7 @@ import { glenmorangieCadboll15 } from "./glenmorangie-cadboll-15";
 import { hibikiHarmony } from "./hibiki-harmony";
 import { nikkaCoffeyGrain } from "./nikka-coffey-grain";
 import { nikkaCoffeyMalt } from "./nikka-coffey-malt";
+import { nikkaFromTheBarrel } from "./nikka-from-the-barrel";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
@@ -35,6 +36,7 @@ const profiles: Record<string, EditorialWine> = {
   c6ae0a90453a0e669f653e0b8: hibikiHarmony,
   c6ae0b57e3bda5da40d60052d: nikkaCoffeyGrain,
   c6ae0b8be6a3bf99ec07f4a87: nikkaCoffeyMalt,
+  c6ae0bc7cbd8722b0c63e5d01: nikkaFromTheBarrel,
   cmtssyq530007l404ab37xcal: tanyaTchelet2021,
   cmtssyq4u0006l404sytto49b: tanyaEliya2021,
   cmtssyq3t0002l404jdevszsb: reserve2018,

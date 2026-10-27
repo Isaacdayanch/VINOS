@@ -263,7 +263,7 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   `apikey: dummy` cambia el error a "Invalid API key" → el proxy no inyecta.
 - Los cinco Macallan (12, 15, 18, 25 y 30), los Glenmorangie Lasanta 12,
   Elementa 14 y Cadboll Estate 15, el Hibiki Japanese Harmony y los Nikka
-  Coffey Grain y Coffey Malt ya están en el CRM, publicados y conectados por ID en
+  Coffey Grain, Coffey Malt y From the Barrel ya están en el CRM, publicados y conectados por ID en
   `wine-profiles.ts` (IDs en `CATALOG-SPIRITS.md`).
 - Todos los destilados publicados: falta la foto de la etiqueta
   trasera y el precio (Isaac: "luego lo ponemos"). Del Lasanta conviene una

@@ -112,6 +112,14 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   foto de cualquier vino o destilado, usar el skill `publicar-botella`.** Primer destilado: Macallan 12 Double
   Cask (vista previa en `/catalogo-publico/seleccion/macallan-12-double-cask`;
   se conecta solo por nombre en `_lib/spirit-profiles.ts` cuando el producto existe en el CRM como DESTILADO).
+- **Botones de arriba en Cava de vinos / destilados**: destilados por tipo
+  (Arak, Whisky, Tequila, Mezcal — siempre visibles, "Próximamente" si no hay)
+  y vinos por uva. La uva sale del campo `varietal` del CRM o del nombre
+  (`GRAPES` en `_lib/collection-filters.ts`); solo se muestran uvas con
+  botellas. Si Isaac captura una uva que no está en `GRAPES` (p. ej.
+  Cabernet Franc, Chardonnay), agregarla ahí. Isaac quedó en capturar la uva
+  de los vinos que no la dicen en el nombre (Romi, Grand Rivallon, Jerusalem
+  Hills Gold/Silver Blend, Titora Grand/Red Seal, Noah 1-3).
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →

@@ -241,7 +241,10 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   Authorization), sin prefijo, host `lwekyvwfrmgzmavwveji.supabase.co`, en el
   entorno **VINOS**; luego sesión nueva. Diagnóstico rápido: mandar
   `apikey: dummy` cambia el error a "Invalid API key" → el proxy no inyecta.
-- Los cuatro Macallan (12, 15, 18 y 25) ya están en el CRM, publicados y
+- Los cinco Macallan (12, 15, 18, 25 y 30) ya están en el CRM, publicados y
   conectados por ID en `wine-profiles.ts` (IDs en `CATALOG-SPIRITS.md`).
-- Macallan 12, 15, 18 y 25: falta la foto de la etiqueta trasera y el precio
-  (Isaac: "luego lo ponemos").
+- Macallan 12, 15, 18, 25 y 30: falta la foto de la etiqueta trasera y el
+  precio (Isaac: "luego lo ponemos").
+- Playwright en este entorno (27-oct): el Chromium preinstalado es el 1243 y
+  `playwright@1.56.1` busca el 1194; lanzar con
+  `chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })`.

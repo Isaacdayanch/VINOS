@@ -13,6 +13,7 @@ import { macallan12DoubleCask } from "./macallan-12-double-cask";
 import { macallan15DoubleCask } from "./macallan-15-double-cask";
 import { macallan18DoubleCask } from "./macallan-18-double-cask";
 import { macallan25SherryOak } from "./macallan-25-sherry-oak";
+import { macallan30DoubleCask } from "./macallan-30-double-cask";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
@@ -21,6 +22,7 @@ const profiles: Record<string, EditorialWine> = {
   c6ae00d97efe58da5d95dfe23: macallan15DoubleCask,
   c6adf8abf229f4f0769251295: macallan18DoubleCask,
   c6ae03474c27b323df6534c5e: macallan25SherryOak,
+  c6ae03733c08d4ce2a2058de0: macallan30DoubleCask,
   cmtssyq530007l404ab37xcal: tanyaTchelet2021,
   cmtssyq4u0006l404sytto49b: tanyaEliya2021,
   cmtssyq3t0002l404jdevszsb: reserve2018,

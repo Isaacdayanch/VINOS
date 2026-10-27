@@ -4,9 +4,13 @@ import { WineDetailPage } from "./WineDetailPage";
 /** Keep label facts and lead with the ambient table photograph. */
 export function EditorialWinePage({ wine, commerce }: { wine: EditorialWine; commerce?: { precioLista: number | null; activo: boolean } }) {
   const spirit = wine.kind === "DESTILADO";
-  // Spirits keep their own order and any number of photos; packshots are named front/box/back.
-  const order = spirit ? wine.photos.map((_, index) => index) : [5, 2, 3, 4, 0, 1];
+  // Spirits take any number of photos; packshots are named front/box/back. Like the wines, the
+  // gallery opens on the most striking scene (the last ambient one, the pairing), then the
+  // other scenes, then the bottle. photos[0] stays the front packshot for the collection card.
   const ambient = (index: number) => spirit ? !/-(front|box|back)\.webp$/.test(wine.photos[index]) : index >= 2;
+  const indexes = wine.photos.map((_, index) => index);
+  const scenes = indexes.filter(ambient);
+  const order = spirit ? [...scenes.slice(-1), ...scenes.slice(0, -1), ...indexes.filter(index => !ambient(index))] : [5, 2, 3, 4, 0, 1];
   const stories = spirit ? [
     ...(wine.tasting ? [{ title: "Nariz", text: wine.tasting.nose }, { title: "Boca", text: wine.tasting.palate }, { title: "Final", text: wine.tasting.finish }] : []),
     ...(wine.serve ? [{ title: "Cómo servirlo", text: wine.serve }] : []),

@@ -20,18 +20,35 @@ export const FACETS_BY_KIND: Record<ProductKind, readonly Facet[]> = {
 };
 export type CollectionFilters = {
   query: string; category: string; year: string; budget: number;
-  facets: Partial<Record<FacetKey, string>>; sort: string;
+  facets: Partial<Record<FacetKey, string>>; sort: string; kind?: ProductKind;
 };
 const normalize = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
+/** The spirits shelves always shown on the page, even before a bottle arrives. */
+export const SPIRIT_TYPES = [
+  { label: "Arak", match: /\bara[kcq]\b/ },
+  { label: "Whisky", match: /whiske?y|scotch|bourbon|single malt/ },
+  { label: "Tequila", match: /tequila/ },
+  { label: "Mezcal", match: /mezcal|mescal/ },
+] as const;
+
+/** Shelf of a spirit: its CRM category first, then its name (some araks have no category). */
+export function spiritType(wine: Pick<PublicWine, "categoria" | "nombre">): string | null {
+  for (const text of [wine.categoria, wine.nombre]) {
+    const found = text ? SPIRIT_TYPES.find(type => type.match.test(normalize(text))) : undefined;
+    if (found) return found.label;
+  }
+  return null;
+}
+
 export function filterCollection(wines: PublicWine[], filters: CollectionFilters) {
-  const { query, category, year, budget, facets, sort } = filters;
+  const { query, category, year, budget, facets, sort, kind } = filters;
   const range = BUDGETS[budget] ?? BUDGETS[0];
   const terms = normalize(query).split(/\s+/).filter(Boolean);
   return wines.filter(wine => {
     const search = normalize([wine.nombre, wine.categoria, wine.anio, wine.varietal, wine.region, wine.cuerpo, wine.maridaje].filter(Boolean).join(" "));
     return terms.every(term => search.includes(term))
-      && (!category || wine.categoria === category)
+      && (!category || (kind === "DESTILADO" ? spiritType(wine) === category : wine.categoria === category))
       && (!year || wine.anio === Number(year))
       && (!budget || (wine.precioLista !== null && wine.precioLista > range.min && wine.precioLista <= range.max))
       && FACETS.every(([key]) => !facets[key] || String(wine[key] ?? "") === facets[key]);

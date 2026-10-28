@@ -98,11 +98,6 @@ export function ProductoForm({
         placeholder={esDestilado ? "Ej. Arak, Whisky, Tequila, Mezcal" : "Ej. Tinto, Reserva, Postre"}
       />
 
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="activo" defaultChecked={d.activo ?? true} />
-        <span>Producto activo</span>
-      </label>
-
       <Campo
         label="Stock mínimo antes de avisar (botellas)"
         name="stockMinimo"

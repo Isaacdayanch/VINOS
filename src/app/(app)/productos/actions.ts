@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { subirFotoProducto } from "@/lib/supabaseStorage";
+import { sincronizarActivoPorStock, sincronizarActivoPorStockVarios } from "@/lib/costeo";
 
 function numeroOpcional(valor: FormDataEntryValue | null) {
   if (!valor || valor === "") return null;
@@ -61,7 +62,6 @@ function datosDesdeFormulario(formData: FormData) {
     proveedor: String(formData.get("proveedor") ?? "").trim() || null,
     tipo: formData.get("tipo") === "DESTILADO" ? ("DESTILADO" as const) : ("VINO" as const),
     categoria: String(formData.get("categoria") ?? "").trim() || null,
-    activo: formData.get("activo") === "on",
     stockMinimo: enteroOpcional(formData.get("stockMinimo")),
     precioLista: numeroOpcional(formData.get("precioLista")),
     precioDescuentoChico: numeroOpcional(formData.get("precioDescuentoChico")),
@@ -90,6 +90,11 @@ export async function crearProducto(formData: FormData) {
     data: { ...datos, sku, fotoUrl },
   });
 
+  // Un producto recién creado no tiene stock todavía (hasta que se le
+  // registre una entrada), así que "activo" debe reflejar eso desde el
+  // principio -- si no, se queda marcado como disponible por default.
+  await sincronizarActivoPorStock(producto.id);
+
   revalidatePath("/productos");
   revalidatePath("/stock");
 
@@ -113,9 +118,24 @@ export async function actualizarProducto(productoId: string, formData: FormData)
     data: { ...datos, sku, ...(fotoUrl ? { fotoUrl } : {}) },
   });
 
+  await sincronizarActivoPorStock(productoId);
+
   revalidatePath("/productos");
   revalidatePath("/stock");
   redirect("/productos");
+}
+
+// Corrige "activo" de TODOS los productos según su stock real ahora mismo.
+// Sirve para arreglar de un jalón productos que se quedaron mal marcados
+// (por ejemplo, de antes de que crearProducto empezara a corregirlo solo).
+export async function corregirActivoTodos() {
+  const productos = await prisma.producto.findMany({ select: { id: true } });
+  await sincronizarActivoPorStockVarios(productos.map((p) => p.id));
+
+  revalidatePath("/productos");
+  revalidatePath("/stock");
+  revalidatePath("/");
+  redirect("/productos?corregido=1");
 }
 
 const MAX_IMAGENES_EXTRA = 7;

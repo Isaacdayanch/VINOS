@@ -131,7 +131,8 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   (p. ej. Dalton Matatia 2018: lista 2,800 → costo 2,520 MXN). Guardar cada
   costo en `COSTOS-BOTELLAS.md` (no es el precio de venta: `precioLista` en
   el CRM es lo que se cobra al cliente y lo da Isaac aparte). El costo real
-  entra al CRM por Stock → Registrar entrada, cuando Isaac lo pida.
+  entra al CRM como línea del pedido **P-W76GP** (Rafa Vinos, en pesos:
+  `tipoCambio` 1, bodega FFCC 689), con "va" de Isaac por botella.
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →

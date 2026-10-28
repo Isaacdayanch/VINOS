@@ -24,12 +24,16 @@ import { nikkaFromTheBarrel } from "./nikka-from-the-barrel";
 import { daltonMatatia2018 } from "./dalton-matatia-2018";
 import { daltonLevantina2021 } from "./dalton-levantina-2021";
 import { daltonFcCabernet2023 } from "./dalton-fc-cabernet-2023";
+import { godinReserva2022 } from "./godin-reserva-2022";
+import { binnunReserve2019 } from "./binnun-reserve-2019";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
   c6ae15c92857c780dc7be2157: daltonMatatia2018,
   c6ae16b6db4b3aa725552c266: daltonLevantina2021,
   c6ae24b67536c229b1869f979: daltonFcCabernet2023,
+  c6ae28521772ffaa1b1badf67: godinReserva2022,
+  c6ae285200c2ab56f6efc15ee: binnunReserve2019,
   // Spirits (CRM IDs; spirit-profiles.ts also matches them by name as a fallback).
   c6adedb93be91f6dedc8a9b51: macallan12DoubleCask,
   c6ae00d97efe58da5d95dfe23: macallan15DoubleCask,

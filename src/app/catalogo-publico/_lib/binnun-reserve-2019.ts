@@ -7,7 +7,8 @@ import type { EditorialWine } from "./editorial-wine";
 // vine plot, strict thinning of grape clusters and hand-picked · stainless steel fermentation and 12 months aging in
 // high-quality French oak barrels · full-body · will continue to develop… for the next five years · serving 18°C ·
 // Winemakers: Eddie Gandler and Danny Yaniv · Consultant: Lewis Pasco · Non mevushal · Kosher for Passover · Alc. 14% ·
-// Contains sulfites · Kfar Binnun, Israel". No photo of the real rear label yet: barcode and fine print unverified.
+// Contains sulfites · Kfar Binnun, Israel". Checked against Isaac's photo of the real rear label
+// (binnun-reserve-2019-label-original.jpeg): text and barcode 7290016742239 match.
 export const binnunReserve2019: EditorialWine = {
   slug: "binnun-reserve-2019",
   name: "Bin Nun Reserve 2019",

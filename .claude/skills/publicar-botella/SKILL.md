@@ -161,8 +161,15 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   2 opciones y elegir la de etiqueta más fiel. La contraetiqueta de Gemini
   SIEMPRE trae letras inventadas: pegar encima la etiqueta REAL recortada de
   la foto de Isaac (medir la caja blanca de la etiqueta en el packshot y en
-  la foto, redimensionar, subir brillo ~1.2 y bajar saturación ~0.8, pegar
-  con borde difuminado). Ver el script en el historial del 27-oct.
+  la foto, redimensionar y pegar con borde difuminado). **Cómo limpiarla**
+  (lección del Matatia, 28-oct: la primera versión quedó manchada y rosada
+  porque la foto venía con poca luz): medir la inclinación con la orilla
+  superior e inferior de la etiqueta y rotar; balance de blancos por franjas
+  de 60 px (dividir cada franja entre su percentil 97 por canal y escalar a
+  251) para que el papel quede blanco parejo; desenfoque 0.4 + unsharp;
+  sombreado cilíndrico (coseno, orillas ~0.78) para que parezca pegada al
+  vidrio; máscara con esquinas redondeadas y blur 1.6. Script en el
+  historial del 28-oct.
   Guardar las fotos originales como `<slug>-front-original.jpeg` y
   `<slug>-label-original.jpeg` en `public/catalogo/`.
 - **Recortar la botella**:

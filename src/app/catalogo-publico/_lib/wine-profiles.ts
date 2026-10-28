@@ -21,9 +21,11 @@ import { hibikiHarmony } from "./hibiki-harmony";
 import { nikkaCoffeyGrain } from "./nikka-coffey-grain";
 import { nikkaCoffeyMalt } from "./nikka-coffey-malt";
 import { nikkaFromTheBarrel } from "./nikka-from-the-barrel";
+import { daltonMatatia2018 } from "./dalton-matatia-2018";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
+  c6ae15c92857c780dc7be2157: daltonMatatia2018,
   // Spirits (CRM IDs; spirit-profiles.ts also matches them by name as a fallback).
   c6adedb93be91f6dedc8a9b51: macallan12DoubleCask,
   c6ae00d97efe58da5d95dfe23: macallan15DoubleCask,

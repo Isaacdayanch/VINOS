@@ -161,14 +161,19 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   2 opciones y elegir la de etiqueta más fiel. La contraetiqueta de Gemini
   SIEMPRE trae letras inventadas: pegar encima la etiqueta REAL recortada de
   la foto de Isaac (medir la caja blanca de la etiqueta en el packshot y en
-  la foto, redimensionar y pegar con borde difuminado). **Cómo limpiarla**
-  (lección del Matatia, 28-oct: la primera versión quedó manchada y rosada
-  porque la foto venía con poca luz): medir la inclinación con la orilla
-  superior e inferior de la etiqueta y rotar; balance de blancos por franjas
-  de 60 px (dividir cada franja entre su percentil 97 por canal y escalar a
-  251) para que el papel quede blanco parejo; desenfoque 0.4 + unsharp;
-  sombreado cilíndrico (coseno, orillas ~0.78) para que parezca pegada al
-  vidrio; máscara con esquinas redondeadas y blur 1.6. Script en el
+  la foto, redimensionar y pegar con borde difuminado). **Cómo limpiarla
+  (método que sí funcionó, Matatia 28-oct)**: Gemini NO sabe integrar la
+  etiqueta en la botella (devuelve su versión con letras inventadas, se
+  probó 4 veces) ni limpiar el texto a mano queda bien (manchas y tinte).
+  Lo que funciona: (1) recortar la etiqueta de la foto de Isaac y hacerle
+  balance de blancos por franjas; (2) mandarle a Gemini SOLO esa etiqueta
+  plana con el prompt de `labelrestore.py` ("devuélvela como escaneo plano
+  de estudio, texto exactamente igual letra por letra"), 3 intentos;
+  (3) revisar cada intento con Read letra por letra, sobre todo años y
+  números (en uno cambió 2018 → 2010): descartar cualquiera con un cambio;
+  (4) pegar la etiqueta restaurada en el packshot trasero de Gemini con
+  sombreado cilíndrico (coseno, orillas ~0.8) y máscara de esquinas
+  redondeadas con blur 1.6. Script: `restaurar_etiqueta.py` en este skill; el pegado está en el
   historial del 28-oct.
   Guardar las fotos originales como `<slug>-front-original.jpeg` y
   `<slug>-label-original.jpeg` en `public/catalogo/`.

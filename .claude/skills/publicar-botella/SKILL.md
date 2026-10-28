@@ -35,6 +35,9 @@ ficha y fotos en el código, y una ficha sin producto no sale en ningún lado
 ## Lo que Isaac ya decidió (no volver a preguntar)
 
 - **Publicar el catálogo = todo lo activo del CRM**, siempre (26-oct-2026).
+- **Costo vs. precio de venta**: Isaac manda la lista de precios del
+  proveedor; su costo = lista − 10 %. Anotarlo en `COSTOS-BOTELLAS.md`. No
+  confundirlo con el precio de venta (`precioLista`), que es otro dato.
 - **Sin precio está bien**: si no lo da, se da de alta sin precio
   ("Precio por confirmar" en la página). Preguntarlo una vez, no insistir.
 - **CRM: leer, sí; crear o publicar, solo con su "va".** Un "súbelo", "hazlo",

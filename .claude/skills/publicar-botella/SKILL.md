@@ -177,6 +177,18 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   historial del 28-oct.
   Guardar las fotos originales como `<slug>-front-original.jpeg` y
   `<slug>-label-original.jpeg` en `public/catalogo/`.
+- **Isaac puede hacer el render de la botella en ChatGPT** (28-oct, le
+  funciona bien): le manda la foto de la botella entera + la etiqueta de
+  cerca con "Haz la imagen profesional, aquí te mando la etiqueta detallada,
+  no cambies nada" y nos manda el resultado. Ese render también inventa
+  detalles chicos (en el Matatia: 14.9 % en vez de 14.5 %, "Modiin" por
+  "Monsey", otro código de barras, sello DW duplicado en la cápsula), así
+  que SIEMPRE: (1) acomodarlo a 4:5 sobre blanco sin recortar la base
+  (escalar a 1140 de alto y centrar en 960×1200); (2) revisar el texto letra
+  por letra contra la foto real; (3) si hay cualquier cambio, pegar encima
+  la etiqueta restaurada y verificada (`restaurar_etiqueta.py` + pegado con
+  sombreado cilíndrico). Guardar el render original como
+  `<slug>-back-chatgpt-original.jpeg`.
 - **Recortar la botella**:
   `python3 -I .claude/skills/publicar-botella/recortar_botella.py foto salida.webp [desde_x] [espejo_px]`
   `desde_x` = columna desde la que solo hay botella (deja fuera el estuche);

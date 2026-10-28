@@ -3,7 +3,7 @@
 Uso:
   python3 -I crm.py buscar <texto>             # productos cuyo nombre o SKU contiene <texto>
   python3 -I crm.py crear <producto.json>      # alta de un producto (falla si ya existe)
-  python3 -I crm.py publicar [--ver]           # publica TODO lo activo; --ver solo muestra qué cambia
+  python3 -I crm.py publicar [--ver]           # publica lo activo + lo ya publicado sin stock; --ver solo muestra qué cambia
 
 La llave: si el entorno tiene el secreto de red de Supabase (encabezado `apikey`),
 el proxy la agrega solo. Si no, se lee de la variable SUPABASE_SECRET_KEY, que se
@@ -74,9 +74,13 @@ def crear(path: str):
 
 
 def publicar(solo_ver: bool):
-    activos = call("GET", "/Producto?select=" + ",".join(PUBLIC_FIELDS) + "&activo=eq.true&order=nombre.asc")
+    todos = call("GET", "/Producto?select=" + ",".join(PUBLIC_FIELDS) + ",activo&order=nombre.asc")
     ultimo = call("GET", "/CatalogoPublicado?select=productos&order=fechaPublicado.desc&limit=1")
     antes = {p.get("id"): p for p in (ultimo[0]["productos"] if ultimo else [])}
+    # Regla de Isaac (28-oct-2026): los activos siempre entran; los que se quedaron sin stock
+    # (inactivos) NO se caen de la página si ya estaban publicados: siguen hasta abajo con
+    # "Muy pronto en tu mesa". Un producto inactivo que nunca se publicó no entra.
+    activos = [{k: p[k] for k in PUBLIC_FIELDS} for p in todos if p["activo"] or p["id"] in antes]
     ids = {p["id"] for p in activos}
     cambios = []
     for p in activos:

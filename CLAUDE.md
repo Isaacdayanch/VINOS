@@ -277,7 +277,12 @@ de Isaac.** Publicar el catálogo = insertar una fila en `CatalogoPublicado`
 con los productos activos (`id,nombre,fotoUrl,tipo,categoria,anio,precioLista`,
 orden por nombre), igual que `publicarCatalogo()`; antes comparar contra la
 última publicación y avisar qué cambia. **Isaac pidió (26-oct): al publicar,
-siempre incluir TODO lo activo en el CRM** (no filtrar productos). Los `id` se generan a mano (no hay
+siempre incluir TODO lo activo en el CRM** (no filtrar productos). **Desde el
+28-oct** el CRM marca inactivo a todo producto sin stock (otra sesión, commit
+`d8640c9`); Isaac decidió que esos NO se caigan de la página: siguen hasta
+abajo con "Muy pronto en tu mesa" (el otro chat está haciendo la lista
+desplegable). Por eso `crm.py publicar` incluye activos + inactivos que ya
+estaban publicados. Un inactivo nunca publicado no entra. Los `id` se generan a mano (no hay
 default en la base): texto que empiece con `c`.
 
 Las dos apps comparten la misma base de datos de Supabase (proyecto

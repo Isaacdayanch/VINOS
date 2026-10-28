@@ -14,7 +14,7 @@ proveedor menos 10 %. Esto NO es el precio de venta; el precio de venta
 | Dalton Elkosh | 3 | 950 | 855 | pendiente | pendiente |  |
 | Dalton Matatia 2018 | 3 | 2,800 | 2,520 | 3,000 | 2,800 | En el CRM (DAL-MAT18) |
 | Godin Reserva | 3 | 750 | 675 | pendiente | pendiente |  |
-| Dalton Asufa Levantina | 3 | 600 | 540 | pendiente | pendiente |  |
+| Dalton Asufa Levantina | 3 | 600 | 540 | pendiente | pendiente | En el CRM (DAL-LEV21), sin precio |
 | Family Collection Cabernet Sauvignon | 1 | 950 | 855 | pendiente | pendiente |  |
 | Family Collection Shiraz | 1 | 950 | 855 | pendiente | pendiente |  |
 | **Total** | **22** | **25,900** | **23,310** | | | |

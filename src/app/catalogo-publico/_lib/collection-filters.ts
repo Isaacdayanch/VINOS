@@ -54,6 +54,7 @@ export const GRAPES = [
   { label: "Carignan", match: /carignan|cari[ñn]ena/ },
   { label: "Touriga Nacional", match: /touriga\s*nacional/ },
   { label: "Tinta Roriz", match: /tinta\s*roriz|tempranillo/ },
+  { label: "Pinot Noir", match: /pinot\s*noir/ },
   { label: "Chenin Blanc", match: /chenin/ },
 ] as const;
 

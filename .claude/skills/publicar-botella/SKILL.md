@@ -314,7 +314,12 @@ alta)? ¿la ficha está conectada (ID en `wine-profiles.ts` o regla de nombre en
   "unregistered callers" = no llegó ninguna llave (el secreto no está o el
   chat no lo tomó: probar en un chat nuevo); "API key not valid" = llave mal
   copiada; 429 "limit: 0" = sin saldo o sin facturación. Si falla, no
-  insistir: plan B con gemini.google.com.
+  insistir: plan B con gemini.google.com. **402 "Your prepayment credits
+  are depleted"** (28-oct-2026, pasó a media botella): se acabó el saldo
+  prepagado de Google. Isaac lo recarga en https://ai.studio/projects →
+  su proyecto → Billing → agregar crédito; en cuanto recarga, las llamadas
+  vuelven a funcionar sin cambiar nada aquí. Mientras, armar ficha y
+  packshots y dejar las escenas pendientes; no subir una ficha sin escenas.
 - **Sin acceso desde aquí**: vercel.app (la página publicada), Postgres
   directo, y casi todas las páginas de productores (usar WebSearch).
 

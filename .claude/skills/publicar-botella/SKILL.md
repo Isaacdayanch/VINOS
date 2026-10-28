@@ -189,6 +189,16 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   la etiqueta restaurada y verificada (`restaurar_etiqueta.py` + pegado con
   sombreado cilíndrico). Guardar el render original como
   `<slug>-back-chatgpt-original.jpeg`.
+- **Contraetiqueta con render de ChatGPT (método Levantina, 28-oct)**: el
+  render de ChatGPT suele estar bien en el texto grande y mal en la letra
+  chica (texto kosher) y en el código de barras. Arreglo: (1) recortar la
+  etiqueta del render y pedirle a Gemini SOLO las correcciones de palabras
+  concretas (`corregir_texto_etiqueta.py`, editar el prompt con las palabras
+  mal → bien; 3 intentos, revisar con zoom); (2) dibujar el código de barras
+  real con `ean13.py` (los 13 dígitos se leen de la foto de Isaac) y pegarlo
+  sobre papel con textura; (3) pegar la etiqueta de vuelta en el render con
+  máscara suave. No retipografiar párrafos con DejaVu: se nota la fuente y
+  el parche plano.
 - **Recortar la botella**:
   `python3 -I .claude/skills/publicar-botella/recortar_botella.py foto salida.webp [desde_x] [espejo_px]`
   `desde_x` = columna desde la que solo hay botella (deja fuera el estuche);

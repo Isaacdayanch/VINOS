@@ -203,6 +203,13 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   28-oct: el render traía cápsula roja y la real es negra). Un cambio de
   color o forma se arregla con Gemini (`capsula.py`: "misma imagen, solo la
   cápsula negra con DOURO en dorado"), 2 intentos, funciona bien.
+- **El render de ChatGPT puede traer OTRA contraetiqueta** (Godin: distinto
+  diseño, otro texto, otro importador, otro código de barras). Por eso la
+  foto real de la contraetiqueta es obligatoria; si llega después, rehacer
+  la contraetiqueta desde la foto real (`etiqueta_plana_ejemplo.py`: escaneo
+  plano con TODO el texto transcrito en el prompt, 3 intentos) y, si un
+  dibujo sale mal (casco griego en vez de vikingo), una pasada con
+  `cambiar_dibujo_etiqueta.py`.
 - **Párrafos largos de letra chica**: Gemini no los corrige bien dentro de
   la botella. Lo que funcionó: pedirle la etiqueta como ESCANEO PLANO con
   TODO el texto correcto en el prompt (`labelflat_godin.py`, 3 intentos),

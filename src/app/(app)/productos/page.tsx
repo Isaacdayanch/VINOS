@@ -1,9 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { corregirActivoTodos } from "@/app/(app)/productos/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProductosPage() {
+export default async function ProductosPage({
+  searchParams,
+}: PageProps<"/productos">) {
+  const sp = await searchParams;
+  const corregido = sp.corregido === "1";
   const productos = await prisma.producto.findMany({ orderBy: { nombre: "asc" } });
 
   return (
@@ -32,6 +38,19 @@ export default async function ProductosPage() {
             Catálogo público
           </Link>
         </div>
+        <form action={corregirActivoTodos}>
+          <SubmitButton
+            className="text-xs text-wine underline text-left w-fit"
+            pendingText="Corrigiendo..."
+          >
+            Corregir disponibilidad según stock real
+          </SubmitButton>
+        </form>
+        {corregido && (
+          <p className="text-xs text-ok font-medium">
+            ✓ Listo, ya se corrigió qué productos están activos según su stock real.
+          </p>
+        )}
       </div>
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">

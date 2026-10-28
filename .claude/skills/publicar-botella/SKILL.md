@@ -199,6 +199,16 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   sobre papel con textura; (3) pegar la etiqueta de vuelta en el render con
   máscara suave. No retipografiar párrafos con DejaVu: se nota la fuente y
   el parche plano.
+- **Comparar SIEMPRE el render de ChatGPT con la foto real de Isaac** (Godin,
+  28-oct: el render traía cápsula roja y la real es negra). Un cambio de
+  color o forma se arregla con Gemini (`capsula.py`: "misma imagen, solo la
+  cápsula negra con DOURO en dorado"), 2 intentos, funciona bien.
+- **Párrafos largos de letra chica**: Gemini no los corrige bien dentro de
+  la botella. Lo que funcionó: pedirle la etiqueta como ESCANEO PLANO con
+  TODO el texto correcto en el prompt (`labelflat_godin.py`, 3 intentos),
+  luego una pasada puntual de corrección sobre la mejor, y las últimas 1–2
+  letras a nivel pixel (copiar un glifo bueno de la misma palabra). Al
+  final pegar la etiqueta plana en la botella con sombreado cilíndrico.
 - **Recortar la botella**:
   `python3 -I .claude/skills/publicar-botella/recortar_botella.py foto salida.webp [desde_x] [espejo_px]`
   `desde_x` = columna desde la que solo hay botella (deja fuera el estuche);

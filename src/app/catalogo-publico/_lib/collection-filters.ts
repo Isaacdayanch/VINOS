@@ -83,6 +83,11 @@ export function filterCollection(wines: PublicWine[], filters: CollectionFilters
       && (!budget || (wine.precioLista !== null && wine.precioLista > range.min && wine.precioLista <= range.max))
       && FACETS.every(([key]) => !facets[key] || String(wine[key] ?? "") === facets[key]);
   }).sort((a, b) => {
+    // Lo que no tiene stock ahora mismo se va hasta el final, sin importar
+    // el orden elegido (nombre o precio).
+    const aFuera = a.activo === false ? 1 : 0;
+    const bFuera = b.activo === false ? 1 : 0;
+    if (aFuera !== bFuera) return aFuera - bFuera;
     if (sort === "low" || sort === "high") {
       // Unknown prices always appear last, in either direction.
       if (a.precioLista === null && b.precioLista !== null) return 1;

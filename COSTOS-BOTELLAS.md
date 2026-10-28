@@ -17,6 +17,6 @@ En el CRM es el pedido **P-W76GP** (Rafa Vinos, 23-oct), puesto en pesos con tip
 | Dalton Matatia 2018 | 3 | 2,800 | 2,520 | 3,000 | 2,800 | En el CRM (DAL-MAT18); 3 botellas registradas en el pedido P-W76GP, bodega FFCC 689 (28-oct) |
 | Godin Reserva | 3 | 750 | 675 | pendiente | pendiente |  |
 | Dalton Asufa Levantina | 3 | 600 | 540 | 750 | pendiente | En el CRM (DAL-LEV21), venta 750; 3 botellas registradas en el pedido P-W76GP, bodega FFCC 689 (28-oct) |
-| Family Collection Cabernet Sauvignon | 1 | 950 | 855 | pendiente | pendiente |  |
+| Family Collection Cabernet Sauvignon | 1 | 950 | 855 | pendiente | pendiente | En el CRM (DAL-FCS23), sin precio; 1 botella registrada en P-W76GP, FFCC 689 (28-oct) |
 | Family Collection Shiraz | 1 | 950 | 855 | pendiente | pendiente |  |
 | **Total** | **22** | **25,900** | **23,310** | | | |

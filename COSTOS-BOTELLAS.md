@@ -18,5 +18,5 @@ En el CRM es el pedido **P-W76GP** (Rafa Vinos, 23-oct), puesto en pesos con tip
 | Godin Reserva | 3 | 750 | 675 | 850 | 780 | En el CRM (GOD-RES22); 3 botellas en P-W76GP, FFCC 689 (28-oct) |
 | Dalton Asufa Levantina | 3 | 600 | 540 | 750 | pendiente | En el CRM (DAL-LEV21), venta 750; 3 botellas registradas en el pedido P-W76GP, bodega FFCC 689 (28-oct) |
 | Family Collection Cabernet Sauvignon | 1 | 950 | 855 | pendiente | pendiente | En el CRM (DAL-FCS23), sin precio; 1 botella registrada en P-W76GP, FFCC 689 (28-oct) |
-| Family Collection Shiraz | 1 | 950 | 855 | pendiente | pendiente |  |
+| Dalton Family Collection Shiraz 2021 | 1 | 950 | 855 | pendiente | pendiente | Ficha y 6 fotos listas (29-oct); falta precio y "va" para alta y entrada |
 | **Total** | **22** | **25,900** | **23,310** | | | |

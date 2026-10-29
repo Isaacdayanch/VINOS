@@ -28,6 +28,7 @@ import { godinReserva2022 } from "./godin-reserva-2022";
 import { binnunReserve2019 } from "./binnun-reserve-2019";
 import { gvaotPinotNoir2020 } from "./gvaot-pinot-noir-2020";
 import { daltonElkoshShiraz2019 } from "./dalton-elkosh-shiraz-2019";
+import { daltonFcShiraz2021 } from "./dalton-fc-shiraz-2021";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
@@ -38,6 +39,7 @@ const profiles: Record<string, EditorialWine> = {
   c6ae285200c2ab56f6efc15ee: binnunReserve2019,
   c6ae3717ef4ac14d4dc38c396: gvaotPinotNoir2020,
   c6ae375ade5f4e53e85358b08: daltonElkoshShiraz2019,
+  c6ae3b04524ebacd19bb68733: daltonFcShiraz2021,
   // Spirits (CRM IDs; spirit-profiles.ts also matches them by name as a fallback).
   c6adedb93be91f6dedc8a9b51: macallan12DoubleCask,
   c6ae00d97efe58da5d95dfe23: macallan15DoubleCask,

@@ -8,7 +8,9 @@ import type { EditorialWine } from "./editorial-wine";
 // Shiraz grapes, hand harvested and aged in French oak · Region: Upper Galilee · Soil type: Limestone · Altitude: 600 m ·
 // Barrel: 18 months · Vegan friendly · Not mevushal · Kosher for Passover · 750 ml · 13.5% alc · Contains sulfites ·
 // Imported by Allied Importers, Brooklyn NY · Produced and bottled by Dalton Winery Ltd., Merom Hagalil, Israel".
-// No photo of the real rear label yet: barcode (7229016607543 on the render) and the fine print of the kosher block unverified.
+// Checked against Isaac's photo of the real rear label (dalton-elkosh-shiraz-2019-label-original.jpeg, 29-oct): the render had
+// "UNDER THE MEHADRIN" / "SHVITT" / lot L60519 / "600 m" / barcode 7229016607543; fixed to "KOSHER LE MEHADRIN" / "SHVI'IT" /
+// L40519 / "600+ m" / real barcode 0033115003222. Only layout difference left: the vegan badge sits bottom-left on the real label.
 export const daltonElkoshShiraz2019: EditorialWine = {
   slug: "dalton-elkosh-shiraz-2019",
   name: "Dalton Elkosh Single Vineyard Shiraz 2019",

@@ -99,6 +99,10 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   (`/catalogo-publico/foto-crema`, ver `_lib/cream-photo.ts`). **NO** usar
   `mix-blend-mode` ni filtros CSS para esto: en iPhone (Safari) no funciona y
   se ven cuadros blancos — Isaac lo reportó como lo menos profesional posible.
+  La misma ruta recorta el blanco sobrante alrededor de la botella y le deja
+  un margen fijo (3 %), para que todas las botellas salgan del mismo tamaño en
+  las tarjetas aunque la foto original venga con mucho espacio a los lados —
+  no hace falta editar fotos a mano para "emparejar" tamaños.
   Siempre revisar los cambios de diseño también en tamaño celular.
 - **Fichas de destilados (Cava de destilados)**: proceso en el skill
   `.claude/skills/publicar-botella/` (vinos y destilados: de la foto al CRM y a la página) y registro en `CATALOG-SPIRITS.md`. Isaac

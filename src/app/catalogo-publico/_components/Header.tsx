@@ -1,14 +1,16 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import styles from "../catalog.module.css";
 
 export function Header({ overHero = false }: { overHero?: boolean }) {
   const menu = useRef<HTMLDialogElement>(null);
   return <header className={`${styles.header} ${overHero ? styles.headerHero : ""}`}>
-    <Link href="/catalogo-publico" aria-label="Vinos, inicio" className={styles.headerBrand}>
-      {overHero ? "SELECCIÓN DE VINOS" : "VINOS"}
+    <Link href="/catalogo-publico" aria-label="Cava 18, inicio" className={styles.headerBrand}>
+      {/* Over the home photograph the wordmark turns cream; the gold 18 stays gold. */}
+      <Image src={overHero ? "/marca/cava18-claro.png" : "/marca/cava18.png"} alt="Cava 18" width={1140} height={291} priority sizes="200px" />
     </Link>
     <div className={styles.headerActions}>
       <Link href="/catalogo-publico/catalogo">Vinos </Link>

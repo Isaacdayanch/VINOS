@@ -20,8 +20,9 @@
 .header { height: 96px; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); gap: 20px; position: relative; z-index: 10; }
 .headerHero { position: absolute; inset: 0 0 auto; color: white; }
 .headerHero :is(a,button):focus-visible { outline-color: white; }
-.headerBrand { font-size: 24px; letter-spacing: .18em; font-weight: 400; }
-.headerHero .headerBrand { font-size: 10px; letter-spacing: .3em; }
+.headerBrand { display: block; flex-shrink: 0; }
+.headerBrand img { display: block; width: auto; height: 40px; }
+.headerHero .headerBrand img { filter: drop-shadow(0 1px 8px rgb(0 0 0 / .35)); }
 .headerActions { display: flex; gap: 30px; align-items: center; font-size: 12px; }
 .headerActions > a { display: flex; align-items: center; min-height: 44px; padding: 10px 18px; border-radius: 50px; transition: color .2s ease, background-color .2s ease; }
 .headerActions > a:is(:hover,:active) { color: var(--cream); background: var(--burgundy); }
@@ -185,8 +186,10 @@
 .empty :is(h1,h3) { font: 400 clamp(35px,4vw,60px)/1.1 var(--serif); }
 .empty p { font-size: 14px; margin: 20px 0 30px; }
 .empty .darkPill { margin-top: 20px; }
-.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 30px; padding: 55px var(--gutter); background: var(--ink); color: var(--cream); }
-.footerBrand { font: 400 50px/1 var(--serif); letter-spacing: .12em; }
+/* Footer on paper, so the full burgundy-and-gold logo reads as printed. */
+.footer { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 60px var(--gutter) 40px; background: var(--paper); color: var(--ink); border-top: 1px solid var(--line); text-align: center; }
+.footerBrand { display: block; }
+.footerBrand img { display: block; width: min(420px, 78vw); height: auto; }
 .footer p { font-size: 11px; }
 .winePage { padding: 12px var(--gutter) 0; }
 .back { display: inline-flex; align-items: center; min-height: 44px; font-size: 11px; margin-bottom: 24px; }
@@ -222,7 +225,7 @@
 .storySections p { white-space: pre-line; font-size: 14px; line-height: 1.9; color: var(--muted); }
 @media (max-width: 1100px) { .productGrid { grid-template-columns: repeat(3,minmax(0,1fr)); } .heroCopy { width: 40%; } .heroBottle { right: 7%; } .heroCaption { display: none; } }
 @media (max-width: 700px) {
-  .header { height: 76px; } .headerActions { gap: 12px; } .headerActions > a { font-size: 10px; gap: 8px; } .headerHero .headerBrand { max-width: 110px; font-size: 8px; line-height: 1.8; }
+  .header { height: 76px; } .headerActions { gap: 12px; } .headerActions > a { font-size: 10px; gap: 8px; } .headerBrand img { height: 30px; }
   .hero { height: max(730px,100svh); max-height: 1000px; }
   .heroBackground { object-position: 58% center; }
   .heroWordmark { top: 15%; font-size: 25vw; left: 0; right: 0; letter-spacing: .015em; }
@@ -262,7 +265,7 @@
   .cardPrice { font-size: 12px; }
   .publication { flex-direction: column; gap: 8px; }
   .publication button { text-align: left; }
-  .footer { flex-direction: column; align-items: flex-start; padding-top: 40px; padding-bottom: 40px; }
+  .footer { padding-top: 40px; padding-bottom: 32px; }
   .winePage { padding-top: 0; }
   .wineTop { grid-template-columns: 1fr; gap: 20px; }
   .wineInfo { padding-top: 20px; }
@@ -292,9 +295,9 @@
 }
 
 /* Public architecture: presentation, priced catalog, and editorial about page. */
-.footerNav { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 11px; }
+.footerNav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; font-size: 11px; }
 .footerNav a { display: inline-flex; align-items: center; min-height: 44px; }
-.footer a:focus-visible { outline-color: var(--cream); }
+.footer p { color: var(--muted); }
 .aboutIntro { padding: 65px var(--gutter) 85px; border-bottom: 1px solid var(--line); }
 .aboutIntro h1 { font: 400 clamp(64px,9vw,140px)/.93 var(--serif); letter-spacing: -.04em; margin: 28px 0 35px; }
 .aboutLead { max-width: 650px; font-size: clamp(16px,1.8vw,21px); line-height: 1.8; color: var(--muted); }

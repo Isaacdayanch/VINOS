@@ -280,7 +280,7 @@ con la URL). `vinos-catalogo.vercel.app` se va a borrar (nadie más lo tenía). 
 Vercel `DOMINIO_CATALOGO_PUBLICO` existe solo para **Preview / catalog-redesign**,
 `URL_CATALOGO_PUBLICO` solo para **Production**, y `APP_PASSWORD` tiene que
 estar en **Production y Preview** (si no, las URLs de preview muestran el CRM
-abierto). Vercel Authentication (Deployment Protection) bloqueaba
+abierto; Isaac la puso en ambos el 3-nov). Vercel Authentication (Deployment Protection) bloqueaba
 lacava18.com con "Log in to Vercel"; hay que tenerla apagada.
 Opción futura: `admin.lacava18.com` para el CRM.
 

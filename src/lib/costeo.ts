@@ -268,6 +268,19 @@ export type ResumenFinanzas = {
 
 const PORCENTAJE_MAASER = 0.1;
 
+// Prefijos de motivo de AjusteStock que son puro acomodo administrativo (no
+// un faltante o sobrante real), así que no deben contarse como pérdida ni
+// ganancia en Finanzas. Incluye los nombres viejos de herramientas ya
+// renombradas, por si queda algún ajuste histórico con ese motivo.
+const MOTIVOS_AJUSTE_ADMINISTRATIVO = [
+  "Devolución de consignación",
+  "Consolidación de bodegas",
+  "Transferencia de bodega",
+  "Asignación inicial de todo el stock a una bodega",
+  "Reparto de stock por bodega",
+  "Corrección:",
+];
+
 export function montoEnMXN(moneda: "MXN" | "USD", monto: number, tipoCambio: number | null) {
   return moneda === "USD" ? monto * (tipoCambio ?? 0) : monto;
 }
@@ -454,11 +467,13 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   let gananciaAjusteBotellas = 0;
   let gananciaAjusteCosto = 0;
   for (const a of ajustesStock) {
-    // Las devoluciones de consignación no son un sobrante misterioso -- ya se
-    // contabilizan solas al no sumarse como venta/ganancia de consignación
-    // (ver gananciaConsignacion arriba), así que aquí se ignoran para no
-    // contarlas dos veces como "ganancia extra".
-    if (a.motivo?.startsWith("Devolución de consignación")) continue;
+    // Estos ajustes no son un faltante/sobrante real de inventario -- son
+    // puro acomodo administrativo (mover stock entre bodegas, devolver una
+    // consignación, corregir un error de otro ajuste), así que no cuentan
+    // como pérdida ni ganancia. Si no se filtran, cada traspaso entre
+    // bodegas o corrección se ve como si hubiera aparecido/desaparecido
+    // inventario de la nada.
+    if (MOTIVOS_AJUSTE_ADMINISTRATIVO.some((prefijo) => a.motivo?.startsWith(prefijo))) continue;
     if (a.botellas < 0) {
       const botellas = Math.abs(a.botellas);
       const costoBruto = a.costoUnitario * botellas;

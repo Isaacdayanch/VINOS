@@ -276,7 +276,12 @@ Name.com, datos privados). Variables puestas por Isaac:
 (lista separada por comas, ver `src/middleware.ts`),
 `URL_CATALOGO_PUBLICO=https://lacava18.com` y **`APP_PASSWORD`** (el CRM
 estaba abierto sin clave hasta ese día — Finanzas visibles para cualquiera
-con la URL). `vinos-catalogo.vercel.app` se va a borrar (nadie más lo tenía).
+con la URL). `vinos-catalogo.vercel.app` se va a borrar (nadie más lo tenía). Ojo: en
+Vercel `DOMINIO_CATALOGO_PUBLICO` existe solo para **Preview / catalog-redesign**,
+`URL_CATALOGO_PUBLICO` solo para **Production**, y `APP_PASSWORD` tiene que
+estar en **Production y Preview** (si no, las URLs de preview muestran el CRM
+abierto). Vercel Authentication (Deployment Protection) bloqueaba
+lacava18.com con "Log in to Vercel"; hay que tenerla apagada.
 Opción futura: `admin.lacava18.com` para el CRM.
 
 Lo que se creía antes: **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde

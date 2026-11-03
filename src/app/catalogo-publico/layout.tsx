@@ -7,7 +7,11 @@ import styles from "./catalog.module.css";
 const serif = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500"], variable: "--catalog-serif" });
 const sans = Manrope({ subsets: ["latin"], variable: "--catalog-sans" });
 
+// Icon (the gold 18 seal), apple-icon and opengraph-image (full logo, the picture
+// WhatsApp shows when the link is shared) live next to this file; the CRM keeps its own.
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.URL_CATALOGO_PUBLICO || "https://lacava18.com"),
+  openGraph: { type: "website", siteName: "Cava 18", locale: "es_MX" },
   title: { default: "Cava 18 | Vinos, whisky y destilados", template: "%s | Cava 18" },
   description: "El vino que puede convertir al plato principal en un acompañamiento. Descubre nuestra selección de vinos.",
   // The public site is deployed from the catalog-redesign branch (a Vercel "preview"),

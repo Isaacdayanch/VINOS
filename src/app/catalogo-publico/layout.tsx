@@ -19,7 +19,7 @@ export default function CatalogLayout({ children }: { children: React.ReactNode 
     {children}
     <footer className={styles.footer}>
       <Link href="/catalogo-publico" className={styles.footerBrand} aria-label="Cava 18, inicio">
-        <Image src="/marca/cava18-completo.png" alt="Cava 18 · Vinos, whisky y destilados" width={1619} height={418} sizes="(max-width: 700px) 80vw, 420px" />
+        <Image src="/catalogo/logo-cava18-completo.png" alt="Cava 18 · Vinos, whisky y destilados" width={1619} height={418} sizes="(max-width: 700px) 80vw, 420px" />
       </Link>
       <nav className={styles.footerNav} aria-label="Enlaces del pie de página">
         <Link href="/catalogo-publico">Inicio</Link>

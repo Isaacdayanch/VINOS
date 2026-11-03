@@ -137,6 +137,12 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   el CRM es lo que se cobra al cliente y lo da Isaac aparte). El costo real
   entra al CRM como línea del pedido **P-W76GP** (Rafa Vinos, en pesos:
   `tipoCambio` 1, bodega FFCC 689), con "va" de Isaac por botella.
+- **Logo Cava 18 (2-nov-2026)**: encabezado = `public/catalogo/logo-cava18.png`
+  (sin eslogan; sobre la foto de la portada, `logo-cava18-claro.png`), pie de
+  página = `logo-cava18-completo.png`, original de Isaac en
+  `logo-cava18-original.jpg`. **Ojo**: en el dominio público el middleware solo
+  sirve archivos de `/catalogo/`; cualquier imagen o archivo público nuevo para
+  la página va en `public/catalogo/` o sale roto.
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →

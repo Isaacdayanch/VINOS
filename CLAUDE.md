@@ -260,7 +260,20 @@ sí pasan.
 
 ### Ramas y sitios publicados (OJO antes de hacer cambios)
 
-Hay **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde
+**Corrección (3-nov-2026, confirmado con captura de Isaac)**: es **UN solo
+proyecto de Vercel** ("vinos", equipo "daymart"). Production = CRM
+(`vinos-snowy.vercel.app`, rama `claude/wine-crm-setup-13v2ux`); el dominio
+`vinos-catalogo.vercel.app` está conectado al entorno **Preview, rama
+`catalog-redesign`** (Settings → Domains). Un dominio nuevo para la página
+pública se conecta igual (Preview + catalog-redesign) y hay que actualizar
+`DOMINIO_CATALOGO_PUBLICO` / `URL_CATALOGO_PUBLICO` o el dominio nuevo cae en
+la lógica del CRM. Ojo: `layout.tsx` pone `noindex` cuando
+`VERCEL_ENV === "preview"` — con dominio propio hay que cambiarlo para que
+Google sí indexe el catálogo. Isaac va a comprar el dominio (probable
+cava18.com); opción futura: `admin.cava18.com` para el CRM (revisar antes que
+`APP_PASSWORD` esté puesta).
+
+Lo que se creía antes: **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde
 una rama distinta:
 
 - **Página pública**: `vinos-catalogo.vercel.app` se publica desde la rama

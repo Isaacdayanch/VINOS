@@ -269,9 +269,15 @@ pública se conecta igual (Preview + catalog-redesign) y hay que actualizar
 `DOMINIO_CATALOGO_PUBLICO` / `URL_CATALOGO_PUBLICO` o el dominio nuevo cae en
 la lógica del CRM. Ojo: `layout.tsx` pone `noindex` cuando
 `VERCEL_ENV === "preview"` — con dominio propio hay que cambiarlo para que
-Google sí indexe el catálogo. Isaac va a comprar el dominio (probable
-cava18.com); opción futura: `admin.cava18.com` para el CRM (revisar antes que
-`APP_PASSWORD` esté puesta).
+Google sí indexe el catálogo. **Dominios (3-nov-2026)**: Isaac compró **lacava18.com** (principal) y
+**cava18.wine** (redirige a lacava18.com), ambos en Vercel (registrador
+Name.com, datos privados). Variables puestas por Isaac:
+`DOMINIO_CATALOGO_PUBLICO=lacava18.com,www.lacava18.com,cava18.wine,www.cava18.wine`
+(lista separada por comas, ver `src/middleware.ts`),
+`URL_CATALOGO_PUBLICO=https://lacava18.com` y **`APP_PASSWORD`** (el CRM
+estaba abierto sin clave hasta ese día — Finanzas visibles para cualquiera
+con la URL). `vinos-catalogo.vercel.app` se va a borrar (nadie más lo tenía).
+Opción futura: `admin.lacava18.com` para el CRM.
 
 Lo que se creía antes: **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde
 una rama distinta:

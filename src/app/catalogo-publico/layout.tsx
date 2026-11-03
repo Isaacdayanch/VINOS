@@ -7,11 +7,14 @@ import styles from "./catalog.module.css";
 const serif = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500"], variable: "--catalog-serif" });
 const sans = Manrope({ subsets: ["latin"], variable: "--catalog-sans" });
 
-// Icon (the gold 18 seal), apple-icon and opengraph-image (full logo, the picture
-// WhatsApp shows when the link is shared) live next to this file; the CRM keeps its own.
+// Icon and apple-icon (the gold 18 seal) live next to this file; the CRM keeps the
+// wine glass (src/app/icon.svg). The share picture (full logo, what WhatsApp shows)
+// is a plain file with an absolute URL: Next would point a file-based
+// opengraph-image at the internal Vercel branch URL on this preview deployment.
+const SITIO = "https://lacava18.com";
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.URL_CATALOGO_PUBLICO || "https://lacava18.com"),
-  openGraph: { type: "website", siteName: "Cava 18", locale: "es_MX" },
+  metadataBase: new URL(SITIO),
+  openGraph: { type: "website", siteName: "Cava 18", locale: "es_MX", images: [{ url: `${SITIO}/catalogo/og-cava18.png`, width: 1200, height: 630, alt: "Cava 18 · Vinos, whisky y destilados" }] },
   title: { default: "Cava 18 | Vinos, whisky y destilados", template: "%s | Cava 18" },
   description: "El vino que puede convertir al plato principal en un acompañamiento. Descubre nuestra selección de vinos.",
   // The public site is deployed from the catalog-redesign branch (a Vercel "preview"),

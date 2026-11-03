@@ -10,7 +10,9 @@ const sans = Manrope({ subsets: ["latin"], variable: "--catalog-sans" });
 export const metadata: Metadata = {
   title: { default: "Cava 18 | Vinos, whisky y destilados", template: "%s | Cava 18" },
   description: "El vino que puede convertir al plato principal en un acompañamiento. Descubre nuestra selección de vinos.",
-  robots: process.env.VERCEL_ENV === "preview" ? { index: false, follow: false } : { index: true, follow: true },
+  // The public site is deployed from the catalog-redesign branch (a Vercel "preview"),
+  // so that branch must be indexable; other previews stay hidden from Google.
+  robots: process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF !== "catalog-redesign" ? { index: false, follow: false } : { index: true, follow: true },
 };
 
 export default function CatalogLayout({ children }: { children: React.ReactNode }) {

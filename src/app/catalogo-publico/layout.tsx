@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import styles from "./catalog.module.css";
+import { AgeGate } from "./_components/AgeGate";
 
 const serif = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500"], variable: "--catalog-serif" });
 const sans = Manrope({ subsets: ["latin"], variable: "--catalog-sans" });
@@ -26,6 +27,7 @@ export default function CatalogLayout({ children }: { children: React.ReactNode 
   return <div className={`${styles.shell} ${serif.variable} ${sans.variable}`}>
     <a className={styles.skip} href="#contenido">Ir al contenido</a>
     {children}
+    <AgeGate />
     <footer className={styles.footer}>
       <Link href="/catalogo-publico" className={styles.footerBrand} aria-label="Cava 18, inicio">
         <Image src="/catalogo/logo-cava18-completo.png" alt="Cava 18 · Vinos, whisky y destilados" width={1619} height={418} sizes="(max-width: 700px) 80vw, 420px" />

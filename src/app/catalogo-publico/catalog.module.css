@@ -490,3 +490,29 @@
   .shopPage .productGrid { margin-top: 10px; }
 }
 @media print { .shelfTop { display: none !important; } }
+
+/* Age check: photo of a pour beside a cream panel; fades in softly. */
+.ageGate { position: fixed; inset: 0; z-index: 200; display: grid; grid-template-columns: 1fr 1fr; background: var(--cream); color: var(--ink); animation: ageIn .6s ease both; }
+@keyframes ageIn { from { opacity: 0; } to { opacity: 1; } }
+.agePhoto { position: relative; overflow: hidden; }
+.agePhoto img { object-fit: cover; object-position: center 40%; animation: ageZoom 14s ease-out both; }
+@keyframes ageZoom { from { transform: scale(1.08); } to { transform: scale(1); } }
+.agePanel { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 18px; padding: 48px clamp(28px,6vw,90px); }
+.ageLogo { width: min(240px,60vw); height: auto; margin-bottom: 22px; }
+.agePanel h2 { font: 400 clamp(38px,4vw,58px)/1.05 var(--serif); letter-spacing: -.02em; }
+.agePanel > p:not(.eyebrow) { font-size: 14px; color: var(--muted); max-width: 340px; line-height: 1.7; text-wrap: balance; }
+.ageActions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 14px; }
+.ageActions button { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 14px 30px; border-radius: 50px; font-size: 13px; }
+.ageNo { border: 1px solid var(--line); background: transparent; color: var(--ink); transition: border-color .2s, color .2s; }
+.ageNo:hover { border-color: var(--burgundy); color: var(--burgundy); }
+.agePanel .ageNote { margin-top: 26px; font-size: 10px !important; letter-spacing: .19em; text-transform: uppercase; }
+@media (max-width: 700px) {
+  .ageGate { grid-template-columns: 1fr; grid-template-rows: 42% 1fr; }
+  .agePanel { justify-content: flex-start; gap: 12px; padding: 30px 24px max(24px, env(safe-area-inset-bottom)); }
+  .ageLogo { width: 170px; margin-bottom: 10px; }
+  .agePanel h2 { font-size: 36px; }
+  .ageActions { flex-direction: column; align-self: stretch; }
+}
+@media (prefers-reduced-motion: reduce) { .ageGate, .agePhoto img { animation: none; } }
+@media print { .ageGate { display: none !important; } }
+.shell .ageActions button:focus-visible { outline: 1px solid var(--burgundy); outline-offset: 3px; }

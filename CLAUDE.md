@@ -283,6 +283,11 @@ estar en **Production y Preview** (si no, las URLs de preview muestran el CRM
 abierto; Isaac la puso en ambos el 3-nov). Vercel Authentication (Deployment Protection) bloqueaba
 lacava18.com con "Log in to Vercel"; hay que tenerla apagada.
 Opción futura: `admin.lacava18.com` para el CRM.
+**4-nov-2026**: Vercel pausó TODO el proyecto (402 DEPLOYMENT_DISABLED) por pasar
+el límite del plan Hobby; Isaac subió el equipo Daymart a **Pro**. Para no
+gastar de más, `vercel.json` (`ignoreCommand`) solo construye `catalog-redesign`
+y `claude/wine-crm-setup-13v2ux`; las ramas `claude/...` de trabajo ya no
+generan builds. Evitar pushes innecesarios a las ramas publicadas.
 
 Lo que se creía antes: **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde
 una rama distinta:

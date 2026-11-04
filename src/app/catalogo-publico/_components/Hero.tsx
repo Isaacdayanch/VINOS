@@ -36,7 +36,9 @@ export function Hero() {
   return <section ref={hero} className={styles.hero} aria-label="Bienvenida">
     <Image src="/catalogo/terrace-deep-garnet.webp" alt="" fill priority sizes="100vw" className={styles.heroBackground} />
     <div className={styles.heroShade} />
-    <div className={styles.heroWordmark} aria-hidden="true">VINOS</div>
+    <div className={styles.heroLogo}>
+      <Image src="/catalogo/logo-cava18-claro.png" alt="Cava 18" width={1140} height={291} priority sizes="(max-width: 700px) 88vw, 70vw" />
+    </div>
     <p className={styles.heroOrigin}>ISRAEL Y EL MUNDO</p>
     <div className={styles.heroBottle}>
       <Image src="/catalogo/reserve-2017-softlight.webp" alt="Dādāh Special Reserve 2017, etiqueta de colores" fill priority sizes="(max-width: 700px) 48vw, 40vw" className={styles.bottleImage} />

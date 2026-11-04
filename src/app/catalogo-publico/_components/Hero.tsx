@@ -38,8 +38,9 @@ export function Hero() {
     <div className={styles.heroShade} />
     <div className={styles.heroLogo}>
       <Image src="/catalogo/logo-cava18-claro.png" alt="Cava 18" width={1140} height={291} priority sizes="(max-width: 700px) 88vw, 70vw" />
+      <span className={styles.heroRule} aria-hidden="true" />
+      <p className={styles.heroOrigin}>ISRAEL Y EL MUNDO</p>
     </div>
-    <p className={styles.heroOrigin}>ISRAEL Y EL MUNDO</p>
     <div className={styles.heroBottle}>
       <Image src="/catalogo/reserve-2017-softlight.webp" alt="Dādāh Special Reserve 2017, etiqueta de colores" fill priority sizes="(max-width: 700px) 48vw, 40vw" className={styles.bottleImage} />
     </div>

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default function PresentationPage() {
   return <>
-    <Header overHero />
+    <Header overHero hideBrand />
     <main id="contenido">
       <Hero />
       <Suspense fallback={<p role="status">Cargando selección de vinos…</p>}><VerticalShowcase /></Suspense>

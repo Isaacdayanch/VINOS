@@ -131,6 +131,10 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   Cabernet Franc, Chardonnay), agregarla ahí. Isaac quedó en capturar la uva
   de los vinos que no la dicen en el nombre (Romi, Grand Rivallon, Jerusalem
   Hills Gold/Silver Blend, Titora Grand/Red Seal, Noah 1-3).
+- **Agotados sin foto no salen (5-nov-2026)**: en Cava de vinos/destilados se
+  ocultan solos los productos inactivos (sin stock) que no tienen foto
+  (`getShopCollection` en `_lib/catalog.ts`); los agotados con foto siguen
+  hasta abajo con "Muy pronto en tu mesa". No hace falta tocar el CRM.
 - **Maridajes aptos para kosher sin que se note (27-oct-2026)**: el mercado
   principal de Isaac es kosher. En textos y fotos de maridaje: sin cerdo ni
   mariscos; carnes solo de res, cordero, pollo o pato; nunca carne y lácteos

@@ -211,8 +211,8 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
     `catalog-redesign` incluido: fotos optimizadas, portada con logo grande).
   - **Resend**: Isaac puso `RESEND_API_KEY` en Vercel el 5-nov; se
     reconstruyeron ambas ramas para que la tomara.
-  - **Costo de envío (Isaac dio "va" el 5-nov; construido en la rama de
-    trabajo, PENDIENTE de que Isaac corra el SQL y luego publicar)**:
+  - **Costo de envío (Isaac dio "va" el 5-nov; SQL corrido por Isaac y
+    publicado en ambas ramas el mismo día)**:
     columnas en `Orden`: `envioCobrado` (lo que paga el cliente; entra al
     total con `totalOrden()` de `costeo.ts`, al recibo, al saldo pendiente
     y a "Por cobrar") y `envioCosto` (lo que le costó; gasto que se resta de
@@ -222,8 +222,7 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
     Envío" de cada orden (cobrado + costo) y en `/ordenes/envios` ("Envíos
     del día": total del día repartido en partes iguales entre las órdenes
     marcadas). Al aceptar un pedido web, `envioCobrado` = envío del pedido.
-    **No publicar a las ramas vivas hasta que las columnas existan en
-    Supabase** (si no, todas las pantallas de órdenes truenan). Isaac dirá
+    Las columnas ya existen en Supabase (verificado por REST). Isaac dirá
     cómo se estructura el costo cuando cierre con la empresa de envíos.
   - Pruebas locales: en este sandbox sí hay PostgreSQL 16 instalado
     (`pg_ctlcluster 16 main start`, usuario postgres/postgres, base

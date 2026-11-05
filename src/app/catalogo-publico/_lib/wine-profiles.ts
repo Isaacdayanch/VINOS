@@ -35,6 +35,8 @@ import { arakElite } from "./arak-elite";
 import { arakZachlawiPistachio } from "./arak-zachlawi-pistachio";
 import { dadahPetitVerdotReserve } from "./dadah-petit-verdot-reserve";
 import { charleyZahav2024 } from "./charley-zahav-2024";
+import { charleyLior2021 } from "./charley-lior-2021";
+import { charleyRomi2021 } from "./charley-romi-2021";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
@@ -74,6 +76,8 @@ const profiles: Record<string, EditorialWine> = {
   cmv62yvae0000jz06442szh7r: arakZachlawiPistachio,
   cmtssyq420003l4047ct1g5wa: dadahPetitVerdotReserve,
   cmtssyq64000bl404ysfp4xsq: charleyZahav2024,
+  cmtssyq5u000al4049b8s4ox3: charleyLior2021,
+  cmtssyq5l0009l4043k1040g2: charleyRomi2021,
 };
 export function wineProfile(id: string, year: number | null, name = "", tipo?: string | null) {
   const profile = profiles[id] ?? spiritProfile(name, tipo);

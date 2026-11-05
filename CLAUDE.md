@@ -289,7 +289,7 @@ Vercel `DOMINIO_CATALOGO_PUBLICO` existe solo para **Preview / catalog-redesign*
 estar en **Production y Preview** (si no, las URLs de preview muestran el CRM
 abierto; Isaac la puso en ambos el 3-nov). Vercel Authentication (Deployment Protection) bloqueaba
 lacava18.com con "Log in to Vercel"; hay que tenerla apagada.
-Opción futura: `admin.lacava18.com` para el CRM.
+**`admin.lacava18.com`** (Production) ya abre el CRM con clave (5-nov-2026). Fotos del catálogo: pasan por `next/image` (localPatterns en `next.config.ts`); tras publicar, precalentar las URLs `/_next/image` de /catalogo, /destilados y la portada para que carguen rápido.
 **4-nov-2026**: Vercel pausó TODO el proyecto (402 DEPLOYMENT_DISABLED) por pasar
 el límite del plan Hobby; Isaac subió el equipo Daymart a **Pro**. Para no
 gastar de más, `vercel.json` (`ignoreCommand`) solo construye `catalog-redesign`

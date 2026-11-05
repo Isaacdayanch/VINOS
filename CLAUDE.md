@@ -143,11 +143,25 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   `logo-cava18-original.jpg`. **Ojo**: en el dominio público el middleware solo
   sirve archivos de `/catalogo/`; cualquier imagen o archivo público nuevo para
   la página va en `public/catalogo/` o sale roto.
-- **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
-  queda tal cual para el público. Isaac quiere armar carrito + pedidos,
-  pero NO le convenció la primera propuesta de logística (pedido web →
-  WhatsApp prellenado → correo → convertir a Orden). Hay que re-proponerla
-  con él antes de construir nada.
+- **Pedidos en línea (carrito)** — se trabaja en el chat/rama
+  `claude/carrito-proceso-compra-evt0qp`. El botón "Haz tu pedido aquí ·
+  Próximamente" sigue tal cual para el público hasta que el carrito esté
+  listo. NO le convenció la primera propuesta (pedido web → WhatsApp
+  prellenado → correo → convertir a Orden). Reglas acordadas el 5-nov-2026:
+  envío **$60 MXN, gratis con 3 botellas o más** (pendiente confirmar si
+  "3" entra en gratis). Zonas: CDMX (CP 01–16, incluye Polanco) y zona
+  metropolitana Edo. Méx. (CP 50–57, incluye Tecamachalco, Bosques,
+  Interlomas); Cuernavaca (CP 62) y Acapulco (CP 39) solo en fechas
+  festivas (zonas `temporal`, apagadas por default). Los pedidos caen en el
+  CRM (tabla `PedidoWeb` + `PedidoWebLinea`, zonas en `ZonaEntrega`, ajustes
+  en `ConfiguracionTienda`; SQL en
+  `prisma/migrations/20261105000000_agrega_pedidos_web/`) y el aviso debe
+  llegar a un **grupo de WhatsApp** de logística (Isaac se saldrá del grupo
+  con el tiempo). WhatsApp no permite publicar en un grupo desde una página
+  sin un servicio intermedio: opción recomendada Whapi.cloud (número
+  dedicado de Cava 18, ~279 MXN/mes); la API oficial de Meta sí tiene
+  grupos pero máximo 8 personas y requiere cuenta verificada. Sin pago en
+  línea en la primera etapa (pendiente confirmar con Isaac).
 
 ## Datos reales importados
 

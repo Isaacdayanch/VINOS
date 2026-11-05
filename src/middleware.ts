@@ -28,6 +28,9 @@ function esRutaPublica(pathname: string) {
   return (
     pathname === "/catalogo-publico" ||
     pathname.startsWith("/catalogo-publico/") ||
+    // Catalog photos are public files on any domain (otherwise they break on a
+    // domain the catalog lock does not know, like the old vinos-catalogo).
+    pathname.startsWith("/catalogo/") ||
     pathname === "/login"
   );
 }

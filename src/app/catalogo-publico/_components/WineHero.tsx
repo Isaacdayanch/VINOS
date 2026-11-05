@@ -53,7 +53,7 @@ export function WineHero({ photos, name, children }: { photos: WinePhoto[]; name
           {photos.map((item, index) => <div key={`${item.url}-${index}`} className={`${styles.photoSlide} ${!item.ambient ? styles.immersiveBottle : ""}`} role="group" aria-roledescription="diapositiva" aria-label={`${index + 1} de ${photos.length}: ${item.caption}`}>
             {item.ambient
               ? <Image src={item.url} alt={`${name}: ${item.caption}`} fill preload={index === 0} draggable={false} sizes="(max-width: 700px) 100vw, 57vw" />
-              : <Image src={creamPhoto(item.url)} alt={`${name}: ${item.caption}`} fill preload={index === 0} draggable={false} unoptimized />}
+              : <Image src={creamPhoto(item.url)} alt={`${name}: ${item.caption}`} fill preload={index === 0} draggable={false} sizes="(max-width: 700px) 100vw, 57vw" />}
           </div>)}
         </div>
         {photo.ambient && <div className={styles.photoDissolve} aria-hidden="true" />}

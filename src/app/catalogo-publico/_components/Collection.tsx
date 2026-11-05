@@ -120,7 +120,7 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
     </div>}
     <div className={styles.resultSummary}><p role="status" aria-live="polite">{count(filtered.length)}{active ? " en tu selección" : " por descubrir"}</p><span>Precios en MXN</span></div>
     <div className={styles.productGrid}>
-      {filtered.map((wine, index) => <WineCard wine={wine} key={wine.id ?? `${wine.nombre}-${index}`} />)}
+      {filtered.map((wine, index) => <WineCard wine={wine} first={index < 4} key={wine.id ?? `${wine.nombre}-${index}`} />)}
     </div>
     {!filtered.length && <div className={styles.empty}><h2>{wines.length ? copy.emptyTitle : copy.noneTitle}</h2><p>{wines.length ? copy.emptyHint : copy.noneHint}</p>{active && <button type="button" className={styles.darkPill} onClick={() => { reset(); searchInput.current?.focus(); }}>Ver {copy.all.toLowerCase()}</button>}</div>}
     <div className={styles.publication}><p>{date ? `Selección publicada el ${date}.` : copy.publication}</p><button type="button" onClick={() => window.print()}>Imprimir selección</button></div>
@@ -138,12 +138,12 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
   </section>;
 }
 
-function WineCard({ wine }: { wine: PublicWine }) {
+function WineCard({ wine, first }: { wine: PublicWine; first: boolean }) {
   const photo = publicPhotograph(wine.id, wine.fotoUrl) ?? spiritPhoto(wine.nombre, wine.tipo);
   const agotado = wine.activo === false;
   const content = <>
     <div className={styles.productImage}>
-      {photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill unoptimized className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}
+      {photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill preload={first} sizes="(max-width: 700px) 46vw, 30vw" className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}
       {agotado && <span className={styles.agotadoBadge}>Muy pronto en tu mesa</span>}
     </div>
     <div className={styles.cardDetails}><p className={styles.eyebrow}>{[wine.categoria, wine.anio].filter(Boolean).join(" · ")}</p><h2>{wine.nombre}</h2>{wine.region && <p className={styles.cardRegion}>{wine.region}</p>}<p className={styles.cardPrice}>{wine.precioLista !== null ? money.format(wine.precioLista) : "Precio por confirmar"}</p></div>

@@ -2,11 +2,25 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "../catalog.module.css";
+
+// Approved by Isaac; they rotate with a soft fade (the first stays fixed with reduced motion).
+const PHRASES = [
+  "El vino que puede convertir al plato principal en un acompañamiento.",
+  "Para brindar por lo que vale la pena.",
+  "Del viñedo a tu mesa.",
+  "Un buen vino no se bebe: se comparte.",
+];
 
 export function Hero() {
   const hero = useRef<HTMLElement>(null);
+  const [phrase, setPhrase] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setPhrase(current => (current + 1) % PHRASES.length), 6500);
+    return () => clearInterval(timer);
+  }, []);
   useEffect(() => {
     const element = hero.current;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -45,7 +59,7 @@ export function Hero() {
       <Image src="/catalogo/reserve-2017-softlight.webp" alt="Dādāh Special Reserve 2017, etiqueta de colores" fill priority sizes="(max-width: 700px) 48vw, 40vw" className={styles.bottleImage} />
     </div>
     <div className={styles.heroCopy}>
-      <h1>El vino que puede convertir al plato principal en un acompañamiento.</h1>
+      <h1 key={phrase} className={styles.heroPhrase} aria-live="off">{PHRASES[phrase]}</h1>
       <Link href="/catalogo-publico/catalogo" className={styles.pill}>Explorar vinos </Link>
     </div>
     <div className={styles.heroCaption}><span>DĀDĀH</span><span>Special Reserve · 2017</span></div>

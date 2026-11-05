@@ -125,6 +125,54 @@ export async function actualizarProducto(productoId: string, formData: FormData)
   redirect("/productos");
 }
 
+// Crea un producto nuevo con los mismos datos que uno existente (foto, descripción,
+// uva, región, maridaje, notas, categoría, proveedor, precios, piezas por caja...),
+// con un SKU nuevo y sin stock todavía. Sirve para restockear una añada distinta del
+// mismo vino (ej. Dadah Cabernet 2019 -> 2023) sin volver a capturar todo a mano.
+export async function duplicarProducto(formData: FormData) {
+  const productoId = String(formData.get("productoId") ?? "");
+  const original = await prisma.producto.findUnique({
+    where: { id: productoId },
+    include: { imagenesExtra: true },
+  });
+  if (!original) throw new Error("Producto no encontrado");
+
+  const sku = await generarSku(original.nombre);
+  const nuevo = await prisma.producto.create({
+    data: {
+      nombre: original.nombre,
+      sku,
+      piezasPorCaja: original.piezasPorCaja,
+      anio: original.anio,
+      proveedor: original.proveedor,
+      tipo: original.tipo,
+      categoria: original.categoria,
+      fotoUrl: original.fotoUrl,
+      stockMinimo: original.stockMinimo,
+      precioLista: original.precioLista,
+      precioDescuentoChico: original.precioDescuentoChico,
+      precioDescuentoGrande: original.precioDescuentoGrande,
+      precioDistribuidor: original.precioDistribuidor,
+      descripcion: original.descripcion,
+      maridaje: original.maridaje,
+      notas: original.notas,
+      varietal: original.varietal,
+      region: original.region,
+      cuerpo: original.cuerpo,
+      alcohol: original.alcohol,
+      imagenesExtra: {
+        create: original.imagenesExtra.map((img) => ({ url: img.url, orden: img.orden })),
+      },
+    },
+  });
+
+  await sincronizarActivoPorStock(nuevo.id);
+
+  revalidatePath("/productos");
+  revalidatePath("/stock");
+  redirect(`/productos/${nuevo.id}/editar?duplicado=1`);
+}
+
 // Corrige "activo" de TODOS los productos según su stock real ahora mismo.
 // Sirve para arreglar de un jalón productos que se quedaron mal marcados
 // (por ejemplo, de antes de que crearProducto empezara a corregirlo solo).

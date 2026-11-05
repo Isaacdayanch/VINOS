@@ -15,8 +15,11 @@ const ETIQUETA_TIPO: Record<string, string> = { entrada: "Entrada", salida: "Sal
 
 export default async function EditarProductoPage({
   params,
+  searchParams,
 }: PageProps<"/productos/[id]/editar">) {
   const { id } = await params;
+  const sp = await searchParams;
+  const duplicado = sp.duplicado === "1";
   const [producto, movimientos] = await Promise.all([
     prisma.producto.findUnique({
       where: { id },
@@ -43,6 +46,11 @@ export default async function EditarProductoPage({
           Ver ficha pública →
         </Link>
       </div>
+      {duplicado && (
+        <p className="text-xs text-ok font-medium">
+          ✓ Se duplicó el producto. Revisa el año, el nombre y los precios antes de guardar.
+        </p>
+      )}
       <GaleriaFotosExtra
         productoId={producto.id}
         imagenes={producto.imagenesExtra}

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
+import { calcularSaldosOrdenes, formatoMXN, totalOrden } from "@/lib/costeo";
 import { AvisoPendientesEntrega } from "@/components/AvisoPendientesEntrega";
+import { AvisoPedidosWeb } from "@/components/AvisoPedidosWeb";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ export default async function OrdenesPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <AvisoPedidosWeb />
       <AvisoPendientesEntrega />
       <div className="flex items-center justify-between">
         <div>
@@ -49,11 +51,17 @@ export default async function OrdenesPage() {
         >
           📦 Pendientes de entregar →
         </Link>
+        <Link
+          href="/ordenes/envios"
+          className="rounded-full bg-wine text-white text-xs font-medium px-3 py-2 whitespace-nowrap"
+        >
+          🚚 Envíos del día →
+        </Link>
       </div>
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {ordenes.map((o) => {
-          const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+          const total = totalOrden(o);
           const pendiente = saldos.get(o.id)?.pendiente ?? total;
           return (
             <Link

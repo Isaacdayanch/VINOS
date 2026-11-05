@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // El PDF del pedido lleva el logo; Vercel no empaca /public en las funciones si no se le dice.
+  outputFileTracingIncludes: { "/**": ["./public/catalogo/logo-cava18-completo.png"] },
   experimental: {
     serverActions: {
       // Por default Next solo deja subir 1MB por foto en los formularios —

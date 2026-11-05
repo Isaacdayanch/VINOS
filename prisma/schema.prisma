@@ -365,7 +365,7 @@ model ZonaEntrega {
   id                  String   @id @default(cuid())
   nombre              String
   codigosPostales     String // inicios de CP separados por coma, ej. "01,02,03"
-  costoEnvio          Float    @default(60)
+  costoEnvio          Float    @default(80)
   botellasEnvioGratis Int? // a partir de cuántas botellas el envío sale gratis (null = nunca)
   activa              Boolean  @default(true)
   temporal            Boolean  @default(false) // solo se prende en fechas festivas (Cuernavaca, Acapulco)

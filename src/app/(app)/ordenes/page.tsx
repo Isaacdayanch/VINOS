@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
 import { AvisoPendientesEntrega } from "@/components/AvisoPendientesEntrega";
+import { AvisoPedidosWeb } from "@/components/AvisoPedidosWeb";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ export default async function OrdenesPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <AvisoPedidosWeb />
       <AvisoPendientesEntrega />
       <div className="flex items-center justify-between">
         <div>

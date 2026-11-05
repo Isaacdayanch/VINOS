@@ -155,13 +155,41 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   festivas (zonas `temporal`, apagadas por default). Los pedidos caen en el
   CRM (tabla `PedidoWeb` + `PedidoWebLinea`, zonas en `ZonaEntrega`, ajustes
   en `ConfiguracionTienda`; SQL en
-  `prisma/migrations/20261105000000_agrega_pedidos_web/`) y el aviso debe
-  llegar a un **grupo de WhatsApp** de logística (Isaac se saldrá del grupo
-  con el tiempo). WhatsApp no permite publicar en un grupo desde una página
-  sin un servicio intermedio: opción recomendada Whapi.cloud (número
-  dedicado de Cava 18, ~279 MXN/mes); la API oficial de Meta sí tiene
-  grupos pero máximo 8 personas y requiere cuenta verificada. Sin pago en
-  línea en la primera etapa (pendiente confirmar con Isaac).
+  `prisma/migrations/20261105000000_agrega_pedidos_web/`, **ya corrido en
+  Supabase el 5-nov** con envío actualizado a 80).
+  **Construido el 5-nov-2026 (rama de trabajo, pendiente "va" de Isaac para
+  publicar en `catalog-redesign` + `claude/wine-crm-setup-13v2ux`)**:
+  - Página: botón "Agregar" en cada tarjeta y en la ficha, bolsa en el
+    encabezado, cajón "Mi pedido" (`_lib/cart.tsx`, guardado en el
+    navegador), `/catalogo-publico/pedido` (datos + CP → cotiza zona/envío
+    con `cotizarEnvio` de `src/lib/tienda.ts`) y `/pedido/gracias`. El
+    servidor re-precia todo desde `CatalogoPublicado` (nunca confía en el
+    precio del navegador). Sin pago en línea: se confirma por WhatsApp.
+  - Anuncio elegante arriba del logo (`Announcement.tsx`), con título, texto
+    y fecha "hasta"; se oculta solo al pasar la fecha (hora de CDMX).
+  - CRM: menú "Pedidos en línea" (`/pedidos-web`, detalle con botones
+    WhatsApp al cliente y "Compartir al grupo" con el texto listo, y
+    "Aceptar y crear orden" → crea/liga Cliente por teléfono, crea Orden +
+    Salidas igual que una venta normal; el envío NO entra a la Orden, solo
+    se muestra como aviso en la orden) y "Tienda en línea" (`/tienda`:
+    pedidos abiertos/cerrados, anuncio, zonas con costo/gratis-desde/activa,
+    teléfonos a los que avisar). Aviso en Dashboard y en Órdenes cuando hay
+    pedidos nuevos.
+  - WhatsApp: Isaac NO quiere chip ni número propio; prefiere **Twilio**
+    pagando por uso. Twilio no manda a grupos: el aviso se manda a cada
+    teléfono de la lista (`src/lib/whatsapp.ts`, variables
+    `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`,
+    opcional `TWILIO_CONTENT_SID` para la plantilla aprobada, y `URL_CRM`
+    para el link al pedido). Mientras no estén puestas, el pedido se guarda
+    igual y queda el botón "Compartir al grupo de logística". Pendiente:
+    guiar a Isaac para crear la cuenta de Twilio y el remitente de WhatsApp
+    (requiere cuenta de Meta Business verificada).
+  - Pruebas locales: en este sandbox sí hay PostgreSQL 16 instalado
+    (`pg_ctlcluster 16 main start`, usuario postgres/postgres, base
+    `vinos_dev`); con `prisma db push` + `prisma db seed` + una fila en
+    `CatalogoPublicado` se puede correr `npm run dev` y probar en navegador
+    con Playwright. Hay que crear a mano una `Ubicacion` para poder aceptar
+    pedidos.
 
 ## Datos reales importados
 

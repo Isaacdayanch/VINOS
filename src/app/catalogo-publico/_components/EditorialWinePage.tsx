@@ -1,8 +1,8 @@
 import type { EditorialWine } from "../_lib/editorial-wine";
-import { WineDetailPage } from "./WineDetailPage";
+import { WineDetailPage, type Commerce } from "./WineDetailPage";
 
 /** Keep label facts and lead with the ambient table photograph. */
-export function EditorialWinePage({ wine, commerce }: { wine: EditorialWine; commerce?: { precioLista: number | null; activo: boolean } }) {
+export function EditorialWinePage({ wine, commerce }: { wine: EditorialWine; commerce?: Commerce }) {
   const spirit = wine.kind === "DESTILADO";
   // Spirits take any number of photos; packshots are named front/box/back. Like the wines, the
   // gallery opens on the most striking scene (the last ambient one, the pairing), then the

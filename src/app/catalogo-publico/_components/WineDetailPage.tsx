@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { Header } from "./Header";
-import { OrderNotice } from "./OrderNotice";
+import { AddToCart } from "./AddToCart";
 import { WineHero, type WinePhoto } from "./WineHero";
 import styles from "../catalog.module.css";
+
+/** What the shop needs to sell the bottle on this page; absent on previews. */
+export type Commerce = { id: string; precioLista: number | null; activo: boolean; foto: string | null; detalle: string };
 
 type WineDetail = {
   name: string; title: string; eyebrow: string; style?: string;
   description?: string | null; facts: string[][]; photos: WinePhoto[];
   stories: { title: string; text: string }[];
-  commerce?: { precioLista: number | null; activo: boolean };
+  commerce?: Commerce;
 };
 
 /** Public presentation shared by CRM galleries and verified editorial profiles. */
@@ -26,7 +29,7 @@ export function WineDetailPage({ wine, spirit = false }: { wine: WineDetail; spi
         {wine.description && <p className={styles.immersiveDescription}>{wine.description}</p>}
         {wine.commerce && <>
           <p className={styles.winePrice}>{wine.commerce.precioLista !== null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(wine.commerce.precioLista) : "Precio por confirmar"}{wine.commerce.precioLista !== null && <span>MXN</span>}</p>
-          {wine.commerce.activo ? <OrderNotice spirit={spirit} /> : <p className={styles.purchaseNote}>Este {noun} no está disponible actualmente.</p>}
+          {wine.commerce.activo && wine.commerce.precioLista !== null ? <AddToCart product={{ id: wine.commerce.id, nombre: wine.name, precio: wine.commerce.precioLista, foto: wine.commerce.foto, detalle: wine.commerce.detalle }} /> : <p className={styles.purchaseNote}>{wine.commerce.activo ? `Escríbenos para conocer el precio de este ${noun}.` : `Este ${noun} no está disponible actualmente.`}</p>}
         </>}
         <a href="#ficha-tecnica" className={styles.immersiveLink}>Conoce el {noun} ↓</a>
       </WineHero>

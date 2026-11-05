@@ -19,6 +19,7 @@ export default async function DetalleOrdenPage({
       cliente: true,
       cobros: { orderBy: { fecha: "desc" } },
       ubicacion: true,
+      pedidoWeb: true,
     },
   });
   if (!orden) notFound();
@@ -72,6 +73,16 @@ export default async function DetalleOrdenPage({
           </div>
         </div>
       </div>
+
+      {orden.pedidoWeb && (
+        <Link href={`/pedidos-web/${orden.pedidoWeb.id}`} className="rounded-lg border border-wine/30 bg-wine-light/40 text-sm px-4 py-3 flex items-center justify-between gap-3">
+          <span>
+            🛒 Viene del pedido en línea <strong>{orden.pedidoWeb.folio}</strong>
+            {orden.pedidoWeb.envio > 0 ? <> · envío a domicilio <strong>{formatoMXN(orden.pedidoWeb.envio)}</strong> (se cobra aparte de las botellas)</> : " · envío gratis"}
+          </span>
+          <span className="underline whitespace-nowrap text-wine">Ver pedido →</span>
+        </Link>
+      )}
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {orden.lineas.map((l) => (

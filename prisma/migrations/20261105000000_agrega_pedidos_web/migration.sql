@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "ZonaEntrega" (
     "id" TEXT NOT NULL,
     "nombre" TEXT NOT NULL,
     "codigosPostales" TEXT NOT NULL, -- inicios de CP separados por coma, ej. "01,02,03"
-    "costoEnvio" DOUBLE PRECISION NOT NULL DEFAULT 60,
+    "costoEnvio" DOUBLE PRECISION NOT NULL DEFAULT 80,
     "botellasEnvioGratis" INTEGER, -- a partir de cuántas botellas el envío sale gratis (NULL = nunca)
     "activa" BOOLEAN NOT NULL DEFAULT true,
     "temporal" BOOLEAN NOT NULL DEFAULT false, -- true = solo se prende en fechas festivas
@@ -89,12 +89,12 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- Zonas iniciales acordadas con Isaac (5-nov-2026): 3 botellas o más = envío gratis; menos, $60.
+-- Zonas iniciales acordadas con Isaac (5-nov-2026): 3 botellas o más = envío gratis; menos, $80.
 -- CDMX = CP 01xxx a 16xxx (incluye Polanco). Edo. de México zona metropolitana = CP 50xxx a 57xxx
 -- (incluye Tecamachalco, Bosques e Interlomas). Cuernavaca y Acapulco solo en fechas festivas (apagadas).
 INSERT INTO "ZonaEntrega" ("id", "nombre", "codigosPostales", "costoEnvio", "botellasEnvioGratis", "activa", "temporal", "nota", "orden") VALUES
-  ('czona_cdmx', 'Ciudad de México', '01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16', 60, 3, true, false, 'Incluye Polanco y todas las alcaldías', 1),
-  ('czona_edomex', 'Zona metropolitana (Estado de México)', '50,51,52,53,54,55,56,57', 60, 3, true, false, 'Incluye Tecamachalco, Bosques e Interlomas', 2),
-  ('czona_cuernavaca', 'Cuernavaca, Morelos', '62', 60, 3, false, true, 'Solo en fechas festivas', 3),
-  ('czona_acapulco', 'Acapulco, Guerrero', '39', 60, 3, false, true, 'Solo en fechas festivas', 4)
+  ('czona_cdmx', 'Ciudad de México', '01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16', 80, 3, true, false, 'Incluye Polanco y todas las alcaldías', 1),
+  ('czona_edomex', 'Zona metropolitana (Estado de México)', '50,51,52,53,54,55,56,57', 80, 3, true, false, 'Incluye Tecamachalco, Bosques e Interlomas', 2),
+  ('czona_cuernavaca', 'Cuernavaca, Morelos', '62', 80, 3, false, true, 'Solo en fechas festivas', 3),
+  ('czona_acapulco', 'Acapulco, Guerrero', '39', 80, 3, false, true, 'Solo en fechas festivas', 4)
 ON CONFLICT ("id") DO NOTHING;

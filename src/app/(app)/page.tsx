@@ -8,6 +8,7 @@ import {
   formatoMXN,
 } from "@/lib/costeo";
 import { AvisoPedidosSinCosto } from "@/components/AvisoPedidosSinCosto";
+import { AvisoPedidosWeb } from "@/components/AvisoPedidosWeb";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -69,6 +70,7 @@ export default async function DashboardPage() {
         />
       </div>
 
+      <AvisoPedidosWeb />
       <AvisoPedidosSinCosto pedidos={pedidosSinCosto} />
 
       {alertas.length > 0 && (

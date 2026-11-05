@@ -78,6 +78,20 @@ const iconos: Record<string, (props: SVGProps<SVGSVGElement>) => React.ReactElem
       <path d="M4 9h16" />
     </Icono>
   ),
+  "/pedidos-web": (p) => (
+    <Icono {...p}>
+      <path d="M3 5h2l2.2 10h10.3L20 8H6.4" />
+      <circle cx="9" cy="19" r="1.5" />
+      <circle cx="16.5" cy="19" r="1.5" />
+    </Icono>
+  ),
+  "/tienda": (p) => (
+    <Icono {...p}>
+      <path d="M4 10 5.5 4h13L20 10" />
+      <path d="M4 10c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3" />
+      <path d="M5.5 13v7h13v-7" />
+    </Icono>
+  ),
   "/recibos": (p) => (
     <Icono {...p}>
       <path d="M6 3h12v18l-2.5-1.5L13 21l-2.5-1.5L8 21l-2-1.5V3Z" />
@@ -92,6 +106,8 @@ const links = [
   { href: "/stock", label: "Stock", disponible: true },
   { href: "/pedidos", label: "Pedidos a proveedores", disponible: true },
   { href: "/ordenes", label: "Órdenes de clientes", disponible: true },
+  { href: "/pedidos-web", label: "Pedidos en línea", disponible: true },
+  { href: "/tienda", label: "Tienda en línea", disponible: true },
   { href: "/precios", label: "Precios", disponible: true },
   { href: "/distribuidores", label: "Consignación", disponible: true },
 ];

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "../catalog.module.css";
+import { CartButton } from "./CartButton";
 
 export function Header({ overHero = false }: { overHero?: boolean }) {
   const menu = useRef<HTMLDialogElement>(null);
@@ -16,6 +17,7 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
     <div className={styles.headerActions}>
       <Link href="/catalogo-publico/catalogo">Vinos </Link>
       <Link href="/catalogo-publico/destilados">Destilados </Link>
+      <CartButton />
       <button type="button" className={styles.menuButton} aria-label="Abrir navegación" onClick={() => menu.current?.showModal()}>
         <span /><span />
       </button>

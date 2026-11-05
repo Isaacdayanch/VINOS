@@ -29,6 +29,14 @@ import { binnunReserve2019 } from "./binnun-reserve-2019";
 import { gvaotPinotNoir2020 } from "./gvaot-pinot-noir-2020";
 import { daltonElkoshShiraz2019 } from "./dalton-elkosh-shiraz-2019";
 import { daltonFcShiraz2021 } from "./dalton-fc-shiraz-2021";
+import { titoraSpecial2021 } from "./titora-special-2021";
+import { titoraGrand2021 } from "./titora-grand-2021";
+import { arakElite } from "./arak-elite";
+import { arakZachlawiPistachio } from "./arak-zachlawi-pistachio";
+import { dadahPetitVerdotReserve } from "./dadah-petit-verdot-reserve";
+import { charleyZahav2024 } from "./charley-zahav-2024";
+import { charleyLior2021 } from "./charley-lior-2021";
+import { charleyRomi2021 } from "./charley-romi-2021";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
@@ -62,6 +70,14 @@ const profiles: Record<string, EditorialWine> = {
   cmu3qg06j0000ic04z60he8vj: reserve2017,
   cmtssyq4b0004l4044dcpucfr: reserve2019,
   cmu4gy9h10000jp04frrjexo4: titoraReserve2023,
+  cmtugu16c0000l104d20eycp2: titoraSpecial2021,
+  cmtuh1gti0001l104uo7jml1q: titoraGrand2021,
+  cmv62um2t0000l3063op1yksy: arakElite,
+  cmv62yvae0000jz06442szh7r: arakZachlawiPistachio,
+  cmtssyq420003l4047ct1g5wa: dadahPetitVerdotReserve,
+  cmtssyq64000bl404ysfp4xsq: charleyZahav2024,
+  cmtssyq5u000al4049b8s4ox3: charleyLior2021,
+  cmtssyq5l0009l4043k1040g2: charleyRomi2021,
 };
 export function wineProfile(id: string, year: number | null, name = "", tipo?: string | null) {
   const profile = profiles[id] ?? spiritProfile(name, tipo);

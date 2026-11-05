@@ -93,6 +93,13 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   `kind`). El `tipo` se lee en vivo del producto (no de la foto congelada
   de `CatalogoPublicado`), así que mover un producto a Destilado cambia de
   página sin volver a publicar.
+- **Tamaño uniforme de botellas (5-nov-2026)**: la ruta `/catalogo-publico/foto-crema`
+  además de pintar el blanco en crema, recorta cada packshot a la botella y la
+  vuelve a centrar en un lienzo 960×1200 con la botella al 94 % del alto. Así
+  todas se ven del mismo tamaño en las tarjetas aunque la foto original tenga
+  márgenes distintos (Isaac reportó Godin y Gva'ot chicos y Grand Rivallon
+  grande). Solo aplica a fotos con las 4 esquinas blancas; las escenas de
+  ambiente no se tocan. Ya no hace falta emparejar fotos a mano.
 - **Fotos de botella sobre crema (regla fija)**: Cava de vinos, Destilados y
   la foto de botella de cada ficha usan fondo crema `#f6f2eb`. Las fotos
   vienen con fondo blanco; el servidor les repinta el blanco en crema

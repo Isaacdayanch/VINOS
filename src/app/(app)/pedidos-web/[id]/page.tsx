@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { calcularResumenInventario, formatoMXN } from "@/lib/costeo";
 import { telefonoLimpio } from "@/lib/tienda";
 import { textoAvisoPedido, whatsappConfigurado } from "@/lib/whatsapp";
+import { correoConfigurado } from "@/lib/correo";
 import { SubmitButton } from "@/components/SubmitButton";
 import { BotonEliminarConfirmado } from "@/components/BotonEliminarConfirmado";
 import Link from "next/link";
@@ -93,18 +94,21 @@ export default async function PedidoWebPage({ params }: PageProps<"/pedidos-web/
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-2 text-sm">
-        <h2 className="font-semibold">Aviso por WhatsApp al grupo</h2>
-        {pedido.avisoWhatsApp ? (
-          <p className="text-ok">✅ Enviado el {new Date(pedido.avisoWhatsApp).toLocaleString("es-MX", { timeZone: "America/Mexico_City", dateStyle: "medium", timeStyle: "short" })}</p>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-semibold">Avisos (correo y WhatsApp)</h2>
+          <a href={`/pedidos-web/${pedido.id}/pdf`} target="_blank" rel="noopener noreferrer" className="rounded-full border border-border bg-surface text-xs font-medium px-3 py-2 whitespace-nowrap">Ver PDF del pedido</a>
+        </div>
+        {pedido.avisoError ? (
+          <p className="whitespace-pre-line text-muted">{pedido.avisoError}</p>
         ) : (
-          <p className="text-warn">⚠️ {pedido.avisoError ?? "Todavía no se ha enviado."}</p>
+          <p className="text-muted">Todavía no se ha enviado ningún aviso.</p>
         )}
-        {whatsappConfigurado() && (
+        {(whatsappConfigurado() || correoConfigurado()) && (
           <form action={reenviarAvisoPedidoWeb.bind(null, pedido.id)}>
-            <SubmitButton className="rounded-full border border-border bg-surface text-xs font-medium px-3 py-2" pendingText="Enviando…">Volver a enviar el aviso</SubmitButton>
+            <SubmitButton className="rounded-full border border-border bg-surface text-xs font-medium px-3 py-2" pendingText="Enviando…">Volver a enviar los avisos</SubmitButton>
           </form>
         )}
-        <p className="text-xs text-muted">Mientras WhatsApp no esté conectado, usa el botón “Compartir al grupo de logística” de arriba: abre WhatsApp con el mensaje ya escrito.</p>
+        <p className="text-xs text-muted">El botón “Compartir al grupo de logística” de arriba abre WhatsApp con el mensaje ya escrito, por si quieres mandarlo a mano.</p>
       </section>
 
       {abierto && !pedido.orden && (

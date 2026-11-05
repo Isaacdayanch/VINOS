@@ -93,7 +93,7 @@ export async function marcarEntregadoPedidoWeb(pedidoId: string) {
 
 /** Vuelve a intentar el aviso por WhatsApp (por si falló o se acaba de conectar Twilio). */
 export async function reenviarAvisoPedidoWeb(pedidoId: string) {
-  const pedido = await prisma.pedidoWeb.findUnique({ where: { id: pedidoId }, include: { lineas: true } });
+  const pedido = await prisma.pedidoWeb.findUnique({ where: { id: pedidoId }, include: { lineas: true, zona: true } });
   if (!pedido) throw new Error("El pedido no existe");
   await avisarPedidoWeb(pedido);
   refrescar(pedidoId);

@@ -1,6 +1,8 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { CLAVES, leerConfiguracion, telefonoLimpio } from "@/lib/tienda";
+import { enviarCorreoVenta } from "@/lib/correo";
+import type { PedidoParaPdf } from "@/lib/pedido-pdf";
 
 /**
  * Aviso de pedido nuevo por WhatsApp (Twilio). Se manda a cada teléfono de la lista
@@ -56,19 +58,30 @@ async function enviarWhatsApp(destino: string, cuerpo: string, variables: Record
   if (!respuesta.ok) throw new Error(`Twilio ${respuesta.status}: ${(await respuesta.text()).slice(0, 300)}`);
 }
 
-/** Manda el aviso a todos los destinatarios y deja constancia en el pedido. Nunca truena: el pedido ya está guardado. */
-export async function avisarPedidoWeb(pedido: Pedido) {
+/** Manda el aviso por WhatsApp a todos los teléfonos configurados. Nunca truena: devuelve qué pasó. */
+export async function avisarWhatsApp(pedido: Pedido): Promise<{ enviado: boolean; detalle: string }> {
   const config = await leerConfiguracion();
   const destinatarios = (config[CLAVES.whatsappDestinatarios] ?? "").split(/[\s,;]+/).map(telefonoLimpio).filter((t) => t.length === 10);
-  if (!whatsappConfigurado() || destinatarios.length === 0) {
-    await prisma.pedidoWeb.update({ where: { id: pedido.id }, data: { avisoError: !whatsappConfigurado() ? "WhatsApp todavía no está conectado (faltan las llaves de Twilio)." : "No hay teléfonos a los que avisar." } });
-    return;
-  }
+  if (!whatsappConfigurado()) return { enviado: false, detalle: "WhatsApp todavía no conectado (faltan las llaves de Twilio)." };
+  if (destinatarios.length === 0) return { enviado: false, detalle: "WhatsApp: no hay teléfonos a los que avisar." };
   const cuerpo = textoAvisoPedido(pedido, process.env.URL_CRM ?? null);
   const resumen = `${pedido.nombre} · ${pedido.botellas} botella${pedido.botellas === 1 ? "" : "s"} · ${pesos.format(pedido.total)}`;
   const errores: string[] = [];
   for (const destino of destinatarios) {
     try { await enviarWhatsApp(destino, cuerpo, { "1": pedido.folio, "2": resumen }); } catch (error) { errores.push(`${destino}: ${error instanceof Error ? error.message : String(error)}`); }
   }
-  await prisma.pedidoWeb.update({ where: { id: pedido.id }, data: { avisoWhatsApp: errores.length < destinatarios.length ? new Date() : null, avisoError: errores.length ? errores.join(" | ").slice(0, 900) : null } });
+  return { enviado: errores.length < destinatarios.length, detalle: errores.length ? `WhatsApp: ${errores.join(" | ")}` : `WhatsApp enviado a ${destinatarios.length} teléfono${destinatarios.length === 1 ? "" : "s"}` };
+}
+
+/** Avisa del pedido por WhatsApp y por correo (PDF) y deja constancia en el pedido. Nunca truena: el pedido ya está guardado. */
+export async function avisarPedidoWeb(pedido: Pedido & PedidoParaPdf) {
+  const [whatsapp, correo] = await Promise.all([avisarWhatsApp(pedido), enviarCorreoVenta(pedido)]);
+  await prisma.pedidoWeb.update({
+    where: { id: pedido.id },
+    data: {
+      avisoWhatsApp: whatsapp.enviado ? new Date() : null,
+      // Un solo renglón con lo que pasó con cada aviso; se muestra tal cual en el CRM.
+      avisoError: [whatsapp, correo].map((r) => `${r.enviado ? "✅" : "⚠️"} ${r.detalle}`).join("\n").slice(0, 900),
+    },
+  });
 }

@@ -70,7 +70,7 @@ export async function crearPedidoWeb(datos: DatosPedido): Promise<ResultadoPedid
         botellas, subtotal, envio: cotizacion.envio, total: subtotal + cotizacion.envio,
         lineas: { create: lineas },
       },
-      include: { lineas: true },
+      include: { lineas: true, zona: true },
     });
     await avisarPedidoWeb(pedido);
     revalidatePath("/pedidos-web");

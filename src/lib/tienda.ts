@@ -9,6 +9,7 @@ export const CLAVES = {
   anuncioHasta: "anuncio.hasta", // YYYY-MM-DD, último día en que se muestra
   pedidosAbiertos: "pedidos.abiertos", // "1" / "0" — apaga el carrito sin tocar código
   whatsappDestinatarios: "whatsapp.destinatarios", // teléfonos separados por coma
+  correoDestinatarios: "correo.destinatarios", // correos separados por coma (aviso "Vendiste" con PDF)
 } as const;
 
 export async function leerConfiguracion(): Promise<Record<string, string>> {

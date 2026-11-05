@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { CLAVES, anuncioVigente, hoyMexico, leerConfiguracion, pedidosAbiertos } from "@/lib/tienda";
 import { whatsappConfigurado } from "@/lib/whatsapp";
+import { correoConfigurado } from "@/lib/correo";
 import { SubmitButton } from "@/components/SubmitButton";
 import { urlCatalogoPublico } from "@/lib/catalogoPublico";
 import Link from "next/link";
-import { guardarAnuncio, guardarDestinatariosWhatsApp, guardarPedidosAbiertos, guardarZona } from "./actions";
+import { guardarAnuncio, guardarDestinatariosCorreo, guardarDestinatariosWhatsApp, guardarPedidosAbiertos, guardarZona } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -85,6 +86,19 @@ export default async function TiendaPage() {
             </form>
           ))}
         </div>
+      </section>
+
+      <section className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-semibold">Correo “Vendiste” con el PDF</h2>
+          <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${correoConfigurado() ? "bg-ok/10 text-ok" : "bg-warn-bg text-warn"}`}>{correoConfigurado() ? "Conectado" : "Sin conectar"}</span>
+        </div>
+        <p className="text-sm text-muted">Cada pedido nuevo llega por correo con el PDF del pedido adjunto. Un correo por renglón.</p>
+        <form action={guardarDestinatariosCorreo} className="flex flex-col gap-3 text-sm">
+          <textarea name="correos" rows={2} defaultValue={(config[CLAVES.correoDestinatarios] ?? "").split(",").filter(Boolean).join("\n")} placeholder={"isaac@ejemplo.com\nlogistica@ejemplo.com"} className={`${input} font-mono`} />
+          <div><SubmitButton className={boton} pendingText="Guardando…">Guardar correos</SubmitButton></div>
+        </form>
+        {!correoConfigurado() && <p className="text-xs text-muted">Falta conectar Resend en Vercel (RESEND_API_KEY). Los pedidos se guardan igual.</p>}
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">

@@ -191,6 +191,31 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
     igual y queda el botón "Compartir al grupo de logística". Pendiente:
     guiar a Isaac para crear la cuenta de Twilio y el remitente de WhatsApp
     (requiere cuenta de Meta Business verificada).
+  - **Correo "Vendiste" con PDF (5-nov, pedido explícito de Isaac para
+    empezar sin WhatsApp)**: cada pedido web manda un correo por **Resend**
+    (`src/lib/correo.ts`, API REST con `fetch`; variable `RESEND_API_KEY`
+    en Vercel, Production y Preview; opcional `CORREO_REMITENTE`, default
+    `Cava 18 <onboarding@resend.dev>` que en el plan gratis solo puede
+    mandar al correo dueño de la cuenta de Resend) con el PDF del pedido
+    adjunto (`src/lib/pedido-pdf.ts`, hecho con `pdf-lib`, logo de
+    `public/catalogo/logo-cava18-completo.png` incluido en las funciones
+    por `outputFileTracingIncludes`). Destinatarios en CRM → Tienda en
+    línea (`correo.destinatarios`; ya quedó `isaacdayanch@gmail.com` en
+    producción). El PDF se puede ver en `/pedidos-web/[id]/pdf`. El estado
+    de ambos avisos (WhatsApp y correo) se guarda en `PedidoWeb.avisoError`
+    como texto de dos renglones. Desde este sandbox `api.resend.com` sí
+    responde (dio 401 con llave falsa), así que se puede probar con llave
+    real si Isaac la pone como secreto de red.
+  - **Publicado el 5-nov-2026** en `catalog-redesign` y
+    `claude/wine-crm-setup-13v2ux` con "va" de Isaac (merge de
+    `catalog-redesign` incluido: fotos optimizadas, portada con logo grande).
+  - **Pendiente (Isaac lo pidió, falta su "va" al diseño)**: registrar el
+    costo real de envío. Propuesta: columnas en `Orden` `envioCobrado`
+    (lo que paga el cliente, aparece en recibo y en saldo pendiente) y
+    `envioCosto` (lo que le cobra la empresa de envíos, gasto en Finanzas),
+    más una pantalla "Gasto de envíos del día" que reparte un total entre
+    las órdenes entregadas ese día. Isaac dirá cómo se estructura cuando
+    cierre con la empresa de envíos.
   - Pruebas locales: en este sandbox sí hay PostgreSQL 16 instalado
     (`pg_ctlcluster 16 main start`, usuario postgres/postgres, base
     `vinos_dev`); con `prisma db push` + `prisma db seed` + una fila en

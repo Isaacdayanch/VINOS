@@ -33,6 +33,12 @@ export async function guardarDestinatariosWhatsApp(formData: FormData) {
   refrescar();
 }
 
+export async function guardarDestinatariosCorreo(formData: FormData) {
+  const correos = String(formData.get("correos") ?? "").split(/[\s,;\n]+/).map((c) => c.trim().toLowerCase()).filter((c) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c));
+  await guardarConfiguracion({ [CLAVES.correoDestinatarios]: [...new Set(correos)].join(",") });
+  refrescar();
+}
+
 export async function guardarZona(zonaId: string, formData: FormData) {
   const costo = Number(formData.get("costoEnvio"));
   const gratis = String(formData.get("botellasEnvioGratis") ?? "").trim();

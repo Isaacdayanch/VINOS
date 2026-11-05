@@ -209,7 +209,9 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   - **Publicado el 5-nov-2026** en `catalog-redesign` y
     `claude/wine-crm-setup-13v2ux` con "va" de Isaac (merge de
     `catalog-redesign` incluido: fotos optimizadas, portada con logo grande).
-  - **Pendiente (Isaac lo pidió, falta su "va" al diseño)**: registrar el
+  - **Resend**: Isaac puso `RESEND_API_KEY` en Vercel el 5-nov; se
+    reconstruyeron ambas ramas para que la tomara.
+  - **Costo de envío (Isaac dio "va" el 5-nov)**: registrar el
     costo real de envío. Propuesta: columnas en `Orden` `envioCobrado`
     (lo que paga el cliente, aparece en recibo y en saldo pendiente) y
     `envioCosto` (lo que le cobra la empresa de envíos, gasto en Finanzas),

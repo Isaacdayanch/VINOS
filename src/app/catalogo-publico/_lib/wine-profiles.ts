@@ -29,6 +29,8 @@ import { binnunReserve2019 } from "./binnun-reserve-2019";
 import { gvaotPinotNoir2020 } from "./gvaot-pinot-noir-2020";
 import { daltonElkoshShiraz2019 } from "./dalton-elkosh-shiraz-2019";
 import { daltonFcShiraz2021 } from "./dalton-fc-shiraz-2021";
+import { titoraSpecial2021 } from "./titora-special-2021";
+import { titoraGrand2021 } from "./titora-grand-2021";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
@@ -62,6 +64,8 @@ const profiles: Record<string, EditorialWine> = {
   cmu3qg06j0000ic04z60he8vj: reserve2017,
   cmtssyq4b0004l4044dcpucfr: reserve2019,
   cmu4gy9h10000jp04frrjexo4: titoraReserve2023,
+  cmtugu16c0000l104d20eycp2: titoraSpecial2021,
+  cmtuh1gti0001l104uo7jml1q: titoraGrand2021,
 };
 export function wineProfile(id: string, year: number | null, name = "", tipo?: string | null) {
   const profile = profiles[id] ?? spiritProfile(name, tipo);

@@ -33,6 +33,8 @@ import { titoraSpecial2021 } from "./titora-special-2021";
 import { titoraGrand2021 } from "./titora-grand-2021";
 import { arakElite } from "./arak-elite";
 import { arakZachlawiPistachio } from "./arak-zachlawi-pistachio";
+import { dadahPetitVerdotReserve } from "./dadah-petit-verdot-reserve";
+import { charleyZahav2024 } from "./charley-zahav-2024";
 
 // Published IDs, descriptive fields only. Prices and availability remain live.
 const profiles: Record<string, EditorialWine> = {
@@ -70,6 +72,8 @@ const profiles: Record<string, EditorialWine> = {
   cmtuh1gti0001l104uo7jml1q: titoraGrand2021,
   cmv62um2t0000l3063op1yksy: arakElite,
   cmv62yvae0000jz06442szh7r: arakZachlawiPistachio,
+  cmtssyq420003l4047ct1g5wa: dadahPetitVerdotReserve,
+  cmtssyq64000bl404ysfp4xsq: charleyZahav2024,
 };
 export function wineProfile(id: string, year: number | null, name = "", tipo?: string | null) {
   const profile = profiles[id] ?? spiritProfile(name, tipo);

@@ -3,10 +3,16 @@ import type { NextRequest } from "next/server";
 import { COOKIE_ACCESO, tokenEsperado } from "@/lib/auth";
 import { hostCatalogoPublico, urlCatalogoPublico } from "@/lib/catalogoPublico";
 
-// Dominio del catálogo público (ej. "catalogo-dadah.vercel.app"), configurado
-// en Vercel como variable de entorno una vez que Isaac agregue ese dominio
-// al proyecto. Mientras no esté puesta, este middleware no hace nada.
-const DOMINIO_CATALOGO_PUBLICO = process.env.DOMINIO_CATALOGO_PUBLICO;
+// Dominios del catálogo público, separados por coma (ej.
+// "cava18.wine,www.cava18.wine,vinos-catalogo.vercel.app"), configurados en
+// Vercel como variable de entorno. En esos dominios solo existe el catálogo.
+// Mientras no esté puesta, este bloque no hace nada.
+// Se limpia lo que se cuele al pegarlo en Vercel: espacios, comillas,
+// "https://", una "/" al final.
+const DOMINIOS_CATALOGO_PUBLICO = (process.env.DOMINIO_CATALOGO_PUBLICO ?? "")
+  .split(/[\s,;]+/)
+  .map((d) => d.toLowerCase().replace(/^[^a-z0-9]*(https?:\/\/)?/, "").replace(/[/"'`]+.*$/, "").replace(/[^a-z0-9.:-]/g, ""))
+  .filter(Boolean);
 
 // Clave compartida para entrar al sistema (todo excepto el catálogo público).
 // Mientras no esté puesta en Vercel, el sistema queda abierto (como antes).
@@ -30,7 +36,7 @@ export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const { pathname } = request.nextUrl;
 
-  if (DOMINIO_CATALOGO_PUBLICO && host === DOMINIO_CATALOGO_PUBLICO) {
+  if (DOMINIOS_CATALOGO_PUBLICO.includes(host.toLowerCase())) {
     // Las fotos editoriales y los íconos del sitio son archivos públicos, no
     // páginas del CRM. Reescribirlos al inicio devuelve HTML y rompe también
     // next/image y el ícono en celulares.

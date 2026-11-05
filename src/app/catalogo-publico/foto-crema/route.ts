@@ -2,6 +2,10 @@ import sharp from "sharp";
 import { CREAM_RGB, isCreamPhotoSource } from "../_lib/cream-photo";
 
 const MAX_WIDTH = 1000;
+const MAX_HEIGHT = 1400;
+// Every bottle gets the same breathing room, so all of them render the same size in
+// the cards no matter how much white the original photo had around it.
+const MARGIN = 0.03;
 // Anything this light counts as the studio white; it is lifted to pure white
 // first so slightly grey backdrops (249, 252, 248…) also disappear.
 const WHITE_POINT = 245;
@@ -46,10 +50,23 @@ export async function GET(request: Request) {
   const original = await fetch(new URL(src, request.url));
   if (!original.ok) return new Response("Foto no encontrada", { status: 404 });
 
-  const { data, info } = await sharp(Buffer.from(await original.arrayBuffer()))
+  const flat = await sharp(Buffer.from(await original.arrayBuffer()))
     .rotate()
-    .resize({ width: MAX_WIDTH, withoutEnlargement: true })
     .flatten({ background: "#ffffff" })
+    .removeAlpha()
+    .png()
+    .toBuffer();
+  // Crop the studio white around the bottle (sharp trims before resizing). Only
+  // near-white goes, which the white-point lift below turns into cream anyway.
+  const fitted = await sharp(flat)
+    .trim({ background: "#ffffff", threshold: 10 })
+    .resize({ width: MAX_WIDTH, height: MAX_HEIGHT, fit: "inside", withoutEnlargement: true })
+    .png()
+    .toBuffer({ resolveWithObject: true })
+    .catch(() => sharp(flat).resize({ width: MAX_WIDTH, height: MAX_HEIGHT, fit: "inside", withoutEnlargement: true }).png().toBuffer({ resolveWithObject: true }));
+  const margin = Math.round(fitted.info.height * MARGIN);
+  const { data, info } = await sharp(fitted.data)
+    .extend({ top: margin, bottom: margin, left: margin, right: margin, background: "#ffffff" })
     .removeAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });

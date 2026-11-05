@@ -18,7 +18,7 @@ export type ShowcaseWine = {
 const selection: readonly ShowcaseWine[] = [
   { slug: "grand-rivallon-2012", productId: "cmtugbmde0002ih049z900g5i", producer: "Château Grand Rivallon", name: "Saint-Émilion Grand Cru", year: 2012, image: "grand-rivallon-2012-front.webp", editorialHref: "/catalogo-publico/cmtugbmde0002ih049z900g5i", description: "Un ensamblaje de Merlot, Cabernet Sauvignon y Cabernet Franc. Redondo, de cuerpo pleno y taninos delicados, según su contraetiqueta." },
   { slug: "reserve-2017", productId: "cmu3qg06j0000ic04z60he8vj", producer: "Dādāh", name: "Special Reserve", year: 2017, image: "reserve-2017-softlight.webp", editorialHref: "/catalogo-publico/seleccion/reserve-2017" },
-  { slug: "titora-special-2021", producer: "La Citadelle de Diamant · Titora", name: "Réserve Spéciale", year: 2021, image: "titora-special-2021.webp",
+  { slug: "titora-special-2021", productId: "cmtugu16c0000l104d20eycp2", producer: "La Citadelle de Diamant · Titora", name: "Réserve Spéciale", year: 2021, image: "titora-special-2021.webp",
     description: "Un tinto seco de Galilea que combina 80% Cabernet Sauvignon, 10% Shiraz y 10% Petit Verdot. Su cuerpo va de medio a pleno, con una textura suave y aterciopelada y un final largo. Dieciocho meses en barricas de roble francés de Allier aportan intensidad y elegancia.",
     facts: ["Galilea · Israel", "18 meses en roble francés", "750 ml · 14.3% alc.", "Servir a 18–22 °C", "Kosher para Pésaj, según etiqueta"] },
   { slug: "titora-grand-2023", producer: "La Citadelle de Diamant · Givat Titora", name: "Grande Réserve", year: 2023, image: "titora-grand-2023-front.webp", editorialHref: "/catalogo-publico/seleccion/titora-grand-2023",
@@ -29,7 +29,7 @@ const selection: readonly ShowcaseWine[] = [
   { slug: "dadah-petit-syrah-reserve-2019", productId: "cmtssyq420003l4047ct1g5wa", producer: "Dādāh", name: "Petit Verdot Syrah Reserve", year: 2019, image: "dadah-petit-syrah-reserve-2019.webp" },
   { slug: "dadah-cabernet-2023", productId: "cmtssyq350000l404mdg2nzou", producer: "Dādāh", name: "Cabernet Sauvignon", year: 2023, image: "dadah-cabernet-2023.webp" },
   { slug: "dadah-malbec-barbera-2023", productId: "cmtssyq3k0001l404n0341dmg", producer: "Dādāh", name: "Malbec Barbera", year: 2023, image: "dadah-malbec-barbera-2023.webp" },
-  { slug: "tanya-enosh-2018", producer: "Enosh by Tanya", name: "Cabernet Sauvignon", year: 2018, image: "tanya-enosh-2018.webp" },
+  { slug: "tanya-enosh-2018", productId: "cmtssyq4l0005l4047nx3t1lc", producer: "Enosh by Tanya", name: "Cabernet Sauvignon", year: 2018, image: "tanya-enosh-2018.webp" },
   { slug: "tanya-petit-verdot-2021", productId: "cmtssyq530007l404ab37xcal", producer: "Tanya", name: "Petit Verdot · Tchelet", year: 2021, image: "tanya-tchelet-2021-front-v1.webp", editorialHref: "/catalogo-publico/cmtssyq530007l404ab37xcal" },
 ];
 
@@ -45,5 +45,6 @@ export function orderShowcase(wines: readonly PublicWine[]): ShowcaseWine[] {
   const rivallon = selection.filter(w => w.slug === "grand-rivallon-2012" && wines.some(p => p.id === w.productId && p.anio === w.year));
   const destacado = selection.filter(w => w.slug === SLUG_DESTACADO);
   const resto = selection.filter(w => w.producer !== "Dādāh" && w.slug !== "grand-rivallon-2012" && w.slug !== SLUG_DESTACADO);
-  return [...dadah, ...rivallon, ...destacado, ...resto];
+  // Every bottle opens its own page: the editorial one when it exists, else its product page.
+  return [...dadah, ...rivallon, ...destacado, ...resto].map(w => ({ ...w, editorialHref: w.editorialHref ?? (w.productId ? `/catalogo-publico/${w.productId}` : undefined) }));
 }

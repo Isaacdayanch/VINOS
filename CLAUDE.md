@@ -99,6 +99,10 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   (`/catalogo-publico/foto-crema`, ver `_lib/cream-photo.ts`). **NO** usar
   `mix-blend-mode` ni filtros CSS para esto: en iPhone (Safari) no funciona y
   se ven cuadros blancos — Isaac lo reportó como lo menos profesional posible.
+  La misma ruta recorta el blanco sobrante alrededor de la botella y le deja
+  un margen fijo (3 %), para que todas las botellas salgan del mismo tamaño en
+  las tarjetas aunque la foto original venga con mucho espacio a los lados —
+  no hace falta editar fotos a mano para "emparejar" tamaños.
   Siempre revisar los cambios de diseño también en tamaño celular.
 - **Fichas de destilados (Cava de destilados)**: proceso en el skill
   `.claude/skills/publicar-botella/` (vinos y destilados: de la foto al CRM y a la página) y registro en `CATALOG-SPIRITS.md`. Isaac
@@ -133,6 +137,12 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   el CRM es lo que se cobra al cliente y lo da Isaac aparte). El costo real
   entra al CRM como línea del pedido **P-W76GP** (Rafa Vinos, en pesos:
   `tipoCambio` 1, bodega FFCC 689), con "va" de Isaac por botella.
+- **Logo Cava 18 (2-nov-2026)**: encabezado = `public/catalogo/logo-cava18.png`
+  (sin eslogan; sobre la foto de la portada, `logo-cava18-claro.png`), pie de
+  página = `logo-cava18-completo.png`, original de Isaac en
+  `logo-cava18-original.jpg`. **Ojo**: en el dominio público el middleware solo
+  sirve archivos de `/catalogo/`; cualquier imagen o archivo público nuevo para
+  la página va en `public/catalogo/` o sale roto.
 - **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
   queda tal cual para el público. Isaac quiere armar carrito + pedidos,
   pero NO le convenció la primera propuesta de logística (pedido web →
@@ -250,7 +260,36 @@ sí pasan.
 
 ### Ramas y sitios publicados (OJO antes de hacer cambios)
 
-Hay **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde
+**Corrección (3-nov-2026, confirmado con captura de Isaac)**: es **UN solo
+proyecto de Vercel** ("vinos", equipo "daymart"). Production = CRM
+(`vinos-snowy.vercel.app`, rama `claude/wine-crm-setup-13v2ux`); el dominio
+`vinos-catalogo.vercel.app` está conectado al entorno **Preview, rama
+`catalog-redesign`** (Settings → Domains). Un dominio nuevo para la página
+pública se conecta igual (Preview + catalog-redesign) y hay que actualizar
+`DOMINIO_CATALOGO_PUBLICO` / `URL_CATALOGO_PUBLICO` o el dominio nuevo cae en
+la lógica del CRM. Ojo: `layout.tsx` pone `noindex` cuando
+`VERCEL_ENV === "preview"` — con dominio propio hay que cambiarlo para que
+Google sí indexe el catálogo. **Dominios (3-nov-2026)**: Isaac compró **lacava18.com** (principal) y
+**cava18.wine** (redirige a lacava18.com), ambos en Vercel (registrador
+Name.com, datos privados). Variables puestas por Isaac:
+`DOMINIO_CATALOGO_PUBLICO=lacava18.com,www.lacava18.com,cava18.wine,www.cava18.wine`
+(lista separada por comas, ver `src/middleware.ts`),
+`URL_CATALOGO_PUBLICO=https://lacava18.com` y **`APP_PASSWORD`** (el CRM
+estaba abierto sin clave hasta ese día — Finanzas visibles para cualquiera
+con la URL). `vinos-catalogo.vercel.app` se va a borrar (nadie más lo tenía). Ojo: en
+Vercel `DOMINIO_CATALOGO_PUBLICO` existe solo para **Preview / catalog-redesign**,
+`URL_CATALOGO_PUBLICO` solo para **Production**, y `APP_PASSWORD` tiene que
+estar en **Production y Preview** (si no, las URLs de preview muestran el CRM
+abierto; Isaac la puso en ambos el 3-nov). Vercel Authentication (Deployment Protection) bloqueaba
+lacava18.com con "Log in to Vercel"; hay que tenerla apagada.
+Opción futura: `admin.lacava18.com` para el CRM.
+**4-nov-2026**: Vercel pausó TODO el proyecto (402 DEPLOYMENT_DISABLED) por pasar
+el límite del plan Hobby; Isaac subió el equipo Daymart a **Pro**. Para no
+gastar de más, `vercel.json` (`ignoreCommand`) solo construye `catalog-redesign`
+y `claude/wine-crm-setup-13v2ux`; las ramas `claude/...` de trabajo ya no
+generan builds. Evitar pushes innecesarios a las ramas publicadas.
+
+Lo que se creía antes: **dos proyectos de Vercel** que despliegan del mismo repo, cada uno desde
 una rama distinta:
 
 - **Página pública**: `vinos-catalogo.vercel.app` se publica desde la rama

@@ -1,7 +1,7 @@
 import { PreciosClienteTabla } from "@/components/PreciosClienteTabla";
 import { DateField } from "@/components/DateField";
 import { SubmitButton } from "@/components/SubmitButton";
-import { calcularEstadoCuentaCliente, calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
+import { calcularEstadoCuentaCliente, calcularSaldosOrdenes, formatoMXN, totalOrden } from "@/lib/costeo";
 import { asegurarCodigoCliente } from "@/lib/clienteCodigo";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -310,7 +310,7 @@ export default async function DetalleClientePage({
         </div>
         <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
           {ordenes.map((o) => {
-            const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+            const total = totalOrden(o);
             const pendiente = saldosOrdenes.get(o.id)?.pendiente ?? total;
             return (
               <Link

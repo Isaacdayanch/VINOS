@@ -52,6 +52,7 @@ export function OrdenForm({
   lineasIniciales,
   ubicaciones,
   ubicacionIdInicial,
+  envioCobradoInicial,
   action,
   botonTexto = "Crear orden",
 }: {
@@ -73,12 +74,15 @@ export function OrdenForm({
   }[];
   ubicaciones: Ubicacion[];
   ubicacionIdInicial?: string | null;
+  envioCobradoInicial?: number;
   action?: (formData: FormData) => void;
   botonTexto?: string;
 }) {
   const [clientes, setClientes] = useState(clientesIniciales);
   const [clienteId, setClienteId] = useState(clienteIdInicial ?? clientes[0]?.id ?? "");
   const [fecha] = useState(fechaInicial ?? (() => new Date().toISOString().slice(0, 10))());
+  const [envioCobrado, setEnvioCobrado] = useState(envioCobradoInicial ? String(envioCobradoInicial) : "");
+  const envio = Number(envioCobrado) || 0;
   const [lineas, setLineas] = useState<Linea[]>(() => {
     if (!lineasIniciales || lineasIniciales.length === 0) return [lineaVacia()];
     return lineasIniciales.map((l) => ({
@@ -394,13 +398,34 @@ export function OrdenForm({
         </button>
       </div>
 
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">Envío cobrado al cliente (MXN)</span>
+        <input
+          name="envioCobrado"
+          type="number"
+          min="0"
+          step="1"
+          inputMode="numeric"
+          placeholder="0 si lo recoge o va gratis"
+          value={envioCobrado}
+          onChange={(e) => setEnvioCobrado(e.target.value)}
+          className="rounded-md border border-border bg-surface px-3 py-2"
+        />
+      </label>
+
       <div className="rounded-lg border border-border bg-wine-light p-4 flex flex-col gap-1">
         <div className="flex items-center justify-between">
           <span className="font-medium">Total</span>
           <span className="font-bold text-wine text-lg">
-            {total.toLocaleString("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 })}
+            {(total + envio).toLocaleString("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 })}
           </span>
         </div>
+        {envio > 0 && (
+          <div className="flex items-center justify-between text-sm text-muted">
+            <span>Incluye envío</span>
+            <span>{envio.toLocaleString("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 })}</span>
+          </div>
+        )}
         <div className="flex items-center justify-between text-sm text-muted">
           <span>Total de botellas</span>
           <span>{totalBotellas}</span>

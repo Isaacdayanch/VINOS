@@ -6,6 +6,7 @@ import {
   calcularFinanzas,
   calcularPedidosSinTipoCambio,
   formatoMXN,
+  totalOrden,
 } from "@/lib/costeo";
 import { AvisoPedidosSinCosto } from "@/components/AvisoPedidosSinCosto";
 import { AvisoPedidosWeb } from "@/components/AvisoPedidosWeb";
@@ -108,7 +109,7 @@ export default async function DashboardPage() {
         <h2 className="font-semibold mb-3">🧾 Últimas órdenes</h2>
         <ul className="flex flex-col gap-2 text-sm">
           {ordenes.slice(0, 5).map((o) => {
-            const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+            const total = totalOrden(o);
             return (
               <li key={o.id} className="flex justify-between">
                 <span>

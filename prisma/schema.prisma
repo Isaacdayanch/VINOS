@@ -216,6 +216,8 @@ model Orden {
   clienteId   String
   estatus     String   @default("Cotización")
   ubicacionId String? // de qué bodega sale toda la orden
+  envioCobrado Float   @default(0) // envío que paga el cliente (entra al total y al recibo)
+  envioCosto   Float? // lo que le costó a Isaac ese envío (gasto en Finanzas); null = sin capturar
   createdAt   DateTime @default(now())
 
   cliente   Cliente      @relation(fields: [clienteId], references: [id])

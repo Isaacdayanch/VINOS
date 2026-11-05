@@ -66,6 +66,7 @@ export default async function EditarOrdenPage({
         fechaInicial={orden.fecha.toISOString().slice(0, 10)}
         ubicaciones={ubicaciones}
         ubicacionIdInicial={orden.ubicacionId}
+        envioCobradoInicial={orden.envioCobrado}
         lineasIniciales={orden.lineas.map((l) => ({
           productoId: l.productoId,
           cantidadBotellas: l.cantidadBotellas,

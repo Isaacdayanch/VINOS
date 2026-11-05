@@ -13,6 +13,41 @@ async function siguienteFolio() {
   });
 }
 
+/** Número de un campo de monto; vacío o inválido = 0. */
+function leerMonto(valor: FormDataEntryValue | null): number {
+  const n = Number(String(valor ?? "").replace(/[^0-9.]/g, ""));
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+/** Envío de una orden: lo cobrado al cliente y lo que costó (vacío = sin capturar). */
+export async function guardarEnvioOrden(ordenId: string, formData: FormData) {
+  const costoTexto = String(formData.get("envioCosto") ?? "").trim();
+  await prisma.orden.update({
+    where: { id: ordenId },
+    data: { envioCobrado: leerMonto(formData.get("envioCobrado")), envioCosto: costoTexto === "" ? null : leerMonto(costoTexto) },
+  });
+  revalidatePath(`/ordenes/${ordenId}`);
+  revalidatePath("/ordenes");
+  revalidatePath("/ordenes/envios");
+  revalidatePath("/finanzas");
+  revalidatePath("/");
+}
+
+/** Reparte en partes iguales lo que costaron los envíos de un día entre las órdenes de ese día. */
+export async function repartirCostoEnviosDia(formData: FormData) {
+  const fecha = String(formData.get("fecha") ?? "");
+  const total = leerMonto(formData.get("total"));
+  const ordenIds = formData.getAll("ordenId").map(String).filter(Boolean);
+  if (!fecha || ordenIds.length === 0) throw new Error("Elige al menos una orden");
+  const porOrden = Math.round((total / ordenIds.length) * 100) / 100;
+  await prisma.$transaction(ordenIds.map((id) => prisma.orden.update({ where: { id }, data: { envioCosto: porOrden } })));
+  revalidatePath("/ordenes/envios");
+  revalidatePath("/ordenes");
+  revalidatePath("/finanzas");
+  for (const id of ordenIds) revalidatePath(`/ordenes/${id}`);
+  redirect(`/ordenes/envios?fecha=${fecha}`);
+}
+
 type LineaForm = {
   productoId: string;
   cantidadBotellas: number;
@@ -27,6 +62,7 @@ export async function crearOrden(formData: FormData) {
   const fecha = String(formData.get("fecha") ?? "");
   const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
   const lineasJson = String(formData.get("lineas") ?? "[]");
+  const envioCobrado = leerMonto(formData.get("envioCobrado"));
 
   if (!clienteId || !fecha || !ubicacionId) {
     throw new Error("Faltan datos de la orden");
@@ -49,6 +85,7 @@ export async function crearOrden(formData: FormData) {
       fecha: new Date(fecha),
       clienteId,
       ubicacionId,
+      envioCobrado,
       estatus: "Surtida - pendiente de pago",
     },
   });
@@ -109,6 +146,7 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
   const fecha = String(formData.get("fecha") ?? "");
   const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
   const lineasJson = String(formData.get("lineas") ?? "[]");
+  const envioCobrado = leerMonto(formData.get("envioCobrado"));
 
   if (!clienteId || !fecha || !ubicacionId) {
     throw new Error("Faltan datos de la orden");
@@ -134,7 +172,7 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
 
   await prisma.orden.update({
     where: { id: ordenId },
-    data: { clienteId, fecha: new Date(fecha), ubicacionId },
+    data: { clienteId, fecha: new Date(fecha), ubicacionId, envioCobrado },
   });
 
   for (const l of lineas) {

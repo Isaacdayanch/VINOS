@@ -211,13 +211,20 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
     `catalog-redesign` incluido: fotos optimizadas, portada con logo grande).
   - **Resend**: Isaac puso `RESEND_API_KEY` en Vercel el 5-nov; se
     reconstruyeron ambas ramas para que la tomara.
-  - **Costo de envío (Isaac dio "va" el 5-nov)**: registrar el
-    costo real de envío. Propuesta: columnas en `Orden` `envioCobrado`
-    (lo que paga el cliente, aparece en recibo y en saldo pendiente) y
-    `envioCosto` (lo que le cobra la empresa de envíos, gasto en Finanzas),
-    más una pantalla "Gasto de envíos del día" que reparte un total entre
-    las órdenes entregadas ese día. Isaac dirá cómo se estructura cuando
-    cierre con la empresa de envíos.
+  - **Costo de envío (Isaac dio "va" el 5-nov; construido en la rama de
+    trabajo, PENDIENTE de que Isaac corra el SQL y luego publicar)**:
+    columnas en `Orden`: `envioCobrado` (lo que paga el cliente; entra al
+    total con `totalOrden()` de `costeo.ts`, al recibo, al saldo pendiente
+    y a "Por cobrar") y `envioCosto` (lo que le costó; gasto que se resta de
+    la ganancia en `calcularFinanzas`, null = sin capturar). SQL en
+    `prisma/migrations/20261105120000_agrega_envio_en_orden/`. Se captura
+    en Nueva orden / Editar (campo "Envío cobrado"), en la sección "🚚
+    Envío" de cada orden (cobrado + costo) y en `/ordenes/envios` ("Envíos
+    del día": total del día repartido en partes iguales entre las órdenes
+    marcadas). Al aceptar un pedido web, `envioCobrado` = envío del pedido.
+    **No publicar a las ramas vivas hasta que las columnas existan en
+    Supabase** (si no, todas las pantallas de órdenes truenan). Isaac dirá
+    cómo se estructura el costo cuando cierre con la empresa de envíos.
   - Pruebas locales: en este sandbox sí hay PostgreSQL 16 instalado
     (`pg_ctlcluster 16 main start`, usuario postgres/postgres, base
     `vinos_dev`); con `prisma db push` + `prisma db seed` + una fila en

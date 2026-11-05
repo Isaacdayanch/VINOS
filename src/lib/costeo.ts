@@ -246,7 +246,9 @@ export type ResumenFinanzas = {
   pagadoDesdeCuenta: number;
   valorInventario: number;
   botellasStock: number;
-  ventasTotales: number;
+  ventasTotales: number; // solo botellas, sin envío
+  enviosCobrados: number; // envío que pagaron los clientes
+  enviosCosto: number; // lo que costaron esos envíos (gasto)
   totalCobrado: number;
   totalPendiente: number;
   gananciaTotal: number;
@@ -319,6 +321,11 @@ export async function calcularPedidosSinTipoCambio(): Promise<PedidoSinCosto[]> 
  * Junta todos los números de Finanzas: inversión, stock, cobros, ganancia,
  * saldo de Caja/Cuenta, y el saldo entre socios (quién le debe a quién).
  */
+/** Total de una orden: botellas (regalos a $0) más el envío cobrado al cliente. */
+export function totalOrden(orden: { envioCobrado?: number | null; lineas: { cantidadBotellas: number; precioUnitario: number }[] }): number {
+  return orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0) + (orden.envioCobrado ?? 0);
+}
+
 export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   const [resumenInventario, socios, pagos, cobros, abonosCliente, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock, lineasConsignacion] =
     await Promise.all([
@@ -345,7 +352,12 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   let costoVentas = 0;
   let regalosBotellas = 0;
   let regalosCosto = 0;
+  // Envíos: lo cobrado al cliente suma a la venta; lo que costó es gasto.
+  let enviosCobrados = 0;
+  let enviosCosto = 0;
   for (const o of ordenes) {
+    enviosCobrados += o.envioCobrado;
+    enviosCosto += o.envioCosto ?? 0;
     for (const l of o.lineas) {
       ventasTotales += l.cantidadBotellas * l.precioUnitario;
       costoVentas += l.cantidadBotellas * l.costoUnitario;
@@ -366,12 +378,12 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   }
   const gananciaConsignacion = ventaConsignacionReconocida - costoConsignacionReconocido;
 
-  const gananciaTotal = ventasTotales - costoVentas + gananciaConsignacion;
+  const gananciaTotal = ventasTotales - costoVentas + gananciaConsignacion + enviosCobrados - enviosCosto;
 
   const totalCobrado =
     cobros.reduce((acc, c) => acc + c.monto, 0) +
     abonosCliente.reduce((acc, a) => acc + a.monto, 0);
-  const totalPendiente = ventasTotales - totalCobrado;
+  const totalPendiente = ventasTotales + enviosCobrados - totalCobrado;
 
   let inversionTotal = 0;
   let totalInyeccionCapital = 0;
@@ -520,6 +532,8 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
     valorInventario,
     botellasStock,
     ventasTotales,
+    enviosCobrados,
+    enviosCosto,
     totalCobrado,
     totalPendiente,
     gananciaTotal,
@@ -875,7 +889,7 @@ export async function calcularEstadoCuentaCliente(clienteId: string) {
   const crudos: Omit<MovimientoEstadoCuenta, "saldo">[] = [];
 
   for (const o of ordenes) {
-    const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+    const total = totalOrden(o);
     crudos.push({
       id: `orden-${o.id}`,
       fecha: o.fecha,
@@ -962,7 +976,7 @@ export async function calcularSaldosOrdenes(clienteId?: string): Promise<Map<str
 
   const saldos = new Map<string, SaldoOrden>();
   for (const o of ordenes) {
-    const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+    const total = totalOrden(o);
     const cobradoDirecto = o.cobros.reduce((acc, c) => acc + c.monto, 0);
     const debeDespuesDeCobros = Math.max(0, total - cobradoDirecto);
     const poolDisponible = poolPorCliente.get(o.clienteId) ?? 0;

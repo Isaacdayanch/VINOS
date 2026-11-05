@@ -50,7 +50,7 @@ export async function confirmarPedidoWeb(pedidoId: string, formData: FormData) {
   const folio = await generarFolioAlAzar("ORD", async (f) => (await prisma.orden.findUnique({ where: { folio: f }, select: { id: true } })) !== null);
   const fecha = new Date();
 
-  const orden = await prisma.orden.create({ data: { folio, fecha, clienteId, ubicacionId, estatus: "Surtida - pendiente de pago" } });
+  const orden = await prisma.orden.create({ data: { folio, fecha, clienteId, ubicacionId, envioCobrado: pedido.envio, estatus: "Surtida - pendiente de pago" } });
   for (const linea of pedido.lineas) {
     const stock = resumen.get(linea.productoId)?.stockActual ?? 0;
     const entregado = stock >= linea.cantidadBotellas; // si no alcanza, queda pendiente de surtir como en una orden normal

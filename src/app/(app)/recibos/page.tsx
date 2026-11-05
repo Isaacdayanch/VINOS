@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatoMXN } from "@/lib/costeo";
+import { formatoMXN, totalOrden } from "@/lib/costeo";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export default async function RecibosPage() {
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {ordenes.map((o) => {
-          const total = o.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+          const total = totalOrden(o);
           return (
             <Link
               key={o.id}

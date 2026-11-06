@@ -173,6 +173,26 @@ export async function duplicarProducto(formData: FormData) {
   redirect(`/productos/${nuevo.id}/editar?duplicado=1`);
 }
 
+// Pausa un producto a mano (ej. le queda 1 pieza que Isaac no quiere vender):
+// se esconde de la Cava pública y el stock ya no lo reactiva solo.
+export async function pausarProducto(formData: FormData) {
+  const productoId = String(formData.get("productoId") ?? "");
+  await prisma.producto.update({ where: { id: productoId }, data: { pausado: true, activo: false } });
+
+  revalidatePath("/productos");
+  revalidatePath("/stock");
+}
+
+// Quita la pausa y regresa a que el stock real decida si está activo.
+export async function reactivarProducto(formData: FormData) {
+  const productoId = String(formData.get("productoId") ?? "");
+  await prisma.producto.update({ where: { id: productoId }, data: { pausado: false } });
+  await sincronizarActivoPorStock(productoId);
+
+  revalidatePath("/productos");
+  revalidatePath("/stock");
+}
+
 // Corrige "activo" de TODOS los productos según su stock real ahora mismo.
 // Sirve para arreglar de un jalón productos que se quedaron mal marcados
 // (por ejemplo, de antes de que crearProducto empezara a corregirlo solo).

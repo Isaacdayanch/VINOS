@@ -67,6 +67,7 @@ model Producto {
   tipo                  TipoProducto @default(VINO)
   categoria             String? // subcategoría: en vinos "Tinto, Reserva..."; en destilados "Arak, Whisky, Tequila..."
   activo                Boolean  @default(true)
+  pausado               Boolean  @default(false) // Isaac lo apagó a mano (ej. le queda 1 pieza que no quiere vender); mientras esté así, el stock ya no lo reactiva solo
   fotoUrl               String?
   stockMinimo           Int?
   precioLista           Float?

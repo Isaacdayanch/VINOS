@@ -169,7 +169,7 @@
 .filters select { width: 100%; min-height: 44px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); font-size: 13px; padding: 8px 24px 8px 0; }
 .filterButton { display: none; min-height: 44px; border: 0; background: none; color: var(--ink); }
 .reset { background: none; border: 0; border-bottom: 1px solid var(--line); font-size: 12px; padding: 12px 0; margin-bottom: 24px; min-height: 44px; color: var(--burgundy); }
-.productGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 48px 28px; }
+.productGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 48px 28px; align-items: start; }
 .card { min-width: 0; }
 .card > a { display: block; }
 .productImage { position: relative; aspect-ratio: 4/5; background: var(--cream); }

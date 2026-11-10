@@ -8,7 +8,6 @@ import type { EditorialWine } from "./editorial-wine";
 // offering rich, ripe and concentrated flavors of juicy plums and black cherries. It is best served with roasted meats, grilled
 // poultry or gourmet cheeses… Open and decant an hour prior to serving at 65°F · Imported by Happy Hearts Wine LLC, Brooklyn NY ·
 // Jerusalem Winery · 9342122 Jerusalem · Israel · Kosher for Passover · Mevushal · Contains sulfites · barcode 8 44510 01312 4".
-// The back photo in the gallery is Gemini's packshot of the bottle with the REAL label from Isaac's photo composited on it.
 export const jerusalemHillsMerlot2023: EditorialWine = {
   slug: "jerusalem-hills-merlot-2023",
   name: "Jerusalem Hills Merlot 2023",
@@ -30,6 +29,8 @@ export const jerusalemHillsMerlot2023: EditorialWine = {
     ["Mevushal", "Sí, mevushal, según etiqueta"],
     ["Kosher", "Kosher para Pésaj, según etiqueta; consulta los sellos originales"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/jerusalem-hills-merlot-2023-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta real, sobre blanco", "El servicio, en una terraza de Jerusalén al atardecer", "Una copa con ciruelas y cerezas sobre piedra de Jerusalén", "Maridaje sugerido: pollo rostizado con hierbas, papas y zanahorias", "Una mesa de Shabat en un patio de Jerusalén"],
+  // No back photo: Isaac decided on 10-nov-2026 that composited back labels look bad; the rear label
+  // is only used as the source of the facts above (photo kept as -label-original.jpeg).
+  photos: ["front", "service", "glass", "pairing", "table"].map(view => `/catalogo/jerusalem-hills-merlot-2023-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, en una terraza de Jerusalén al atardecer", "Una copa con ciruelas y cerezas sobre piedra de Jerusalén", "Maridaje sugerido: pollo rostizado con hierbas, papas y zanahorias", "Una mesa de Shabat en un patio de Jerusalén"],
 };

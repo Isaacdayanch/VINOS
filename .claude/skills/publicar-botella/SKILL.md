@@ -145,15 +145,22 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
 |---|---|---|
 | `front` | botella sobre blanco | recorte de la foto de Isaac |
 | `box` | estuche (destilados) | recorte de la foto de Isaac |
-| `back` | contraetiqueta | foto de SU botella (la de México trae etiqueta en español); nunca IA |
+| ~~`back`~~ | **YA NO VA en la galería (regla de Isaac, 10-nov-2026)** | La foto trasera de Isaac se usa SOLO para transcribir los datos de la ficha; se guarda como `<slug>-label-original.jpeg` y no se publica ninguna versión (ni de Gemini, ni montaje, ni plana): todas se ven mal. Isaac: "se ve pinche, quítalo". |
 | `glass`, `pairing` | destilados: vaso y maridaje | IA (Gemini) |
 | `service`, `glass`, `pairing`, `table` | vinos: servicio, copa, maridaje, mesa | IA (Gemini) |
 
-- Orden en `photos`: destilados `front, box, back, glass, pairing`; vinos
-  `front, back, service, glass, pairing, table` (la galería de vino abre con
+- Orden en `photos`: destilados `front, box, glass, pairing`; vinos
+  `front, service, glass, pairing, table` (la galería de vino abre con
   `table` sola; la de destilado abre sola con `pairing`, luego `glass` y al
   final las de botella/estuche — Isaac quiere que la primera foto sea la
   ambientada). `front` va primero en la lista porque es la foto de la tarjeta.
+  Desde el 10-nov `EditorialWinePage` ordena por el NOMBRE del archivo
+  (`-table`, `-service`, `-glass`, `-pairing`, `-front`, `-back`, `-box`), ya
+  no por posición: quitar o agregar una vista no descompone el orden. Las
+  fichas viejas que aún tienen `back` siguen funcionando; Isaac va a pedir
+  quitarlas botella por botella ("ayúdame a quitar las de atrás de algunos
+  vinos"): borrar la vista de `photos`/`captions`, `git rm` del `.webp` y
+  conservar el `-label-original`.
 - **Vinos con foto de celular (no packshot)**: `recortar_botella.py` solo
   sirve con fondo blanco. Si la foto es sobre mesa/pared (Dalton Matatia,
   27-oct), generar `front`, `back` y `box` con Gemini a partir de la foto
@@ -177,8 +184,7 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   historial del 28-oct.
   Guardar las fotos originales como `<slug>-front-original.jpeg` y
   `<slug>-label-original.jpeg` en `public/catalogo/`.
-- **Método vigente para la contraetiqueta (10-nov-2026, aprobado por Isaac con el
-  Jerusalem Hills Merlot)**: Isaac manda SOLO dos fotos de celular (frente y
+- **(Descartado el mismo 10-nov: Isaac vio la contraetiqueta publicada y pidió quitarla; queda solo como registro de lo que se probó.)** Método de contraetiqueta real sobre botella de Gemini (Jerusalem Hills Merlot): Isaac manda SOLO dos fotos de celular (frente y
   atrás, derechas, buena luz; ya no usa ChatGPT). Gemini redibuja la letra
   chica SIEMPRE, aunque se le pida "píxel por píxel" (6/6 intentos fallaron),
   así que: (1) `packshot` de atrás con Gemini (botella perfecta, texto

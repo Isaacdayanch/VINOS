@@ -30,6 +30,6 @@ export const gvaotPinotNoir2020: EditorialWine = {
     ["Mevushal", "No mevushal, según etiqueta"],
     ["Kosher", "Kosher para Pésaj, según etiqueta; consulta los sellos originales"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/gvaot-pinot-noir-2020-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, con la niebla de la mañana en Samaria", "Una copa a contraluz, con cerezas", "Maridaje sugerido: pato rostizado con cerezas y betabel", "Un picnic en el viñedo al atardecer"],
+  photos: ["front", "service", "glass", "pairing", "table"].map(view => `/catalogo/gvaot-pinot-noir-2020-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, con la niebla de la mañana en Samaria", "Una copa a contraluz, con cerezas", "Maridaje sugerido: pato rostizado con cerezas y betabel", "Un picnic en el viñedo al atardecer"],
 };

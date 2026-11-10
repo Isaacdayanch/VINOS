@@ -991,9 +991,12 @@ export async function calcularSaldosOrdenes(clienteId?: string): Promise<Map<str
  * Activa/desactiva un producto solo, según si tiene botellas en stock ahora
  * mismo. Se llama después de cualquier cambio que mueva su inventario
  * (entradas o salidas) para que "activo" siempre refleje si hay existencia,
- * sin que Isaac tenga que acordarse de tocarlo a mano.
+ * sin que Isaac tenga que acordarse de tocarlo a mano. Si lo pausó a mano,
+ * no lo toca -- el stock ya no lo reactiva mientras siga pausado.
  */
 export async function sincronizarActivoPorStock(productoId: string) {
+  const producto = await prisma.producto.findUnique({ where: { id: productoId }, select: { pausado: true } });
+  if (producto?.pausado) return;
   const resumen = await calcularResumenInventario();
   const stockActual = resumen.get(productoId)?.stockActual ?? 0;
   await prisma.producto.update({

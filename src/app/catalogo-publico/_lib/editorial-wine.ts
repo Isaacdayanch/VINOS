@@ -32,6 +32,6 @@ export function editorialMetadata(wine: EditorialWine): Metadata {
     ...(domain ? { metadataBase: new URL(`https://${domain}`) } : {}),
     title: wine.name,
     description: wine.description,
-    openGraph: { title: wine.name, description: wine.description, type: "website", images: [{ url: wine.photos[5] ?? wine.photos[0], alt: wine.name }] },
+    openGraph: { title: wine.name, description: wine.description, type: "website", images: [{ url: wine.photos.find(photo => photo.endsWith("-table.webp")) ?? wine.photos[0], alt: wine.name }] },
   };
 }

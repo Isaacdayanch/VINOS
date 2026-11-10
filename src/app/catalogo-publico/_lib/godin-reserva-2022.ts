@@ -30,6 +30,6 @@ export const godinReserva2022: EditorialWine = {
     ["Kosher", "Kosher para Pésaj (OU-P), según etiqueta; consulta los sellos originales"],
     ["Denominación", "DOP Douro Garantia · Instituto dos Vinhos do Douro e do Porto, según etiqueta"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/godin-reserva-2022-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, frente a las terrazas del Douro", "Una copa en la bodega de piedra", "Maridaje sugerido: corte de res a las brasas con pimientos asados", "Una mesa en una quinta del Douro"],
+  photos: ["front", "service", "glass", "pairing", "table"].map(view => `/catalogo/godin-reserva-2022-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, frente a las terrazas del Douro", "Una copa en la bodega de piedra", "Maridaje sugerido: corte de res a las brasas con pimientos asados", "Una mesa en una quinta del Douro"],
 };

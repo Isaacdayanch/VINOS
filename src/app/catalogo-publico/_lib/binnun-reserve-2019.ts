@@ -32,6 +32,6 @@ export const binnunReserve2019: EditorialWine = {
     ["Mevushal", "No mevushal, según etiqueta"],
     ["Kosher", "Kosher para Pésaj, según etiqueta; consulta los sellos originales"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/binnun-reserve-2019-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, entre las vides al amanecer", "Una copa al sol de Judea", "Maridaje sugerido: costillas de cordero con hierbas y verduras asadas", "Una mesa de Shabat en las colinas"],
+  photos: ["front", "service", "glass", "pairing", "table"].map(view => `/catalogo/binnun-reserve-2019-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, entre las vides al amanecer", "Una copa al sol de Judea", "Maridaje sugerido: costillas de cordero con hierbas y verduras asadas", "Una mesa de Shabat en las colinas"],
 };

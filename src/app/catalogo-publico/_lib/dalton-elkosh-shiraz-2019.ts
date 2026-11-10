@@ -36,6 +36,6 @@ export const daltonElkoshShiraz2019: EditorialWine = {
     ["Mevushal", "No mevushal, según etiqueta"],
     ["Kosher", "Kosher para Pésaj, según etiqueta; consulta los sellos originales"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table", "box"].map(view => `/catalogo/dalton-elkosh-shiraz-2019-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, en una terraza de piedra de la Alta Galilea", "Una copa sobre piedra caliza, con una amonita", "Maridaje sugerido: arrachera a la parrilla con chimichurri y verduras tatemadas", "Una cena de otoño bajo las luces", "El estuche de Elkosh"],
+  photos: ["front", "service", "glass", "pairing", "table", "box"].map(view => `/catalogo/dalton-elkosh-shiraz-2019-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, en una terraza de piedra de la Alta Galilea", "Una copa sobre piedra caliza, con una amonita", "Maridaje sugerido: arrachera a la parrilla con chimichurri y verduras tatemadas", "Una cena de otoño bajo las luces", "El estuche de Elkosh"],
 };

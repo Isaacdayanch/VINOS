@@ -100,6 +100,15 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   márgenes distintos (Isaac reportó Godin y Gva'ot chicos y Grand Rivallon
   grande). Solo aplica a fotos con las 4 esquinas blancas; las escenas de
   ambiente no se tocan. Ya no hace falta emparejar fotos a mano.
+- **Sin foto de contraetiqueta en las fichas (10-nov-2026)**: Isaac probó la
+  contraetiqueta real montada sobre la botella de Gemini y la descartó ("se
+  ve pinche"). Las fichas nuevas llevan frente + 4 escenas (vinos) o frente +
+  estuche + 2 escenas (destilados). La foto trasera de Isaac solo sirve para
+  transcribir datos. Las fichas viejas con `back` se van quitando conforme
+  él lo pida, botella por botella. Ya sin `back` (10-nov): Jerusalem Hills
+  Merlot, Matatia, Levantina, Family Collection Cabernet y Shiraz, Bin Nun,
+  Godin, Gva'ot Pinot Noir y Elkosh. Las fichas del otro chat (Dādāh, Tanya,
+  Titora, Grand Rivallon) la conservan hasta que Isaac diga.
 - **Fotos de botella sobre crema (regla fija)**: Cava de vinos, Destilados y
   la foto de botella de cada ficha usan fondo crema `#f6f2eb`. Las fotos
   vienen con fondo blanco; el servidor les repinta el blanco en crema

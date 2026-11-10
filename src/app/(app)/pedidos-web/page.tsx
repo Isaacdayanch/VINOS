@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { formatoMXN } from "@/lib/costeo";
+import { RefreshButton } from "@/components/RefreshButton";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -27,9 +28,12 @@ export default async function PedidosWebPage({ searchParams }: PageProps<"/pedid
           <h1 className="text-2xl font-bold text-wine">Pedidos en línea</h1>
           <p className="text-muted text-sm">Lo que tus clientes piden desde lacava18.com</p>
         </div>
-        <Link href="/tienda" className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium whitespace-nowrap hover:bg-wine-light/40">
-          ⚙︎ Tienda en línea
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <RefreshButton className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium whitespace-nowrap hover:bg-wine-light/40" />
+          <Link href="/tienda" className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium whitespace-nowrap hover:bg-wine-light/40">
+            ⚙︎ Tienda en línea
+          </Link>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">

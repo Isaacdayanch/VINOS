@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { corregirActivoTodos, duplicarProducto } from "@/app/(app)/productos/actions";
+import { corregirActivoTodos, duplicarProducto, pausarProducto, reactivarProducto } from "@/app/(app)/productos/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import Link from "next/link";
 
@@ -80,11 +80,24 @@ export default async function ProductosPage({
                 Destilado
               </span>
             )}
-            {!p.activo && (
+            {p.pausado ? (
+              <span className="text-xs text-warn border border-warn/40 rounded px-2 py-0.5 whitespace-nowrap">
+                Pausado
+              </span>
+            ) : !p.activo ? (
               <span className="text-xs text-muted border border-border rounded px-2 py-0.5">
                 Inactivo
               </span>
-            )}
+            ) : null}
+            <form action={p.pausado ? reactivarProducto : pausarProducto}>
+              <input type="hidden" name="productoId" value={p.id} />
+              <SubmitButton
+                className="text-xs text-wine underline whitespace-nowrap"
+                pendingText={p.pausado ? "Reactivando..." : "Pausando..."}
+              >
+                {p.pausado ? "Reactivar" : "Pausar"}
+              </SubmitButton>
+            </form>
             <form action={duplicarProducto}>
               <input type="hidden" name="productoId" value={p.id} />
               <SubmitButton

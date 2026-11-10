@@ -33,6 +33,6 @@ export const daltonLevantina2021: EditorialWine = {
     ["Vegano", "Apto para veganos, según sello de la etiqueta"],
     ["Ilustración de la etiqueta", "Hagar Bareket, según contraetiqueta"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/dalton-levantina-2021-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, en una azotea frente al mar", "Una copa sobre mosaico levantino", "Maridaje sugerido: kofta de cordero con berenjena, tahini y granada", "Una mesa de mezze bajo la parra"],
+  photos: ["front", "service", "glass", "pairing", "table"].map(view => `/catalogo/dalton-levantina-2021-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, en una azotea frente al mar", "Una copa sobre mosaico levantino", "Maridaje sugerido: kofta de cordero con berenjena, tahini y granada", "Una mesa de mezze bajo la parra"],
 };

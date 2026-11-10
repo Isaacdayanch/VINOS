@@ -29,6 +29,6 @@ export const daltonFcCabernet2023: EditorialWine = {
     ["Kosher", "Kosher para Pésaj y lemehadrin (OU-P y Beit Yoseph), según etiqueta; consulta los sellos originales"],
     ["Vegano", "Apto para veganos, según sello de la etiqueta"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/dalton-fc-cabernet-2023-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, en un mirador del bosque", "Una copa junto a la chimenea", "Maridaje sugerido: brisket braseado con verduras asadas", "Una cena de otoño frente al bosque"],
+  photos: ["front", "service", "glass", "pairing", "table"].map(view => `/catalogo/dalton-fc-cabernet-2023-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, en un mirador del bosque", "Una copa junto a la chimenea", "Maridaje sugerido: brisket braseado con verduras asadas", "Una cena de otoño frente al bosque"],
 };

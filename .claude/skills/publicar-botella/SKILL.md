@@ -177,6 +177,22 @@ Todas en `public/catalogo/<slug>-<vista>.webp`, 960×1200.
   historial del 28-oct.
   Guardar las fotos originales como `<slug>-front-original.jpeg` y
   `<slug>-label-original.jpeg` en `public/catalogo/`.
+- **Método vigente para la contraetiqueta (10-nov-2026, aprobado por Isaac con el
+  Jerusalem Hills Merlot)**: Isaac manda SOLO dos fotos de celular (frente y
+  atrás, derechas, buena luz; ya no usa ChatGPT). Gemini redibuja la letra
+  chica SIEMPRE, aunque se le pida "píxel por píxel" (6/6 intentos fallaron),
+  así que: (1) `packshot` de atrás con Gemini (botella perfecta, texto
+  inventado); (2) recortar la etiqueta REAL de la foto de Isaac; aplanar la
+  luz dividiendo por el percentil 90 de brillo por columna y por fila;
+  igualar el papel al de Gemini (≈212,210,206); redimensionar al ancho de la
+  etiqueta de Gemini conservando la proporción real; multiplicar por el
+  perfil de sombreado horizontal de la etiqueta de Gemini; pegar con máscara
+  redondeada (blur 1) tras tapar la etiqueta de Gemini con vidrio; (3) zoom y
+  leer letra por letra. Frente: Gemini suele cambiar solo la línea cursiva
+  → corrección puntual (`fixfront_jhm.py`) y trasplante de esa línea sobre el
+  render que tenga bien el hebreo (los dos renders de Gemini comparten
+  encuadre: offset 0,0 tras escalar a 960×1200). Escena `service`: pedir
+  "UNA SOLA botella, la de referencia sirviendo", si no Gemini pone dos.
 - **Isaac puede hacer el render de la botella en ChatGPT** (28-oct, le
   funciona bien): le manda la foto de la botella entera + la etiqueta de
   cerca con "Haz la imagen profesional, aquí te mando la etiqueta detallada,

@@ -30,6 +30,7 @@ import { gvaotPinotNoir2020 } from "./gvaot-pinot-noir-2020";
 import { daltonElkoshShiraz2019 } from "./dalton-elkosh-shiraz-2019";
 import { daltonFcShiraz2021 } from "./dalton-fc-shiraz-2021";
 import { jerusalemHillsMerlot2023 } from "./jerusalem-hills-merlot-2023";
+import { jerusalemHillsCabernet2023 } from "./jerusalem-hills-cabernet-2023";
 import { titoraSpecial2021 } from "./titora-special-2021";
 import { titoraGrand2021 } from "./titora-grand-2021";
 import { arakElite } from "./arak-elite";
@@ -50,6 +51,7 @@ const profiles: Record<string, EditorialWine> = {
   c6ae375ade5f4e53e85358b08: daltonElkoshShiraz2019,
   c6ae3b04524ebacd19bb68733: daltonFcShiraz2021,
   cmv63yb5l0003jt061y753kmf: jerusalemHillsMerlot2023,
+  cmv63x9640000jt064s24brtr: jerusalemHillsCabernet2023,
   // Spirits (CRM IDs; spirit-profiles.ts also matches them by name as a fallback).
   c6adedb93be91f6dedc8a9b51: macallan12DoubleCask,
   c6ae00d97efe58da5d95dfe23: macallan15DoubleCask,

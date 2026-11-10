@@ -50,6 +50,7 @@ export default async function FinanzasPage() {
         <StatCard label="Por cobrar" value={formatoMXN(finanzas.totalPendiente)} />
         <StatCard label="Cobrado" value={formatoMXN(finanzas.totalCobrado)} />
         <StatCard label="Ganancia" value={formatoMXN(finanzas.gananciaTotal)} />
+        <StatCard label="🚚 Envíos (cobrado − costo)" value={`${formatoMXN(finanzas.enviosCobrados)} − ${formatoMXN(finanzas.enviosCosto)}`} />
         <StatCard label="Botellas en stock" value={finanzas.botellasStock.toString()} />
       </div>
 

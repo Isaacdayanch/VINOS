@@ -1,8 +1,8 @@
-import { crearCobro, marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
+import { crearCobro, guardarEnvioOrden, marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
 import { DateField } from "@/components/DateField";
 import { SubmitButton } from "@/components/SubmitButton";
 import { prisma } from "@/lib/prisma";
-import { calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
+import { calcularSaldosOrdenes, formatoMXN, totalOrden } from "@/lib/costeo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -19,11 +19,12 @@ export default async function DetalleOrdenPage({
       cliente: true,
       cobros: { orderBy: { fecha: "desc" } },
       ubicacion: true,
+      pedidoWeb: true,
     },
   });
   if (!orden) notFound();
 
-  const total = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+  const total = totalOrden(orden);
   const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
   const saldo = (await calcularSaldosOrdenes(orden.clienteId)).get(orden.id);
@@ -72,6 +73,16 @@ export default async function DetalleOrdenPage({
           </div>
         </div>
       </div>
+
+      {orden.pedidoWeb && (
+        <Link href={`/pedidos-web/${orden.pedidoWeb.id}`} className="rounded-lg border border-wine/30 bg-wine-light/40 text-sm px-4 py-3 flex items-center justify-between gap-3">
+          <span>
+            🛒 Viene del pedido en línea <strong>{orden.pedidoWeb.folio}</strong>
+            {orden.pedidoWeb.envio > 0 ? <> · envío a domicilio <strong>{formatoMXN(orden.pedidoWeb.envio)}</strong></> : " · envío gratis"}
+          </span>
+          <span className="underline whitespace-nowrap text-wine">Ver pedido →</span>
+        </Link>
+      )}
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {orden.lineas.map((l) => (
@@ -138,6 +149,12 @@ export default async function DetalleOrdenPage({
           <span>Total de botellas</span>
           <span>{totalBotellas}</span>
         </div>
+        {orden.envioCobrado > 0 && (
+          <div className="flex items-center justify-between text-sm text-muted">
+            <span>Incluye envío</span>
+            <span>{formatoMXN(orden.envioCobrado)}</span>
+          </div>
+        )}
         <div className="flex items-center justify-between text-sm text-muted">
           <span>Cobrado</span>
           <span>{formatoMXN(cobrado)}</span>
@@ -161,6 +178,32 @@ export default async function DetalleOrdenPage({
           </div>
         )}
       </div>
+
+      <details className="rounded-lg border border-border bg-surface" open={orden.envioCobrado > 0 && orden.envioCosto === null}>
+        <summary className="p-4 cursor-pointer text-sm font-medium flex items-center justify-between gap-3">
+          <span>🚚 Envío</span>
+          <span className="text-xs text-muted font-normal">
+            Cobrado {formatoMXN(orden.envioCobrado)} · Costo {orden.envioCosto === null ? "sin capturar" : formatoMXN(orden.envioCosto)}
+          </span>
+        </summary>
+        <form action={guardarEnvioOrden.bind(null, orden.id)} className="p-4 pt-0 flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Cobrado al cliente</span>
+              <input name="envioCobrado" type="number" min="0" step="1" defaultValue={orden.envioCobrado} className="rounded-md border border-border bg-surface px-3 py-2" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm">
+              <span className="font-medium">Lo que te costó</span>
+              <input name="envioCosto" type="number" min="0" step="0.01" defaultValue={orden.envioCosto ?? ""} placeholder="vacío = no sé aún" className="rounded-md border border-border bg-surface px-3 py-2" />
+            </label>
+          </div>
+          <p className="text-xs text-muted">
+            Lo cobrado entra al total y al recibo. Lo que te costó se resta de tu ganancia en Finanzas. Si lo sabes por día y no por pedido, usa{" "}
+            <Link href={`/ordenes/envios?fecha=${new Date(orden.fecha).toISOString().slice(0, 10)}`} className="text-wine underline">Envíos del día</Link>.
+          </p>
+          <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 text-sm font-medium self-start" pendingText="Guardando...">Guardar envío</SubmitButton>
+        </form>
+      </details>
 
       {orden.cobros.length > 0 && (
         <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">

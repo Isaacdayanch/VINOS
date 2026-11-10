@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { corregirActivoTodos } from "@/app/(app)/productos/actions";
+import { corregirActivoTodos, duplicarProducto, pausarProducto, reactivarProducto } from "@/app/(app)/productos/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import Link from "next/link";
 
@@ -55,39 +55,59 @@ export default async function ProductosPage({
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {productos.map((p) => (
-          <Link
-            key={p.id}
-            href={`/productos/${p.id}/editar`}
-            className="p-4 flex items-center gap-3 hover:bg-wine-light/40"
-          >
-            <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
-              {p.fotoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
-              ) : (
-                <span className="text-xl">🍷</span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">
-                {p.nombre} {p.anio ? `(${p.anio})` : ""}
-              </p>
-              <p className="text-xs text-muted">
-                {p.sku} · {p.piezasPorCaja} por caja
-                {p.categoria ? ` · ${p.categoria}` : ""}
-              </p>
-            </div>
+          <div key={p.id} className="p-4 flex items-center gap-3 hover:bg-wine-light/40">
+            <Link href={`/productos/${p.id}/editar`} className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-12 aspect-[2/3] rounded-md bg-surface border border-border overflow-hidden flex items-center justify-center shrink-0 p-1">
+                {p.fotoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.fotoUrl} alt={p.nombre} className="w-full h-full object-contain" />
+                ) : (
+                  <span className="text-xl">🍷</span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">
+                  {p.nombre} {p.anio ? `(${p.anio})` : ""}
+                </p>
+                <p className="text-xs text-muted">
+                  {p.sku} · {p.piezasPorCaja} por caja
+                  {p.categoria ? ` · ${p.categoria}` : ""}
+                </p>
+              </div>
+            </Link>
             {p.tipo === "DESTILADO" && (
               <span className="text-xs text-wine border border-wine/40 rounded px-2 py-0.5 whitespace-nowrap">
                 Destilado
               </span>
             )}
-            {!p.activo && (
+            {p.pausado ? (
+              <span className="text-xs text-warn border border-warn/40 rounded px-2 py-0.5 whitespace-nowrap">
+                Pausado
+              </span>
+            ) : !p.activo ? (
               <span className="text-xs text-muted border border-border rounded px-2 py-0.5">
                 Inactivo
               </span>
-            )}
-          </Link>
+            ) : null}
+            <form action={p.pausado ? reactivarProducto : pausarProducto}>
+              <input type="hidden" name="productoId" value={p.id} />
+              <SubmitButton
+                className="text-xs text-wine underline whitespace-nowrap"
+                pendingText={p.pausado ? "Reactivando..." : "Pausando..."}
+              >
+                {p.pausado ? "Reactivar" : "Pausar"}
+              </SubmitButton>
+            </form>
+            <form action={duplicarProducto}>
+              <input type="hidden" name="productoId" value={p.id} />
+              <SubmitButton
+                className="text-xs text-wine underline whitespace-nowrap"
+                pendingText="Duplicando..."
+              >
+                Duplicar
+              </SubmitButton>
+            </form>
+          </div>
         ))}
         {productos.length === 0 && (
           <p className="p-6 text-center text-muted text-sm">

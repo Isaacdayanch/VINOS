@@ -11,6 +11,9 @@ import { EditorialWinePage } from "../_components/EditorialWinePage";
 import { editorialMetadata } from "../_lib/editorial-wine";
 import { publicPhotograph } from "../_lib/public-photography";
 import type { WinePhoto } from "../_components/WineHero";
+import { AddToCart } from "../_components/AddToCart";
+import { creamPhoto } from "../_lib/cream-photo";
+import { spiritPhoto } from "../_lib/spirit-profiles";
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +32,14 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
   const product = await getPublicWine((await params).id);
   if (!product) notFound();
   const profile = wineProfile(product.id, product.anio, product.nombre, product.tipo);
-  if (profile) return <EditorialWinePage wine={profile} commerce={{ precioLista: product.precioLista, activo: product.activo }} />;
   const spirit = product.tipo === "DESTILADO";
+  const front = publicPhotograph(product.id, product.fotoUrl);
+  // The basket shows the same packshot as the collection card (cream background).
+  const cardPhoto = front ?? spiritPhoto(product.nombre, product.tipo);
+  const commerce = { id: product.id, precioLista: product.precioLista, activo: product.activo, foto: cardPhoto ? creamPhoto(cardPhoto) : null, detalle: [product.categoria, product.anio].filter(Boolean).join(" · ") };
+  if (profile) return <EditorialWinePage wine={profile} commerce={commerce} />;
   const collectionHref = spirit ? "/catalogo-publico/destilados" : "/catalogo-publico/catalogo";
   // Spirits open on their ambient photos, like the wines; the bottle comes after.
-  const front = publicPhotograph(product.id, product.fotoUrl);
   const extras = product.imagenesExtra.map((p) => p.url);
   const photos = (spirit ? [...extras, front] : [front, ...extras]).filter((p): p is string => Boolean(p));
   const details = (spirit
@@ -82,7 +88,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
       eyebrow: tanya ? "TANYA · ISRAEL · 2021" : enosh ? "BY TANYA · ISRAEL · 2018" : dadahBlend ? "CARMELO · ISRAEL · 2023" : [product.categoria, product.anio].filter(Boolean).join(" · "),
       style: tanya ? "Cabernet Sauvignon · Reserve" : dadahBlend ? "Malbec–Barbera" : product.varietal ?? undefined,
       description: product.descripcion,
-      commerce: { precioLista: product.precioLista, activo: product.activo },
+      commerce,
       facts: [...additionalWineFacts(product.id, product.anio), ...details.map(([label, value]) => [String(label), String(value)])],
       photos: [...ambient, ...(front ? [{ url: front, caption: "La botella", ambient: false }] : []), ...rear],
       stories: [["En la copa", product.notas], ["En la mesa", product.maridaje]].flatMap(([title, text]) => text ? [{ title: title!, text }] : []),
@@ -99,7 +105,7 @@ export default async function WinePage({ params }: PageProps<"/catalogo-publico/
           <h1>{product.nombre}</h1>
           {product.region && <p className={styles.region}>{product.region}</p>}
           <p className={styles.winePrice}>{product.precioLista !== null ? new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(product.precioLista) : "Precio por confirmar"}<span>MXN</span></p>
-          <p className={styles.purchaseNote}>{product.activo ? "Los pedidos en línea estarán disponibles próximamente." : "Esta botella no está disponible actualmente."}</p>
+          {product.activo && product.precioLista !== null ? <AddToCart product={{ ...commerce, nombre: product.nombre, precio: product.precioLista }} /> : <p className={styles.purchaseNote}>{product.activo ? "Escríbenos para conocer el precio de esta botella." : "Esta botella no está disponible actualmente."}</p>}
           <dl className={styles.details}>{details.map(([label, value]) => <div key={String(label)}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           <a href="#sobre-el-vino" className={styles.textLink}>{spirit ? "Conoce este destilado " : "Conoce este vino "}</a>
         </div>

@@ -4,6 +4,10 @@ import Link from "next/link";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import styles from "./catalog.module.css";
 import { AgeGate } from "./_components/AgeGate";
+import { Announcement } from "./_components/Announcement";
+import { CartDrawer } from "./_components/CartDrawer";
+import { CartProvider } from "./_lib/cart";
+import { getStorefront } from "./_lib/storefront";
 
 const serif = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500"], variable: "--catalog-serif" });
 const sans = Manrope({ subsets: ["latin"], variable: "--catalog-sans" });
@@ -23,10 +27,16 @@ export const metadata: Metadata = {
   robots: process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF !== "catalog-redesign" ? { index: false, follow: false } : { index: true, follow: true },
 };
 
-export default function CatalogLayout({ children }: { children: React.ReactNode }) {
+export default async function CatalogLayout({ children }: { children: React.ReactNode }) {
+  const { regla, abierto } = await getStorefront();
   return <div className={`${styles.shell} ${serif.variable} ${sans.variable}`}>
     <a className={styles.skip} href="#contenido">Ir al contenido</a>
-    {children}
+    <CartProvider>
+    <Announcement />
+    {/* Positioned wrapper: the home header is absolute and must start below the notice, not the page top. */}
+    <div className={styles.pageBody}>{children}</div>
+    <CartDrawer regla={regla} abierto={abierto} />
+    </CartProvider>
     <AgeGate />
     <footer className={styles.footer}>
       <Link href="/catalogo-publico" className={styles.footerBrand} aria-label="Cava 18, inicio">

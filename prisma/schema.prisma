@@ -67,6 +67,7 @@ model Producto {
   tipo                  TipoProducto @default(VINO)
   categoria             String? // subcategoría: en vinos "Tinto, Reserva..."; en destilados "Arak, Whisky, Tequila..."
   activo                Boolean  @default(true)
+  pausado               Boolean  @default(false) // Isaac lo apagó a mano (ej. le queda 1 pieza que no quiere vender); mientras esté así, el stock ya no lo reactiva solo
   fotoUrl               String?
   stockMinimo           Int?
   precioLista           Float?
@@ -83,6 +84,7 @@ model Producto {
   createdAt             DateTime @default(now())
 
   entradas               EntradaLinea[]
+  pedidosWebLineas       PedidoWebLinea[]
   salidas                Salida[]
   ordenLineas            OrdenLinea[]
   preciosCliente         PrecioClienteProducto[]
@@ -131,6 +133,7 @@ model Cliente {
   preciosProducto PrecioClienteProducto[]
   abonos          AbonoCliente[]
   distribuidores  Distribuidor[]
+  pedidosWeb      PedidoWeb[]
 }
 
 // Pago del cliente a cuenta general, sin ligarlo a una orden específica
@@ -214,12 +217,15 @@ model Orden {
   clienteId   String
   estatus     String   @default("Cotización")
   ubicacionId String? // de qué bodega sale toda la orden
+  envioCobrado Float   @default(0) // envío que paga el cliente (entra al total y al recibo)
+  envioCosto   Float? // lo que le costó a Isaac ese envío (gasto en Finanzas); null = sin capturar
   createdAt   DateTime @default(now())
 
   cliente   Cliente      @relation(fields: [clienteId], references: [id])
   ubicacion Ubicacion?   @relation(fields: [ubicacionId], references: [id])
   lineas    OrdenLinea[]
   cobros    Cobro[]
+  pedidoWeb PedidoWeb?
 }
 
 model OrdenLinea {
@@ -353,4 +359,73 @@ model CobroConsignacion {
   notas              String?
 
   notaConsignacion NotaConsignacion @relation(fields: [notaConsignacionId], references: [id])
+}
+
+// ---------- Pedidos en línea (carrito de lacava18.com) ----------
+
+// Zona de entrega: a qué códigos postales se entrega y cuánto cuesta el envío.
+model ZonaEntrega {
+  id                  String   @id @default(cuid())
+  nombre              String
+  codigosPostales     String // inicios de CP separados por coma, ej. "01,02,03"
+  costoEnvio          Float    @default(80)
+  botellasEnvioGratis Int? // a partir de cuántas botellas el envío sale gratis (null = nunca)
+  activa              Boolean  @default(true)
+  temporal            Boolean  @default(false) // solo se prende en fechas festivas (Cuernavaca, Acapulco)
+  nota                String?
+  orden               Int      @default(0)
+  createdAt           DateTime @default(now())
+
+  pedidos PedidoWeb[]
+}
+
+// Pedido tal como lo levantó el cliente en la página. Al aceptarse se convierte en una Orden normal.
+model PedidoWeb {
+  id            String    @id @default(cuid())
+  folio         String    @unique // ej. W-0001
+  fecha         DateTime  @default(now())
+  estatus       String    @default("Nuevo") // Nuevo / Confirmado / Entregado / Cancelado
+  nombre        String
+  telefono      String
+  email         String?
+  calle         String // calle y número
+  colonia       String?
+  codigoPostal  String
+  ciudad        String? // alcaldía / municipio
+  referencias   String?
+  notas         String?
+  zonaId        String?
+  botellas      Int
+  subtotal      Float
+  envio         Float     @default(0)
+  total         Float
+  avisoWhatsApp DateTime? // cuándo se mandó el aviso al grupo
+  avisoError    String?
+  clienteId     String?
+  ordenId       String?   @unique
+  createdAt     DateTime  @default(now())
+
+  zona    ZonaEntrega?     @relation(fields: [zonaId], references: [id])
+  cliente Cliente?         @relation(fields: [clienteId], references: [id])
+  orden   Orden?           @relation(fields: [ordenId], references: [id])
+  lineas  PedidoWebLinea[]
+}
+
+model PedidoWebLinea {
+  id               String @id @default(cuid())
+  pedidoWebId      String
+  productoId       String
+  nombreProducto   String // nombre al momento de pedir
+  cantidadBotellas Int
+  precioUnitario   Float
+
+  pedido   PedidoWeb @relation(fields: [pedidoWebId], references: [id], onDelete: Cascade)
+  producto Producto  @relation(fields: [productoId], references: [id])
+}
+
+// Ajustes de la tienda en línea (llave → valor): grupo de WhatsApp, tienda abierta/cerrada, etc.
+model ConfiguracionTienda {
+  clave     String   @id
+  valor     String
+  updatedAt DateTime @default(now()) @updatedAt
 }

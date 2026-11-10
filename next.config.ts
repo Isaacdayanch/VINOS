@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // El PDF del pedido lleva el logo; Vercel no empaca /public en las funciones si no se le dice.
+  outputFileTracingIncludes: { "/**": ["./public/catalogo/logo-cava18-completo.png"] },
   experimental: {
     serverActions: {
       // Por default Next solo deja subir 1MB por foto en los formularios —
@@ -9,6 +11,15 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Local images next/image may optimize. The cream bottle photos come from a
+    // route with a query string (?src=…), which Next only optimizes when listed here.
+    localPatterns: [
+      { pathname: "/catalogo/**" },
+      { pathname: "/catalogo-publico/foto-crema" },
+      { pathname: "/uploads/**" },
+    ],
+    // Resized copies are kept for 31 days, across deployments.
+    minimumCacheTTL: 2678400,
     remotePatterns: [
       {
         protocol: "https",

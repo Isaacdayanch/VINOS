@@ -6,7 +6,8 @@ import Link from "next/link";
 import type { ProductKind, PublicWine } from "../_lib/catalog";
 import { BUDGETS, FACETS_BY_KIND, filterCollection, shelfList, type FacetKey } from "../_lib/collection-filters";
 import styles from "../catalog.module.css";
-import { OrderNotice } from "./OrderNotice";
+import { AddToCartCompact } from "./AddToCart";
+import { useCart } from "../_lib/cart";
 import { publicPhotograph } from "../_lib/public-photography";
 import { spiritPhoto } from "../_lib/spirit-profiles";
 import { creamPhoto } from "../_lib/cream-photo";
@@ -91,7 +92,7 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
   return <section id="seleccion" className={styles.collection} aria-labelledby="selection-heading">
     <div className={styles.shopIntro}>
       <h1 id="selection-heading">{copy.title}</h1>
-      <div className={styles.shopIntroAside}><p>{copy.lead}</p><OrderNotice /></div>
+      <div className={styles.shopIntroAside}><p>{copy.lead}</p><OrderPill /></div>
     </div>
     <div className={styles.shelfTop}>
       <div className={styles.shelves} role="group" aria-label={copy.railLabel}>
@@ -120,7 +121,7 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
     </div>}
     <div className={styles.resultSummary}><p role="status" aria-live="polite">{count(filtered.length)}{active ? " en tu selección" : " por descubrir"}</p><span>Precios en MXN</span></div>
     <div className={styles.productGrid}>
-      {filtered.map((wine, index) => <WineCard wine={wine} key={wine.id ?? `${wine.nombre}-${index}`} />)}
+      {filtered.map((wine, index) => <WineCard wine={wine} first={index < 4} key={wine.id ?? `${wine.nombre}-${index}`} />)}
     </div>
     {!filtered.length && <div className={styles.empty}><h2>{wines.length ? copy.emptyTitle : copy.noneTitle}</h2><p>{wines.length ? copy.emptyHint : copy.noneHint}</p>{active && <button type="button" className={styles.darkPill} onClick={() => { reset(); searchInput.current?.focus(); }}>Ver {copy.all.toLowerCase()}</button>}</div>}
     <div className={styles.publication}><p>{date ? `Selección publicada el ${date}.` : copy.publication}</p><button type="button" onClick={() => window.print()}>Imprimir selección</button></div>
@@ -138,15 +139,29 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
   </section>;
 }
 
-function WineCard({ wine }: { wine: PublicWine }) {
+/** "Haz tu pedido aquí" at the top of the cava: opens the basket. */
+function OrderPill() {
+  const { bottles, ready, setOpen } = useCart();
+  return <button type="button" className={styles.orderPill} onClick={() => setOpen(true)}>
+    <span>{ready && bottles ? "Ver mi pedido" : "Haz tu pedido aquí"}</span>
+    <span className={styles.orderSoon}>{ready && bottles ? `${bottles} botella${bottles === 1 ? "" : "s"}` : "Entrega a domicilio"}</span>
+  </button>;
+}
+
+function WineCard({ wine, first }: { wine: PublicWine; first: boolean }) {
   const photo = publicPhotograph(wine.id, wine.fotoUrl) ?? spiritPhoto(wine.nombre, wine.tipo);
   const agotado = wine.activo === false;
+  const detalle = [wine.categoria, wine.anio].filter(Boolean).join(" · ");
+  const comprable = Boolean(wine.id) && !agotado && wine.precioLista !== null;
   const content = <>
     <div className={styles.productImage}>
-      {photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill unoptimized className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}
+      {photo ? <Image src={creamPhoto(photo)} alt={`${wine.nombre}${wine.anio ? `, ${wine.anio}` : ""}`} fill preload={first} sizes="(max-width: 700px) 46vw, 30vw" className={styles.bottleImage} /> : <span className={styles.noImage}>Fotografía próximamente</span>}
       {agotado && <span className={styles.agotadoBadge}>Muy pronto en tu mesa</span>}
     </div>
     <div className={styles.cardDetails}><p className={styles.eyebrow}>{[wine.categoria, wine.anio].filter(Boolean).join(" · ")}</p><h2>{wine.nombre}</h2>{wine.region && <p className={styles.cardRegion}>{wine.region}</p>}<p className={styles.cardPrice}>{wine.precioLista !== null ? money.format(wine.precioLista) : "Precio por confirmar"}</p></div>
   </>;
-  return <article className={styles.card}>{wine.id ? <Link href={`/catalogo-publico/${wine.id}`} prefetch={false}>{content}</Link> : <div>{content}</div>}</article>;
+  return <article className={styles.card}>
+    {wine.id ? <Link href={`/catalogo-publico/${wine.id}`} prefetch={false}>{content}</Link> : <div>{content}</div>}
+    {comprable && <div className={styles.cardAction}><AddToCartCompact product={{ id: wine.id!, nombre: wine.nombre, precio: wine.precioLista, foto: photo ? creamPhoto(photo) : null, detalle }} /></div>}
+  </article>;
 }

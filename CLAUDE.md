@@ -150,11 +150,86 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   `logo-cava18-original.jpg`. **Ojo**: en el dominio público el middleware solo
   sirve archivos de `/catalogo/`; cualquier imagen o archivo público nuevo para
   la página va en `public/catalogo/` o sale roto.
-- **Pedidos en línea**: el botón "Haz tu pedido aquí · Próximamente" se
-  queda tal cual para el público. Isaac quiere armar carrito + pedidos,
-  pero NO le convenció la primera propuesta de logística (pedido web →
-  WhatsApp prellenado → correo → convertir a Orden). Hay que re-proponerla
-  con él antes de construir nada.
+- **Pedidos en línea (carrito)** — se trabaja en el chat/rama
+  `claude/carrito-proceso-compra-evt0qp`. El botón "Haz tu pedido aquí ·
+  Próximamente" sigue tal cual para el público hasta que el carrito esté
+  listo. NO le convenció la primera propuesta (pedido web → WhatsApp
+  prellenado → correo → convertir a Orden). Reglas acordadas el 5-nov-2026:
+  envío **$60 MXN, gratis con 3 botellas o más** (pendiente confirmar si
+  "3" entra en gratis). Zonas: CDMX (CP 01–16, incluye Polanco) y zona
+  metropolitana Edo. Méx. (CP 50–57, incluye Tecamachalco, Bosques,
+  Interlomas); Cuernavaca (CP 62) y Acapulco (CP 39) solo en fechas
+  festivas (zonas `temporal`, apagadas por default). Los pedidos caen en el
+  CRM (tabla `PedidoWeb` + `PedidoWebLinea`, zonas en `ZonaEntrega`, ajustes
+  en `ConfiguracionTienda`; SQL en
+  `prisma/migrations/20261105000000_agrega_pedidos_web/`, **ya corrido en
+  Supabase el 5-nov** con envío actualizado a 80).
+  **Construido el 5-nov-2026 (rama de trabajo, pendiente "va" de Isaac para
+  publicar en `catalog-redesign` + `claude/wine-crm-setup-13v2ux`)**:
+  - Página: botón "Agregar" en cada tarjeta y en la ficha, bolsa en el
+    encabezado, cajón "Mi pedido" (`_lib/cart.tsx`, guardado en el
+    navegador), `/catalogo-publico/pedido` (datos + CP → cotiza zona/envío
+    con `cotizarEnvio` de `src/lib/tienda.ts`) y `/pedido/gracias`. El
+    servidor re-precia todo desde `CatalogoPublicado` (nunca confía en el
+    precio del navegador). Sin pago en línea: se confirma por WhatsApp.
+  - Anuncio elegante arriba del logo (`Announcement.tsx`), con título, texto
+    y fecha "hasta"; se oculta solo al pasar la fecha (hora de CDMX).
+  - CRM: menú "Pedidos en línea" (`/pedidos-web`, detalle con botones
+    WhatsApp al cliente y "Compartir al grupo" con el texto listo, y
+    "Aceptar y crear orden" → crea/liga Cliente por teléfono, crea Orden +
+    Salidas igual que una venta normal; el envío NO entra a la Orden, solo
+    se muestra como aviso en la orden) y "Tienda en línea" (`/tienda`:
+    pedidos abiertos/cerrados, anuncio, zonas con costo/gratis-desde/activa,
+    teléfonos a los que avisar). Aviso en Dashboard y en Órdenes cuando hay
+    pedidos nuevos.
+  - WhatsApp: Isaac NO quiere chip ni número propio; prefiere **Twilio**
+    pagando por uso. Twilio no manda a grupos: el aviso se manda a cada
+    teléfono de la lista (`src/lib/whatsapp.ts`, variables
+    `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`,
+    opcional `TWILIO_CONTENT_SID` para la plantilla aprobada, y `URL_CRM`
+    para el link al pedido). Mientras no estén puestas, el pedido se guarda
+    igual y queda el botón "Compartir al grupo de logística". Pendiente:
+    guiar a Isaac para crear la cuenta de Twilio y el remitente de WhatsApp
+    (requiere cuenta de Meta Business verificada).
+  - **Correo "Vendiste" con PDF (5-nov, pedido explícito de Isaac para
+    empezar sin WhatsApp)**: cada pedido web manda un correo por **Resend**
+    (`src/lib/correo.ts`, API REST con `fetch`; variable `RESEND_API_KEY`
+    en Vercel, Production y Preview; opcional `CORREO_REMITENTE`, default
+    `Cava 18 <onboarding@resend.dev>` que en el plan gratis solo puede
+    mandar al correo dueño de la cuenta de Resend) con el PDF del pedido
+    adjunto (`src/lib/pedido-pdf.ts`, hecho con `pdf-lib`, logo de
+    `public/catalogo/logo-cava18-completo.png` incluido en las funciones
+    por `outputFileTracingIncludes`). Destinatarios en CRM → Tienda en
+    línea (`correo.destinatarios`; ya quedó `isaacdayanch@gmail.com` en
+    producción). El PDF se puede ver en `/pedidos-web/[id]/pdf`. El estado
+    de ambos avisos (WhatsApp y correo) se guarda en `PedidoWeb.avisoError`
+    como texto de dos renglones. Desde este sandbox `api.resend.com` sí
+    responde (dio 401 con llave falsa), así que se puede probar con llave
+    real si Isaac la pone como secreto de red.
+  - **Publicado el 5-nov-2026** en `catalog-redesign` y
+    `claude/wine-crm-setup-13v2ux` con "va" de Isaac (merge de
+    `catalog-redesign` incluido: fotos optimizadas, portada con logo grande).
+  - **Resend**: Isaac puso `RESEND_API_KEY` en Vercel el 5-nov; se
+    reconstruyeron ambas ramas para que la tomara.
+  - **Costo de envío (Isaac dio "va" el 5-nov; SQL corrido por Isaac y
+    publicado en ambas ramas el mismo día)**:
+    columnas en `Orden`: `envioCobrado` (lo que paga el cliente; entra al
+    total con `totalOrden()` de `costeo.ts`, al recibo, al saldo pendiente
+    y a "Por cobrar") y `envioCosto` (lo que le costó; gasto que se resta de
+    la ganancia en `calcularFinanzas`, null = sin capturar). SQL en
+    `prisma/migrations/20261105120000_agrega_envio_en_orden/`. Se captura
+    en Nueva orden / Editar (campo "Envío cobrado"), en la sección "🚚
+    Envío" de cada orden (cobrado + costo) y en `/ordenes/envios` ("Envíos
+    del día": total del día repartido en partes iguales entre las órdenes
+    marcadas). Al aceptar un pedido web, `envioCobrado` = envío del pedido.
+    Las columnas ya existen en Supabase (verificado por REST). Isaac dirá
+    cómo se estructura el costo cuando cierre con la empresa de envíos.
+  - Pruebas locales: en este sandbox sí hay PostgreSQL 16 instalado
+    (`pg_ctlcluster 16 main start`, usuario postgres/postgres, base
+    `vinos_dev`); con `prisma db push` + `prisma db seed` + una fila en
+    `CatalogoPublicado` se puede correr `npm run dev` y probar en navegador
+    con Playwright. Hay que crear a mano una `Ubicacion` para poder aceptar
+    pedidos.
 
 ## Datos reales importados
 
@@ -289,7 +364,7 @@ Vercel `DOMINIO_CATALOGO_PUBLICO` existe solo para **Preview / catalog-redesign*
 estar en **Production y Preview** (si no, las URLs de preview muestran el CRM
 abierto; Isaac la puso en ambos el 3-nov). Vercel Authentication (Deployment Protection) bloqueaba
 lacava18.com con "Log in to Vercel"; hay que tenerla apagada.
-Opción futura: `admin.lacava18.com` para el CRM.
+**`admin.lacava18.com`** (Production) ya abre el CRM con clave (5-nov-2026). Fotos del catálogo: pasan por `next/image` (localPatterns en `next.config.ts`); tras publicar, precalentar las URLs `/_next/image` de /catalogo, /destilados y la portada para que carguen rápido.
 **4-nov-2026**: Vercel pausó TODO el proyecto (402 DEPLOYMENT_DISABLED) por pasar
 el límite del plan Hobby; Isaac subió el equipo Daymart a **Pro**. Para no
 gastar de más, `vercel.json` (`ignoreCommand`) solo construye `catalog-redesign`

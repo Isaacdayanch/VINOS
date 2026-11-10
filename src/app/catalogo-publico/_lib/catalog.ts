@@ -1,6 +1,8 @@
 import "server-only";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { publicPhotograph } from "./public-photography";
+import { spiritPhoto } from "./spirit-profiles";
 
 export type ProductKind = "VINO" | "DESTILADO";
 
@@ -60,9 +62,14 @@ const getShopProducts = cache(async () => {
   })) };
 });
 
+// Isaac (5-nov-2026): a bottle with no stock (inactive) and no photo is hidden from the page;
+// sold-out bottles with a photo stay at the bottom as "Muy pronto en tu mesa".
+// It comes back by itself as soon as it gets a photo or stock.
+const hasPhoto = (wine: PublicWine) => Boolean(publicPhotograph(wine.id, wine.fotoUrl) ?? spiritPhoto(wine.nombre, wine.tipo));
+
 export const getShopCollection = cache(async (kind: ProductKind) => {
   const { date, wines } = await getShopProducts();
-  return { date, wines: wines.filter(wine => wine.tipo === kind) };
+  return { date, wines: wines.filter(wine => wine.tipo === kind && (wine.activo !== false || hasPhoto(wine))) };
 });
 
 export const getPublicWine = cache(async (id: string) => {

@@ -31,11 +31,12 @@ export default async function ReciboOrdenPage({
   });
   if (!orden) notFound();
 
-  const total = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+  const totalBotellasMxn = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0);
+  const total = totalBotellasMxn + orden.envioCobrado;
   const totalSinRegalos = orden.lineas.reduce(
     (acc, l) => acc + l.cantidadBotellas * (l.esRegalo ? (l.producto.precioLista ?? 0) : l.precioUnitario),
     0,
-  );
+  ) + orden.envioCobrado;
   const descuentoRegalos = totalSinRegalos - total;
   const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
@@ -135,6 +136,18 @@ export default async function ReciboOrdenPage({
             cabe entero en la primera — nunca se corta a la mitad. */}
         <div className="print-no-break">
           <div className="flex flex-col gap-0.5 items-end">
+            {orden.envioCobrado > 0 && (
+              <>
+                <div className="flex justify-between w-44">
+                  <span className="text-muted">Botellas</span>
+                  <span>{formatoMXN(totalBotellasMxn)}</span>
+                </div>
+                <div className="flex justify-between w-44">
+                  <span className="text-muted">Envío a domicilio</span>
+                  <span>{formatoMXN(orden.envioCobrado)}</span>
+                </div>
+              </>
+            )}
             {descuentoRegalos > 0.5 ? (
               <>
                 <div className="flex justify-between w-44">

@@ -30,6 +30,6 @@ export const daltonFcShiraz2021: EditorialWine = {
     ["Kosher", "Kosher para Pésaj y lemehadrin (OU-P y Beit Yoseph), según etiqueta; consulta los sellos originales"],
     ["Vegano", "Apto para veganos, según sello de la etiqueta"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table"].map(view => `/catalogo/dalton-fc-shiraz-2021-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, en una pradera de la Galilea al atardecer", "Una copa en la ventana de una casa de campo", "Maridaje sugerido: pierna de cordero rostizada con romero y verduras", "Una sobremesa de campo con pan, dátiles e higos"],
+  photos: ["front", "service", "glass", "pairing", "table"].map(view => `/catalogo/dalton-fc-shiraz-2021-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, en una pradera de la Galilea al atardecer", "Una copa en la ventana de una casa de campo", "Maridaje sugerido: pierna de cordero rostizada con romero y verduras", "Una sobremesa de campo con pan, dátiles e higos"],
 };

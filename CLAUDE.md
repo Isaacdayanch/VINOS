@@ -105,7 +105,10 @@ Menú de tres rayitas (☰) arriba, con estas secciones:
   ve pinche"). Las fichas nuevas llevan frente + 4 escenas (vinos) o frente +
   estuche + 2 escenas (destilados). La foto trasera de Isaac solo sirve para
   transcribir datos. Las fichas viejas con `back` se van quitando conforme
-  él lo pida, botella por botella (ya quitado: Jerusalem Hills Merlot).
+  él lo pida, botella por botella. Ya sin `back` (10-nov): Jerusalem Hills
+  Merlot, Matatia, Levantina, Family Collection Cabernet y Shiraz, Bin Nun,
+  Godin, Gva'ot Pinot Noir y Elkosh. Las fichas del otro chat (Dādāh, Tanya,
+  Titora, Grand Rivallon) la conservan hasta que Isaac diga.
 - **Fotos de botella sobre crema (regla fija)**: Cava de vinos, Destilados y
   la foto de botella de cada ficha usan fondo crema `#f6f2eb`. Las fotos
   vienen con fondo blanco; el servidor les repinta el blanco en crema

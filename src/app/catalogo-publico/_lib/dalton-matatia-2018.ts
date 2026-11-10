@@ -35,6 +35,6 @@ export const daltonMatatia2018: EditorialWine = {
     ["Vegano", "Apto para veganos, según sello de la etiqueta"],
     ["Presentación", "Estuche rígido negro y dorado"],
   ],
-  photos: ["front", "back", "service", "glass", "pairing", "table", "box"].map(view => `/catalogo/dalton-matatia-2018-${view}.webp`),
-  captions: ["La botella, sobre blanco", "La contraetiqueta, sobre blanco", "El servicio, en una terraza de la Galilea", "Una copa a la luz del atardecer", "Maridaje sugerido: rib eye a la parrilla con papas y cebolla asadas", "Una mesa para compartir entre olivos", "El estuche de Matatia"],
+  photos: ["front", "service", "glass", "pairing", "table", "box"].map(view => `/catalogo/dalton-matatia-2018-${view}.webp`),
+  captions: ["La botella, sobre blanco", "El servicio, en una terraza de la Galilea", "Una copa a la luz del atardecer", "Maridaje sugerido: rib eye a la parrilla con papas y cebolla asadas", "Una mesa para compartir entre olivos", "El estuche de Matatia"],
 };

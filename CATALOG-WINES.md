@@ -1,6 +1,7 @@
 # Registro de vinos y protocolo editorial
 
 Este archivo es el seguimiento compartido entre Isaac, Codex y Claude Code.
+**10-nov-2026**: por decisión de Isaac ya no se publica foto de contraetiqueta (`back`). Se quitó de Jerusalem Hills Merlot, Matatia, Levantina, FC Cabernet, FC Shiraz, Bin Nun, Godin, Gva'ot Pinot Noir y Elkosh; las demás fichas la conservan hasta que él lo pida.
 Proceso completo de la foto al CRM y a la página (también destilados): `.claude/skills/publicar-botella/SKILL.md`.
 No considerar un vino terminado hasta abrir su URL en Preview, comprobar sus imágenes y entregar el enlace a Isaac.
 

@@ -35,6 +35,7 @@ import { jerusalemHillsCabernetShiraz2023 } from "./jerusalem-hills-cabernet-shi
 import { jerusalemHillsSilverBlend2023 } from "./jerusalem-hills-silver-blend-2023";
 import { jerusalemHillsReserve2023 } from "./jerusalem-hills-reserve-2023";
 import { jerusalemHillsMuscat2023 } from "./jerusalem-hills-muscat-2023";
+import { noahMerlot2023 } from "./noah-merlot-2023";
 import { titoraSpecial2021 } from "./titora-special-2021";
 import { titoraGrand2021 } from "./titora-grand-2021";
 import { arakElite } from "./arak-elite";
@@ -60,6 +61,7 @@ const profiles: Record<string, EditorialWine> = {
   cmv64068v0000jp06c2j7yfo9: jerusalemHillsSilverBlend2023,
   cmv6410a60008jt06rliby66y: jerusalemHillsReserve2023,
   cmw9y22kv0000l9072nt5hgsb: jerusalemHillsMuscat2023,
+  cmv631eh90001jz06avnqchje: noahMerlot2023,
   // Spirits (CRM IDs; spirit-profiles.ts also matches them by name as a fallback).
   c6adedb93be91f6dedc8a9b51: macallan12DoubleCask,
   c6ae00d97efe58da5d95dfe23: macallan15DoubleCask,

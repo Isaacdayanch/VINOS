@@ -1,4 +1,4 @@
-import { crearCobro, guardarEnvioOrden, marcarLineaEntregada } from "@/app/(app)/ordenes/actions";
+import { cancelarOrden, crearCobro, guardarEnvioOrden, marcarLineaEntregada, reactivarOrden } from "@/app/(app)/ordenes/actions";
 import { DateField } from "@/components/DateField";
 import { SubmitButton } from "@/components/SubmitButton";
 import { prisma } from "@/lib/prisma";
@@ -24,6 +24,7 @@ export default async function DetalleOrdenPage({
   });
   if (!orden) notFound();
 
+  const cancelada = orden.estatus === "Cancelada";
   const total = totalOrden(orden);
   const totalBotellas = orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas, 0);
   const cobrado = orden.cobros.reduce((acc, c) => acc + c.monto, 0);
@@ -48,16 +49,18 @@ export default async function DetalleOrdenPage({
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <p className="text-muted text-sm">
             {orden.cliente.nombre.replace("Cliente Especial - ", "")} ·{" "}
-            {pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
+            {cancelada ? "Cancelada" : pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
             {orden.ubicacion ? ` · ${orden.ubicacion.nombre}` : ""}
           </p>
           <div className="flex flex-wrap gap-3">
-            <Link
-              href={`/ordenes/${orden.id}/editar`}
-              className="text-sm text-wine underline whitespace-nowrap"
-            >
-              Editar
-            </Link>
+            {!cancelada && (
+              <Link
+                href={`/ordenes/${orden.id}/editar`}
+                className="text-sm text-wine underline whitespace-nowrap"
+              >
+                Editar
+              </Link>
+            )}
             <Link
               href={`/ordenes/${orden.id}/replicar`}
               className="text-sm text-wine underline whitespace-nowrap"
@@ -70,9 +73,23 @@ export default async function DetalleOrdenPage({
             >
               Ver recibo
             </Link>
+            <form action={cancelada ? reactivarOrden.bind(null, orden.id) : cancelarOrden.bind(null, orden.id)}>
+              <SubmitButton
+                className={`text-sm underline whitespace-nowrap ${cancelada ? "text-wine" : "text-warn"}`}
+                pendingText={cancelada ? "Reactivando..." : "Cancelando..."}
+              >
+                {cancelada ? "Reactivar orden" : "Cancelar orden"}
+              </SubmitButton>
+            </form>
           </div>
         </div>
       </div>
+
+      {cancelada && (
+        <div className="rounded-lg border border-border bg-surface px-4 py-3 text-sm text-muted">
+          🚫 Esta orden está cancelada: no cuenta como venta, ganancia ni pendiente de cobro. Sus botellas y movimientos de inventario se dejaron tal cual estaban.
+        </div>
+      )}
 
       {orden.pedidoWeb && (
         <Link href={`/pedidos-web/${orden.pedidoWeb.id}`} className="rounded-lg border border-wine/30 bg-wine-light/40 text-sm px-4 py-3 flex items-center justify-between gap-3">
@@ -125,7 +142,7 @@ export default async function DetalleOrdenPage({
               <span className="font-semibold whitespace-nowrap">
                 {l.esRegalo ? "Sin costo" : formatoMXN(l.cantidadBotellas * l.precioUnitario)}
               </span>
-              {!l.entregado && (
+              {!l.entregado && !cancelada && (
                 <form action={marcarLineaEntregada.bind(null, l.id, orden.id)}>
                   <SubmitButton
                     className="rounded-md bg-wine text-white px-2.5 py-1 text-xs font-medium whitespace-nowrap hover:bg-wine-dark transition-colors"
@@ -223,7 +240,7 @@ export default async function DetalleOrdenPage({
         </div>
       )}
 
-      {pendiente > 0 && (
+      {!cancelada && pendiente > 0 && (
         <details className="rounded-lg border border-border bg-surface">
           <summary className="p-4 cursor-pointer text-sm font-medium">
             + Registrar cobro

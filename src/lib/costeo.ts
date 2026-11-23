@@ -356,6 +356,9 @@ export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   let enviosCobrados = 0;
   let enviosCosto = 0;
   for (const o of ordenes) {
+    // Una orden cancelada no cuenta como venta, costo, ganancia ni envío --
+    // sus botellas y movimientos de stock se dejan tal cual (ver Salida).
+    if (o.estatus === "Cancelada") continue;
     enviosCobrados += o.envioCobrado;
     enviosCosto += o.envioCosto ?? 0;
     for (const l of o.lineas) {
@@ -889,11 +892,12 @@ export async function calcularEstadoCuentaCliente(clienteId: string) {
   const crudos: Omit<MovimientoEstadoCuenta, "saldo">[] = [];
 
   for (const o of ordenes) {
-    const total = totalOrden(o);
+    const cancelada = o.estatus === "Cancelada";
+    const total = cancelada ? 0 : totalOrden(o);
     crudos.push({
       id: `orden-${o.id}`,
       fecha: o.fecha,
-      concepto: `Orden ${o.folio}`,
+      concepto: `Orden ${o.folio}${cancelada ? " (Cancelada)" : ""}`,
       cargo: total,
       abono: 0,
       ordenId: o.id,
@@ -976,7 +980,7 @@ export async function calcularSaldosOrdenes(clienteId?: string): Promise<Map<str
 
   const saldos = new Map<string, SaldoOrden>();
   for (const o of ordenes) {
-    const total = totalOrden(o);
+    const total = o.estatus === "Cancelada" ? 0 : totalOrden(o);
     const cobradoDirecto = o.cobros.reduce((acc, c) => acc + c.monto, 0);
     const debeDespuesDeCobros = Math.max(0, total - cobradoDirecto);
     const poolDisponible = poolPorCliente.get(o.clienteId) ?? 0;

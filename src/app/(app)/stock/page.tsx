@@ -88,8 +88,11 @@ export default async function StockPage({ searchParams }: PageProps<"/stock">) {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/stock/ubicaciones" className="text-xs text-wine underline whitespace-nowrap">
-            Editar ubicaciones
+          <Link
+            href="/stock/ubicaciones"
+            className="rounded-full bg-wine text-white text-xs font-medium px-3 py-2 whitespace-nowrap"
+          >
+            Ubicaciones →
           </Link>
         </div>
       </div>

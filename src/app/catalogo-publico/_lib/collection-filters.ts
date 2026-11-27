@@ -56,6 +56,7 @@ export const GRAPES = [
   { label: "Tinta Roriz", match: /tinta\s*roriz|tempranillo/ },
   { label: "Pinot Noir", match: /pinot\s*noir/ },
   { label: "Chenin Blanc", match: /chenin/ },
+  { label: "Muscat", match: /muscat|moscatel|moscato/ },
 ] as const;
 
 export function wineGrapes(wine: Pick<PublicWine, "nombre" | "varietal">): string[] {

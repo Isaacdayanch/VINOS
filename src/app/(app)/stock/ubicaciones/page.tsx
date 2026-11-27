@@ -43,10 +43,10 @@ export default async function UbicacionesPage({
 
       {ubicaciones.length >= 2 && (
         <div className="rounded-lg border border-wine/40 bg-wine-light/30 p-4 flex flex-col gap-2">
-          <p className="font-medium text-wine">Transferencia pendiente a Quijote 9</p>
+          <p className="font-medium text-wine">Transferir stock entre bodegas</p>
           <p className="text-xs text-muted">
-            Herramienta de un solo uso para pasar lo que ya mandaste a Quijote 9, descontándolo
-            de 689. Cuando quede confirmada se quita de aquí.
+            Elige los vinos y cantidades que quieres mover de una bodega a otra. El total de tu
+            inventario no cambia, solo en dónde está.
           </p>
           <Link
             href="/stock/transferir"

@@ -61,6 +61,7 @@ export default async function OrdenesPage() {
 
       <div className="rounded-lg border border-border bg-surface divide-y divide-border overflow-hidden">
         {ordenes.map((o) => {
+          const cancelada = o.estatus === "Cancelada";
           const total = totalOrden(o);
           const pendiente = saldos.get(o.id)?.pendiente ?? total;
           return (
@@ -75,12 +76,12 @@ export default async function OrdenesPage() {
                 </p>
                 <p className="text-xs text-muted">
                   {new Date(o.fecha).toLocaleDateString("es-MX")} ·{" "}
-                  <span className={pendiente > 0.5 ? "text-warn" : "text-ok"}>
-                    {pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
+                  <span className={cancelada ? "text-muted" : pendiente > 0.5 ? "text-warn" : "text-ok"}>
+                    {cancelada ? "Cancelada" : pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
                   </span>
                 </p>
               </div>
-              <span className="font-semibold text-wine whitespace-nowrap">{formatoMXN(total)}</span>
+              <span className={`font-semibold whitespace-nowrap ${cancelada ? "text-muted line-through" : "text-wine"}`}>{formatoMXN(total)}</span>
             </Link>
           );
         })}

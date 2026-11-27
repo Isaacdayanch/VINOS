@@ -142,6 +142,10 @@ export async function crearOrden(formData: FormData) {
 }
 
 export async function actualizarOrden(ordenId: string, formData: FormData) {
+  const actual = await prisma.orden.findUnique({ where: { id: ordenId }, select: { estatus: true } });
+  if (actual?.estatus === "Cancelada") {
+    throw new Error("Esta orden está cancelada; reactívala antes de editarla");
+  }
   const clienteId = String(formData.get("clienteId") ?? "");
   const fecha = String(formData.get("fecha") ?? "");
   const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
@@ -229,9 +233,9 @@ export async function actualizarOrden(ordenId: string, formData: FormData) {
 export async function marcarLineaEntregada(ordenLineaId: string, ordenId: string) {
   const [linea, orden] = await Promise.all([
     prisma.ordenLinea.findUnique({ where: { id: ordenLineaId } }),
-    prisma.orden.findUnique({ where: { id: ordenId }, select: { ubicacionId: true } }),
+    prisma.orden.findUnique({ where: { id: ordenId }, select: { ubicacionId: true, estatus: true } }),
   ]);
-  if (!linea || linea.entregado) return;
+  if (!linea || linea.entregado || orden?.estatus === "Cancelada") return;
 
   const resumen = await calcularResumenInventario();
   const costoUnitario = resumen.get(linea.productoId)?.costoPromedioPorBotella ?? 0;
@@ -276,6 +280,11 @@ export async function crearCobro(ordenId: string, formData: FormData) {
     throw new Error("Faltan datos del cobro");
   }
 
+  const orden = await prisma.orden.findUnique({ where: { id: ordenId }, select: { estatus: true } });
+  if (orden?.estatus === "Cancelada") {
+    throw new Error("Esta orden está cancelada; no se le pueden registrar cobros");
+  }
+
   await prisma.cobro.create({
     data: { ordenId, fecha: new Date(fecha), monto, cuenta, comisionPct, metodoPago, notas },
   });
@@ -283,5 +292,40 @@ export async function crearCobro(ordenId: string, formData: FormData) {
   revalidatePath(`/ordenes/${ordenId}`);
   revalidatePath("/ordenes");
   revalidatePath("/finanzas");
+  revalidatePath("/");
+}
+
+// Cancela una orden que nunca se hizo de verdad (error de captura, etc.) sin
+// tocar sus botellas ni sus movimientos de Salida -- si el inventario ya se
+// corrigió aparte, cancelar la orden no debe volver a mover el stock. Deja de
+// contar como venta, ganancia o pendiente de cobro en Finanzas y en el estado
+// de cuenta del cliente.
+export async function cancelarOrden(ordenId: string) {
+  const orden = await prisma.orden.update({
+    where: { id: ordenId },
+    data: { estatus: "Cancelada" },
+    select: { clienteId: true },
+  });
+
+  revalidatePath("/ordenes");
+  revalidatePath(`/ordenes/${ordenId}`);
+  revalidatePath("/finanzas");
+  revalidatePath(`/clientes/${orden.clienteId}`);
+  revalidatePath("/");
+}
+
+// Deshace una cancelación hecha por error: regresa la orden a contar como
+// venta normal. No mueve inventario (cancelarOrden tampoco lo movió).
+export async function reactivarOrden(ordenId: string) {
+  const orden = await prisma.orden.update({
+    where: { id: ordenId },
+    data: { estatus: "Surtida - pendiente de pago" },
+    select: { clienteId: true },
+  });
+
+  revalidatePath("/ordenes");
+  revalidatePath(`/ordenes/${ordenId}`);
+  revalidatePath("/finanzas");
+  revalidatePath(`/clientes/${orden.clienteId}`);
   revalidatePath("/");
 }

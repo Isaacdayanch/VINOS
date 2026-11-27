@@ -645,14 +645,39 @@
 .buyCta span { transition: transform .2s ease; }
 .buyCta:hover span { transform: translateX(4px); }
 .buyPerk { margin-top: 14px !important; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: rgb(255 255 255 / .9); text-shadow: 0 1px 8px rgb(0 0 0 / .35); }
-.stickyBuy { display: none; }
 @media (max-width: 700px) {
-  .buyCta { margin-top: 22px; min-height: 54px; padding: 15px 30px; font-size: 14px; }
+  .buyCta { margin-top: 22px; min-height: 54px; padding: 15px 24px; font-size: 14px; white-space: nowrap; }
   .buyPerk { font-size: 9.5px; letter-spacing: .14em; }
-  .stickyBuy { position: fixed; z-index: 60; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 8px 8px 18px; border-radius: 50px; background: rgb(246 242 235 / .96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgb(30 10 15 / .22); border: 1px solid var(--line); transform: translateY(140%); opacity: 0; transition: transform .35s ease, opacity .35s ease; }
-  .stickyBuy > span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); line-height: 1.3; }
-  .stickyBuy a { flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 20px; border-radius: 50px; background: var(--burgundy); color: #fff !important; font-size: 13px; font-weight: 500; }
-  .stickyBuyShown { transform: none; opacity: 1; }
 }
-@media (prefers-reduced-motion: reduce) { .stickyBuy { transition: none; } }
-@media print { .stickyBuy { display: none !important; } }
+
+/* Online-order prompts: thin bar on top, floating button, and the three steps in the catalog. */
+.orderBar { display: flex; align-items: center; justify-content: center; gap: 10px 22px; flex-wrap: wrap; padding: 9px var(--gutter); background: linear-gradient(90deg, #4f1326, var(--burgundy) 50%, #4f1326); color: #f6ebe0; font-size: 12px; }
+.orderBar p { display: inline-flex; align-items: center; gap: 4px 14px; flex-wrap: wrap; justify-content: center; }
+.orderBar strong { font: 500 13px/1 var(--serif); letter-spacing: .2em; text-transform: uppercase; color: #e8c98a; }
+.orderBar :is(a, button) { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 6px 16px; border-radius: 50px; border: 1px solid #e8c98a; background: transparent; color: #f6ebe0 !important; font-size: 12px; font-weight: 500; letter-spacing: .04em; transition: background-color .2s ease, color .2s ease; }
+.orderBar :is(a, button):is(:hover, :active) { background: #e8c98a; color: #3a0f1c !important; }
+.floatOrder { position: fixed; z-index: 70; right: 24px; bottom: 24px; transform: translateY(160%); opacity: 0; transition: transform .4s cubic-bezier(.16,1,.3,1), opacity .3s ease; pointer-events: none; }
+.floatOrderShown { transform: none; opacity: 1; pointer-events: auto; }
+.floatOrder :is(a, button) { display: inline-flex; align-items: center; gap: 14px; min-height: 60px; padding: 10px 26px 10px 14px; border: 0; border-radius: 50px; background: var(--burgundy); color: #fff !important; text-align: left; box-shadow: 0 14px 36px rgb(40 8 18 / .38), 0 0 0 1px rgb(232 201 138 / .45) inset; transition: background-color .2s ease, transform .2s ease; }
+.floatOrder a { padding-left: 26px; }
+.floatOrder :is(a, button):is(:hover, :active) { background: #7a2240; transform: translateY(-2px); }
+.floatOrder :is(a, button) > span:not(.floatOrderCount) { display: grid; font-size: 15px; font-weight: 500; letter-spacing: .01em; line-height: 1.15; }
+.floatOrder small { font-size: 10px; font-weight: 400; letter-spacing: .14em; text-transform: uppercase; color: #e8c98a; margin-top: 3px; }
+.floatOrder :is(a, button) > span[aria-hidden] { font-size: 18px; }
+.floatOrderCount { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #e8c98a; color: #3a0f1c; font-size: 15px; font-weight: 600; }
+.orderSteps { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0 0 18px; padding: 0; list-style: none; font-size: 12px; letter-spacing: .04em; color: var(--ink); }
+.orderSteps li { display: inline-flex; align-items: center; gap: 9px; }
+.orderSteps b { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--burgundy); color: #fff; font-size: 11px; font-weight: 600; }
+@media (max-width: 700px) {
+  .orderBar { justify-content: space-between; gap: 8px; padding: 8px 14px; font-size: 10.5px; }
+  .orderBar p { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .orderBar strong { font-size: 11px; letter-spacing: .16em; }
+  .orderBar span { line-height: 1.25; }
+  .orderBar :is(a, button) { flex-shrink: 0; font-size: 11px; padding: 6px 13px; }
+  .floatOrder { left: 14px; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); }
+  .floatOrder :is(a, button) { width: 100%; justify-content: space-between; min-height: 58px; }
+  .orderSteps { gap: 6px 14px; font-size: 10.5px; margin-bottom: 12px; }
+  .orderSteps b { width: 19px; height: 19px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .floatOrder { transition: none; } }
+@media print { .orderBar, .floatOrder, .orderSteps { display: none !important; } }

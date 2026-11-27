@@ -13,7 +13,7 @@ const PHRASES = [
   "Un buen vino no se bebe: se comparte.",
 ];
 
-export function Hero({ freeShipping = null }: { freeShipping?: string | null }) {
+export function Hero() {
   const hero = useRef<HTMLElement>(null);
   const [phrase, setPhrase] = useState(0);
   useEffect(() => {
@@ -60,8 +60,8 @@ export function Hero({ freeShipping = null }: { freeShipping?: string | null }) 
     </div>
     <div className={styles.heroCopy}>
       <h1 key={phrase} className={styles.heroPhrase} aria-live="off">{PHRASES[phrase]}</h1>
-      <Link href="/catalogo-publico/catalogo" className={styles.buyCta}>Compra ahora <span aria-hidden="true">→</span></Link>
-      {freeShipping && <p className={styles.buyPerk}>{freeShipping}</p>}
+      <Link href="/catalogo-publico/catalogo" className={styles.buyCta}>Haz tu pedido en línea <span aria-hidden="true">→</span></Link>
+      <p className={styles.buyPerk}>Entrega a domicilio en CDMX</p>
     </div>
     <div className={styles.heroCaption}><span>DĀDĀH</span><span>Special Reserve · 2017</span></div>
     <a href="#historia" className={styles.scrollHint}>Desliza para descubrir </a>

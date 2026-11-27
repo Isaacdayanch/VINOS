@@ -5,6 +5,7 @@ import { Cormorant_Garamond, Manrope } from "next/font/google";
 import styles from "./catalog.module.css";
 import { AgeGate } from "./_components/AgeGate";
 import { Announcement } from "./_components/Announcement";
+import { OrderBar, FloatingOrder } from "./_components/OrderPrompts";
 import { CartDrawer } from "./_components/CartDrawer";
 import { CartProvider } from "./_lib/cart";
 import { getStorefront } from "./_lib/storefront";
@@ -32,10 +33,12 @@ export default async function CatalogLayout({ children }: { children: React.Reac
   return <div className={`${styles.shell} ${serif.variable} ${sans.variable}`}>
     <a className={styles.skip} href="#contenido">Ir al contenido</a>
     <CartProvider>
+    <OrderBar abierto={abierto} />
     <Announcement />
     {/* Positioned wrapper: the home header is absolute and must start below the notice, not the page top. */}
     <div className={styles.pageBody}>{children}</div>
     <CartDrawer regla={regla} abierto={abierto} />
+    <FloatingOrder abierto={abierto} />
     </CartProvider>
     <AgeGate />
     <footer className={styles.footer}>

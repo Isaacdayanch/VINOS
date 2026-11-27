@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { ProductKind, PublicWine } from "../_lib/catalog";
 import { BUDGETS, FACETS_BY_KIND, filterCollection, shelfList, type FacetKey } from "../_lib/collection-filters";
 import styles from "../catalog.module.css";
+import { OrderSteps } from "./OrderPrompts";
 import { AddToCartCompact } from "./AddToCart";
 import { useCart } from "../_lib/cart";
 import { publicPhotograph } from "../_lib/public-photography";
@@ -94,6 +95,7 @@ export function Collection({ wines, date, kind = "VINO" }: { wines: PublicWine[]
       <h1 id="selection-heading">{copy.title}</h1>
       <div className={styles.shopIntroAside}><p>{copy.lead}</p><OrderPill /></div>
     </div>
+    <OrderSteps />
     <div className={styles.shelfTop}>
       <div className={styles.shelves} role="group" aria-label={copy.railLabel}>
         {shelves.map(item =>

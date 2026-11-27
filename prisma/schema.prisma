@@ -91,6 +91,7 @@ model Producto {
   notaConsignacionLineas NotaConsignacionLinea[]
   imagenesExtra          ProductoImagenExtra[]
   ajustesStock           AjusteStock[]
+  preciosDistribuidor    PrecioDistribuidorProducto[]
 }
 
 model AjusteStock {
@@ -164,6 +165,19 @@ model PrecioClienteProducto {
   producto Producto @relation(fields: [productoId], references: [id])
 
   @@unique([clienteId, productoId])
+}
+
+model PrecioDistribuidorProducto {
+  id             String   @id @default(cuid())
+  distribuidorId String
+  productoId     String
+  precio         Float
+  updatedAt      DateTime @updatedAt
+
+  distribuidor Distribuidor @relation(fields: [distribuidorId], references: [id])
+  producto     Producto     @relation(fields: [productoId], references: [id])
+
+  @@unique([distribuidorId, productoId])
 }
 
 model Socio {
@@ -310,8 +324,9 @@ model Distribuidor {
   listoEvento Boolean          @default(false) // Isaac marca si ya está listo para cuadrar el evento
   createdAt   DateTime         @default(now())
 
-  cliente           Cliente?           @relation(fields: [clienteId], references: [id])
+  cliente           Cliente?                     @relation(fields: [clienteId], references: [id])
   notasConsignacion NotaConsignacion[]
+  preciosProducto   PrecioDistribuidorProducto[]
 }
 
 model NotaConsignacion {

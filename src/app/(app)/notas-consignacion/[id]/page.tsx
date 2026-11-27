@@ -66,6 +66,14 @@ export default async function DetalleNotaConsignacionPage({
               Ver nota imprimible
             </Link>
             {sinActividad && (
+              <Link
+                href={`/notas-consignacion/${nota.id}/editar`}
+                className="text-sm text-wine underline whitespace-nowrap"
+              >
+                Editar
+              </Link>
+            )}
+            {sinActividad && (
               <BotonEliminarConfirmado
                 action={eliminar}
                 mensaje={`¿Seguro que quieres eliminar la nota ${nota.folio}? Esto le regresa las botellas al stock, como si nunca hubiera salido.`}
@@ -80,7 +88,7 @@ export default async function DetalleNotaConsignacionPage({
 
       {!sinActividad && (
         <p className="text-xs text-muted -mt-4">
-          Esta nota ya tiene pagos o devoluciones registradas, así que ya no se puede eliminar.
+          Esta nota ya tiene pagos o devoluciones registradas, así que ya no se puede eliminar ni editar.
         </p>
       )}
 

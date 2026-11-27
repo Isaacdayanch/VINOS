@@ -13,6 +13,7 @@ import { DateField } from "@/components/DateField";
 import { LineaPedidoRow } from "@/components/LineaPedidoRow";
 import { SubmitButton } from "@/components/SubmitButton";
 import { calcularCostosPedido, montoEnMXN, formatoMXN, tipoCambioEstimadoDePagos } from "@/lib/costeo";
+import { proveedoresConocidos } from "@/lib/proveedores";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,7 +27,7 @@ export default async function DetallePedidoPage({
   const { id } = await params;
   const sp = await searchParams;
   const nuevoProducto = typeof sp.nuevoProducto === "string" ? sp.nuevoProducto : undefined;
-  const [pedido, productos, socios, pagos, ubicaciones] = await Promise.all([
+  const [pedido, productos, socios, pagos, ubicaciones, proveedores] = await Promise.all([
     prisma.pedido.findUnique({
       where: { id },
       include: {
@@ -41,6 +42,7 @@ export default async function DetallePedidoPage({
       orderBy: { fecha: "desc" },
     }),
     prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
+    proveedoresConocidos(),
   ]);
   if (!pedido) notFound();
 
@@ -240,6 +242,7 @@ export default async function DetallePedidoPage({
         <CostosPedidoForm
           action={guardarPedido}
           proveedor={pedido.proveedor ?? undefined}
+          proveedoresConocidos={proveedores}
           tipoCambio={pedido.tipoCambio}
           logisticaUSD={pedido.logisticaUSD}
           logisticaMXN={pedido.logisticaMXN}

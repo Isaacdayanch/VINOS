@@ -1,4 +1,4 @@
-import type { Cliente, PrecioClienteProducto, Producto } from "@prisma/client";
+import type { Cliente, PrecioClienteProducto, PrecioDistribuidorProducto, Producto } from "@prisma/client";
 
 const CAMPO_POR_CATEGORIA = {
   LISTA: "precioLista",
@@ -38,4 +38,27 @@ export function construirDatosPrecios(
   }
 
   return { preciosPorClienteProducto, categoriaPorCliente, esUltimoPrecio };
+}
+
+/**
+ * Lo mismo que arriba pero para un distribuidor: el precio por default es el
+ * "Precio distribuidor" del producto (Panel de Precios), y si ya se le dio
+ * un precio distinto a este distribuidor antes en ese vino, se sugiere ese.
+ */
+export function construirDatosPreciosDistribuidor(
+  productos: Producto[],
+  preciosGuardados: PrecioDistribuidorProducto[],
+) {
+  const preciosPorProducto: Record<string, number> = {};
+  for (const p of productos) {
+    preciosPorProducto[p.id] = p.precioDistribuidor ?? p.precioLista ?? 0;
+  }
+
+  const esUltimoPrecio: Record<string, boolean> = {};
+  for (const pg of preciosGuardados) {
+    preciosPorProducto[pg.productoId] = pg.precio;
+    esUltimoPrecio[pg.productoId] = true;
+  }
+
+  return { preciosPorProducto, esUltimoPrecio };
 }

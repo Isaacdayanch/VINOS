@@ -7,6 +7,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 export function CostosPedidoForm({
   action,
   proveedor,
+  proveedoresConocidos,
   tipoCambio,
   logisticaUSD,
   logisticaMXN,
@@ -16,6 +17,7 @@ export function CostosPedidoForm({
 }: {
   action: (formData: FormData) => void;
   proveedor?: string;
+  proveedoresConocidos?: string[];
   tipoCambio?: number | null;
   logisticaUSD?: number | null;
   logisticaMXN?: number | null;
@@ -38,8 +40,14 @@ export function CostosPedidoForm({
         <input
           name="proveedor"
           defaultValue={proveedor}
+          list="proveedores-conocidos"
           className="rounded-md border border-border bg-surface px-3 py-2"
         />
+        <datalist id="proveedores-conocidos">
+          {proveedoresConocidos?.map((p) => (
+            <option key={p} value={p} />
+          ))}
+        </datalist>
       </label>
 
       <label className="flex flex-col gap-1 text-sm">

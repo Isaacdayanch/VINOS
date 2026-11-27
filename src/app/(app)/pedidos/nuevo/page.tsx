@@ -1,13 +1,14 @@
 import { crearPedido, generarFolioPedido } from "@/app/(app)/pedidos/actions";
 import { DateField } from "@/components/DateField";
 import { SubmitButton } from "@/components/SubmitButton";
+import { proveedoresConocidos } from "@/lib/proveedores";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function NuevoPedidoPage() {
   const hoy = new Date().toISOString().slice(0, 10);
-  const folio = await generarFolioPedido();
+  const [folio, proveedores] = await Promise.all([generarFolioPedido(), proveedoresConocidos()]);
 
   return (
     <div className="flex flex-col gap-6 max-w-lg">
@@ -25,7 +26,12 @@ export default async function NuevoPedidoPage() {
 
       <form action={crearPedido} className="flex flex-col gap-4">
         <input type="hidden" name="folio" value={folio} />
-        <Campo label="Proveedor" name="proveedor" placeholder="Ej. Rashbi Wines Corp" />
+        <Campo label="Proveedor" name="proveedor" placeholder="Ej. Rashbi Wines Corp" list="proveedores" />
+        <datalist id="proveedores">
+          {proveedores.map((p) => (
+            <option key={p} value={p} />
+          ))}
+        </datalist>
         <DateField name="fecha" label="Fecha del pedido" defaultValue={hoy} />
 
         <div className="rounded-lg border border-border p-4 flex flex-col gap-4">
@@ -87,6 +93,7 @@ function Campo({
   defaultValue?: string;
   step?: string;
   required?: boolean;
+  list?: string;
 }) {
   return (
     <label className="flex flex-col gap-1 text-sm">

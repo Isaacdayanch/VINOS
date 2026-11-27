@@ -1,6 +1,7 @@
 import { crearNotaConsignacion } from "@/app/(app)/distribuidores/actions";
 import { NotaConsignacionForm } from "@/components/NotaConsignacionForm";
 import { calcularResumenInventario } from "@/lib/costeo";
+import { construirDatosPreciosDistribuidor } from "@/lib/precios";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,13 +13,16 @@ export default async function NuevaNotaConsignacionPage({
 }: PageProps<"/distribuidores/[id]/nueva-nota">) {
   const { id } = await params;
 
-  const [distribuidor, productos, resumen, ubicaciones] = await Promise.all([
+  const [distribuidor, productos, resumen, ubicaciones, preciosGuardados] = await Promise.all([
     prisma.distribuidor.findUnique({ where: { id } }),
     prisma.producto.findMany({ where: { activo: true }, orderBy: { nombre: "asc" } }),
     calcularResumenInventario(),
     prisma.ubicacion.findMany({ orderBy: { createdAt: "asc" } }),
+    prisma.precioDistribuidorProducto.findMany({ where: { distribuidorId: id } }),
   ]);
   if (!distribuidor) notFound();
+
+  const { preciosPorProducto, esUltimoPrecio } = construirDatosPreciosDistribuidor(productos, preciosGuardados);
 
   const stockPorProducto: Record<string, number> = {};
   for (const p of productos) {
@@ -62,6 +66,8 @@ export default async function NuevaNotaConsignacionPage({
           stockPorProducto={stockPorProducto}
           action={crear}
           ubicaciones={ubicaciones}
+          preciosPorProducto={preciosPorProducto}
+          esUltimoPrecio={esUltimoPrecio}
         />
       )}
     </div>

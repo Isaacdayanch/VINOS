@@ -39,18 +39,42 @@ export function NotaConsignacionForm({
   action,
   fechaInicial,
   ubicaciones,
+  ubicacionIdInicial,
+  preciosPorProducto,
+  esUltimoPrecio,
+  lineasIniciales,
+  botonTexto = "Crear nota de consignación",
 }: {
   productos: Producto[];
   stockPorProducto?: Record<string, number>;
   action: (formData: FormData) => void;
   fechaInicial?: string;
   ubicaciones: Ubicacion[];
+  ubicacionIdInicial?: string | null;
+  preciosPorProducto?: Record<string, number>;
+  esUltimoPrecio?: Record<string, boolean>;
+  lineasIniciales?: { productoId: string; cantidadBotellas: number; precioUnitario: number }[];
+  botonTexto?: string;
 }) {
   const [fecha] = useState(fechaInicial ?? (() => new Date().toISOString().slice(0, 10))());
-  const [lineas, setLineas] = useState<Linea[]>([lineaVacia()]);
+  const [lineas, setLineas] = useState<Linea[]>(() => {
+    if (!lineasIniciales || lineasIniciales.length === 0) return [lineaVacia()];
+    return lineasIniciales.map((l) => ({
+      key: Math.random().toString(36).slice(2),
+      productoId: l.productoId,
+      piezasPorCaja: productos.find((p) => p.id === l.productoId)?.piezasPorCaja ?? 1,
+      cantidad: l.cantidadBotellas,
+      unidad: "BOTELLAS" as Unidad,
+      precioUnitario: l.precioUnitario,
+    }));
+  });
 
   function precioSugerido(productoId: string) {
-    return productos.find((p) => p.id === productoId)?.precioDistribuidor ?? 0;
+    return (
+      preciosPorProducto?.[productoId] ??
+      productos.find((p) => p.id === productoId)?.precioDistribuidor ??
+      0
+    );
   }
 
   function actualizarLinea(index: number, cambios: Partial<Linea>) {
@@ -105,7 +129,7 @@ export function NotaConsignacionForm({
         <span className="font-medium">¿De cuál bodega sale?</span>
         <select
           name="ubicacionId"
-          defaultValue={ubicaciones[0]?.id ?? ""}
+          defaultValue={ubicacionIdInicial ?? ubicaciones[0]?.id ?? ""}
           required
           className="rounded-md border border-border bg-surface px-3 py-2"
         >
@@ -196,6 +220,13 @@ export function NotaConsignacionForm({
                 />
               </div>
             </label>
+            {l.productoId && (
+              <p className="text-xs text-muted -mt-1">
+                {esUltimoPrecio?.[l.productoId]
+                  ? "Último precio que le diste a este distribuidor en este vino."
+                  : "Precio sugerido según el “Precio distribuidor” de este vino."}
+              </p>
+            )}
           </div>
         ))}
         <button type="button" onClick={agregarLinea} className="text-sm text-wine underline text-left">
@@ -210,8 +241,8 @@ export function NotaConsignacionForm({
         </span>
       </div>
 
-      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Creando...">
-        Crear nota de consignación
+      <SubmitButton className="rounded-md bg-wine text-white px-4 py-2 font-medium" pendingText="Guardando...">
+        {botonTexto}
       </SubmitButton>
     </form>
   );

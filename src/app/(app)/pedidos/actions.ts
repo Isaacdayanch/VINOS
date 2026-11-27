@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { sincronizarActivoPorStock } from "@/lib/costeo";
 import { generarFolioAlAzar } from "@/lib/folio";
+import { normalizarProveedor } from "@/lib/proveedores";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -20,7 +21,7 @@ export async function generarFolioPedido() {
 }
 
 export async function crearPedido(formData: FormData) {
-  const proveedor = String(formData.get("proveedor") ?? "").trim();
+  const proveedor = normalizarProveedor(String(formData.get("proveedor") ?? ""));
   const fecha = String(formData.get("fecha") ?? "");
   const tipoCambio = numeroOpcional(formData.get("tipoCambio"));
   const logisticaUSD = numeroOpcional(formData.get("logisticaUSD"));
@@ -56,7 +57,7 @@ export async function crearPedido(formData: FormData) {
 }
 
 export async function actualizarPedido(pedidoId: string, formData: FormData) {
-  const proveedor = String(formData.get("proveedor") ?? "").trim();
+  const proveedor = normalizarProveedor(String(formData.get("proveedor") ?? ""));
   const tipoCambio = numeroOpcional(formData.get("tipoCambio"));
   const logisticaUSD = numeroOpcional(formData.get("logisticaUSD"));
   const logisticaMXN = numeroOpcional(formData.get("logisticaMXN"));

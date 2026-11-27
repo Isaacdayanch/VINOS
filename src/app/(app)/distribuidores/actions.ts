@@ -117,6 +117,12 @@ export async function crearNotaConsignacion(distribuidorId: string, formData: Fo
         ubicacionId,
       },
     });
+
+    await prisma.precioDistribuidorProducto.upsert({
+      where: { distribuidorId_productoId: { distribuidorId, productoId: l.productoId } },
+      create: { distribuidorId, productoId: l.productoId, precio: l.precioUnitario },
+      update: { precio: l.precioUnitario },
+    });
   }
 
   await sincronizarActivoPorStockVarios(lineas.map((l) => l.productoId));
@@ -126,6 +132,89 @@ export async function crearNotaConsignacion(distribuidorId: string, formData: Fo
   revalidatePath("/stock");
   revalidatePath("/");
   redirect(`/notas-consignacion/${nota.id}`);
+}
+
+// Solo se puede editar mientras no tenga pagos ni devoluciones registradas
+// (igual que para eliminarla) -- si no, reconstruir sus líneas movería
+// cobros/stock que ya pasaron de verdad.
+export async function actualizarNotaConsignacion(notaConsignacionId: string, formData: FormData) {
+  const fecha = String(formData.get("fecha") ?? "");
+  const ubicacionId = String(formData.get("ubicacionId") ?? "").trim();
+  const lineasJson = String(formData.get("lineas") ?? "[]");
+
+  if (!fecha || !ubicacionId) {
+    throw new Error("Falta la fecha o la bodega de la nota");
+  }
+
+  const lineas: LineaForm[] = JSON.parse(lineasJson).filter(
+    (l: LineaForm) => l.productoId && l.cantidadBotellas > 0,
+  );
+
+  if (lineas.length === 0) {
+    throw new Error("Agrega al menos un vino a la nota");
+  }
+
+  const notaActual = await prisma.notaConsignacion.findUniqueOrThrow({
+    where: { id: notaConsignacionId },
+    include: { cobros: true, lineas: true },
+  });
+  const tieneActividad =
+    notaActual.cobros.length > 0 ||
+    notaActual.lineas.some((l) => l.botellasPagadas > 0 || l.botellasDevueltas > 0);
+  if (tieneActividad) {
+    throw new Error("Esta nota ya tiene pagos o devoluciones registradas, no se puede editar.");
+  }
+
+  const resumen = await calcularResumenInventario();
+  const productosAnteriores = notaActual.lineas.map((l) => l.productoId);
+
+  await prisma.salida.deleteMany({ where: { notaConsignacionId } });
+  await prisma.notaConsignacionLinea.deleteMany({ where: { notaConsignacionId } });
+
+  await prisma.notaConsignacion.update({
+    where: { id: notaConsignacionId },
+    data: { fecha: new Date(fecha), ubicacionId },
+  });
+
+  for (const l of lineas) {
+    const costoUnitario = resumen.get(l.productoId)?.costoPromedioPorBotella ?? 0;
+
+    await prisma.notaConsignacionLinea.create({
+      data: {
+        notaConsignacionId,
+        productoId: l.productoId,
+        cantidadBotellas: l.cantidadBotellas,
+        precioUnitario: l.precioUnitario,
+        costoUnitario,
+      },
+    });
+
+    await prisma.salida.create({
+      data: {
+        fecha: new Date(fecha),
+        productoId: l.productoId,
+        botellas: l.cantidadBotellas,
+        motivo: "Consignación",
+        notaConsignacionId,
+        ubicacionId,
+      },
+    });
+
+    await prisma.precioDistribuidorProducto.upsert({
+      where: { distribuidorId_productoId: { distribuidorId: notaActual.distribuidorId, productoId: l.productoId } },
+      create: { distribuidorId: notaActual.distribuidorId, productoId: l.productoId, precio: l.precioUnitario },
+      update: { precio: l.precioUnitario },
+    });
+  }
+
+  await sincronizarActivoPorStockVarios([...productosAnteriores, ...lineas.map((l) => l.productoId)]);
+
+  revalidatePath(`/notas-consignacion/${notaConsignacionId}`);
+  revalidatePath(`/distribuidores/${notaActual.distribuidorId}`);
+  revalidatePath("/distribuidores");
+  revalidatePath("/stock");
+  revalidatePath("/");
+  redirect(`/notas-consignacion/${notaConsignacionId}`);
 }
 
 // Solo se puede borrar si nunca se le registró ningún pago, para no afectar

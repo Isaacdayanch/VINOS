@@ -14,21 +14,21 @@ const campos = { nombre: "", telefono: "", email: "", calle: "", colonia: "", co
 export function CheckoutForm({ zonas, abierto }: { zonas: string[]; abierto: boolean }) {
   const { items, bottles, subtotal, ready, setQuantity, clear } = useCart();
   const [valores, setValores] = useState(campos);
-  const [quote, setQuote] = useState<{ cp: string; bottles: number; result: Cotizacion } | null>(null);
+  const [quote, setQuote] = useState<{ cp: string; bottles: number; subtotal: number; result: Cotizacion } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [enviando, startTransition] = useTransition();
   const router = useRouter();
   const cp = valores.codigoPostal.replace(/\D/g, "");
 
-  // Shipping quote as soon as the postal code is complete, and again if the bottle count changes.
+  // Shipping quote as soon as the postal code is complete, and again if the basket changes.
   useEffect(() => {
     if (cp.length !== 5) return;
     let vigente = true;
-    cotizarEnvioAction(cp, bottles).then(result => { if (vigente) setQuote({ cp, bottles, result }); });
+    cotizarEnvioAction(cp, bottles, subtotal).then(result => { if (vigente) setQuote({ cp, bottles, subtotal, result }); });
     return () => { vigente = false; };
-  }, [cp, bottles]);
+  }, [cp, bottles, subtotal]);
   // The quote only counts while it matches what is on screen; otherwise a new one is on its way.
-  const cotizacion = quote && quote.cp === cp && quote.bottles === bottles ? quote.result : null;
+  const cotizacion = quote && quote.cp === cp && quote.bottles === bottles && quote.subtotal === subtotal ? quote.result : null;
 
   const set = (campo: keyof typeof campos) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setValores(current => ({ ...current, [campo]: event.target.value }));
   const envio = cotizacion?.ok ? cotizacion.envio : null;
@@ -70,7 +70,7 @@ export function CheckoutForm({ zonas, abierto }: { zonas: string[]; abierto: boo
           </div>
           <p id="cp-estado" className={`${styles.cpStatus} ${cotizacion && !cotizacion.ok ? styles.cpBad : ""}`} role="status">
             {cp.length === 5 && !cotizacion && "Revisando tu zona…"}
-            {cotizacion?.ok && <>{cotizacion.zona} · {cotizacion.envio ? `envío ${money.format(cotizacion.envio)}` : "envío gratis"}{cotizacion.botellasParaGratis > 0 && ` (gratis a partir de ${cotizacion.gratisDesde} botellas)`}</>}
+            {cotizacion?.ok && <>{cotizacion.zona} · {cotizacion.envio ? `envío ${money.format(cotizacion.envio)}` : "envío gratis"}{cotizacion.botellasParaGratis > 0 && ` (gratis a partir de ${cotizacion.gratisDesde} botellas)`}{cotizacion.faltaMonto > 0 && ` · te faltan ${money.format(cotizacion.faltaMonto)} para envío gratis`}</>}
             {cotizacion && !cotizacion.ok && cotizacion.motivo}
           </p>
           <label>Alcaldía o municipio<input autoComplete="address-level2" value={valores.ciudad} onChange={set("ciudad")} /></label>

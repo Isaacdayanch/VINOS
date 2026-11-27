@@ -39,6 +39,12 @@ export async function guardarDestinatariosCorreo(formData: FormData) {
   refrescar();
 }
 
+export async function guardarEnvioGratisMonto(formData: FormData) {
+  const monto = Math.round(Number(String(formData.get("monto") ?? "").replace(/[^\d.]/g, "")));
+  await guardarConfiguracion({ [CLAVES.envioGratisMonto]: Number.isFinite(monto) && monto > 0 ? String(monto) : "" });
+  refrescar();
+}
+
 export async function guardarZona(zonaId: string, formData: FormData) {
   const costo = Number(formData.get("costoEnvio"));
   const gratis = String(formData.get("botellasEnvioGratis") ?? "").trim();

@@ -19,13 +19,13 @@ function where(path: string): Where {
 }
 
 /** Thin bar at the very top of every public page: online orders are open. */
-export function OrderBar({ abierto }: { abierto: boolean }) {
+export function OrderBar({ abierto, envioGratis }: { abierto: boolean; envioGratis: string | null }) {
   const page = where(usePathname());
   const { bottles, ready, setOpen } = useCart();
   if (!abierto || page.checkout) return null;
   const withCart = ready && bottles > 0;
   return <div className={styles.orderBar}>
-    <p><strong>Pedidos en línea</strong><span>Entrega a domicilio en CDMX y zona metropolitana</span></p>
+    <p><strong>Pedidos en línea</strong><span>{envioGratis ? `${envioGratis} · CDMX y zona metropolitana` : "Entrega a domicilio en CDMX y zona metropolitana"}</span></p>
     {withCart
       ? <button type="button" onClick={() => setOpen(true)}>Ver mi pedido ({bottles}) <span aria-hidden="true">→</span></button>
       : !page.shop && <Link href={CATALOGO}>Pide ahora <span aria-hidden="true">→</span></Link>}
@@ -33,7 +33,7 @@ export function OrderBar({ abierto }: { abierto: boolean }) {
 }
 
 /** Floating call to action: on the home page after a little scroll; elsewhere as soon as the cart has bottles. */
-export function FloatingOrder({ abierto }: { abierto: boolean }) {
+export function FloatingOrder({ abierto, envioGratis }: { abierto: boolean; envioGratis: string | null }) {
   const page = where(usePathname());
   const { bottles, ready, setOpen } = useCart();
   const [scrolled, setScrolled] = useState(false);
@@ -54,7 +54,7 @@ export function FloatingOrder({ abierto }: { abierto: boolean }) {
           <span aria-hidden="true">→</span>
         </button>
       : <Link href={CATALOGO} tabIndex={shown ? 0 : -1}>
-          <span>Haz tu pedido en línea<small>Entrega a domicilio</small></span>
+          <span>Haz tu pedido en línea<small>{envioGratis ?? "Entrega a domicilio"}</small></span>
           <span aria-hidden="true">→</span>
         </Link>}
   </div>;

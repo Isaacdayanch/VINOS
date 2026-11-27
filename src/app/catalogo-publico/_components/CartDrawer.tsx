@@ -6,7 +6,8 @@ import Link from "next/link";
 import { money, useCart } from "../_lib/cart";
 import styles from "../catalog.module.css";
 
-export type ReglaEnvio = { costo: number; gratisDesde: number | null; zonas: string[] };
+import { textoEnvioGratis, type ReglaEnvio } from "../_lib/envio-gratis";
+export type { ReglaEnvio };
 
 function CloseIcon() { return <svg width="22" height="22" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" /></svg>; }
 
@@ -22,8 +23,11 @@ export function CartDrawer({ regla, abierto }: { regla: ReglaEnvio; abierto: boo
     if (!open && element.open) element.close();
   }, [open]);
 
-  const faltan = regla.gratisDesde ? Math.max(0, regla.gratisDesde - bottles) : 0;
-  const envioTexto = !bottles ? null : regla.gratisDesde && faltan === 0 ? "Envío gratis" : `Envío ${money.format(regla.costo)}${regla.gratisDesde ? ` · gratis desde ${regla.gratisDesde} botellas` : ""}`;
+  const porMonto = regla.gratisDesdeMonto !== null;
+  const faltan = !porMonto && regla.gratisDesde ? Math.max(0, regla.gratisDesde - bottles) : 0;
+  const faltaMonto = porMonto ? Math.max(0, regla.gratisDesdeMonto! - subtotal) : 0;
+  const gratisYa = porMonto ? faltaMonto === 0 : Boolean(regla.gratisDesde) && faltan === 0;
+  const envioTexto = !bottles ? null : gratisYa ? "Envío gratis" : `Envío ${money.format(regla.costo)}${textoEnvioGratis(regla) ? ` · ${textoEnvioGratis(regla)!.replace("Envío gratis", "gratis")}` : ""}`;
 
   return <dialog ref={dialog} className={styles.cartDrawer} aria-labelledby="cart-title" onClose={() => setOpen(false)} onClick={event => { if (event.target === event.currentTarget) setOpen(false); }}>
     <div className={styles.cartHeading}>
@@ -56,7 +60,7 @@ export function CartDrawer({ regla, abierto }: { regla: ReglaEnvio; abierto: boo
       {items.length > 0 && <>
         <div className={styles.cartTotals}>
           <p><span>Subtotal</span><span>{money.format(subtotal)}</span></p>
-          {envioTexto && <p className={styles.cartShipping}><span>{envioTexto}</span>{faltan > 0 && <span>Te falta{faltan === 1 ? "" : "n"} {faltan} para envío gratis</span>}</p>}
+          {envioTexto && <p className={styles.cartShipping}><span>{envioTexto}</span>{faltan > 0 && <span>Te falta{faltan === 1 ? "" : "n"} {faltan} para envío gratis</span>}{faltaMonto > 0 && <span>Te faltan {money.format(faltaMonto)} para envío gratis</span>}</p>}
         </div>
         {abierto
           ? <Link href="/catalogo-publico/pedido" className={styles.darkPill} onClick={() => setOpen(false)}>Continuar con mi pedido</Link>

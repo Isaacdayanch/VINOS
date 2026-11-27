@@ -10,6 +10,7 @@ export const CLAVES = {
   pedidosAbiertos: "pedidos.abiertos", // "1" / "0" — apaga el carrito sin tocar código
   whatsappDestinatarios: "whatsapp.destinatarios", // teléfonos separados por coma
   correoDestinatarios: "correo.destinatarios", // correos separados por coma (aviso "Vendiste" con PDF)
+  envioGratisMonto: "envio.gratisDesdeMonto", // pesos; si está puesto, manda sobre "gratis desde N botellas" de cada zona
 } as const;
 
 export async function leerConfiguracion(): Promise<Record<string, string>> {
@@ -46,8 +47,14 @@ export function pedidosAbiertos(config: Record<string, string>): boolean {
   return (config[CLAVES.pedidosAbiertos] ?? "1") !== "0";
 }
 
+/** Envío gratis por monto de compra (Isaac, 27-nov-2026: $2,500), o null si se usa la regla por botellas. */
+export function montoEnvioGratis(config: Record<string, string>): number | null {
+  const monto = Number(config[CLAVES.envioGratisMonto]);
+  return Number.isFinite(monto) && monto > 0 ? monto : null;
+}
+
 export type Cotizacion =
-  | { ok: true; zonaId: string; zona: string; envio: number; gratisDesde: number | null; botellasParaGratis: number }
+  | { ok: true; zonaId: string; zona: string; envio: number; gratisDesde: number | null; botellasParaGratis: number; gratisDesdeMonto: number | null; faltaMonto: number }
   | { ok: false; motivo: string };
 
 /** Zonas con sus inicios de código postal ya separados. */
@@ -56,8 +63,8 @@ export async function zonasEntrega() {
   return zonas.map((zona) => ({ ...zona, prefijos: zona.codigosPostales.split(/[\s,;]+/).filter(Boolean) }));
 }
 
-/** Cuánto cuesta el envío a un código postal para cierto número de botellas. */
-export async function cotizarEnvio(codigoPostal: string, botellas: number): Promise<Cotizacion> {
+/** Cuánto cuesta el envío a un código postal para cierto pedido (botellas y subtotal en pesos). */
+export async function cotizarEnvio(codigoPostal: string, botellas: number, subtotal: number): Promise<Cotizacion> {
   const cp = codigoPostal.replace(/\D/g, "");
   if (cp.length !== 5) return { ok: false, motivo: "Escribe los 5 dígitos de tu código postal." };
   const zonas = await zonasEntrega();
@@ -66,8 +73,13 @@ export async function cotizarEnvio(codigoPostal: string, botellas: number): Prom
     const apagada = zonas.find((z) => !z.activa && z.prefijos.some((prefijo) => cp.startsWith(prefijo)));
     return { ok: false, motivo: apagada ? `Por ahora no tenemos entregas en ${apagada.nombre}. Escríbenos y te avisamos cuando abramos fechas.` : "Todavía no llegamos a tu zona. Escríbenos y buscamos la manera." };
   }
+  const monto = montoEnvioGratis(await leerConfiguracion());
+  if (monto !== null) {
+    const faltaMonto = Math.max(0, monto - subtotal);
+    return { ok: true, zonaId: zona.id, zona: zona.nombre, envio: faltaMonto === 0 ? 0 : zona.costoEnvio, gratisDesde: null, botellasParaGratis: 0, gratisDesdeMonto: monto, faltaMonto };
+  }
   const gratis = zona.botellasEnvioGratis !== null && botellas >= zona.botellasEnvioGratis;
-  return { ok: true, zonaId: zona.id, zona: zona.nombre, envio: gratis ? 0 : zona.costoEnvio, gratisDesde: zona.botellasEnvioGratis, botellasParaGratis: zona.botellasEnvioGratis ? Math.max(0, zona.botellasEnvioGratis - botellas) : 0 };
+  return { ok: true, zonaId: zona.id, zona: zona.nombre, envio: gratis ? 0 : zona.costoEnvio, gratisDesde: zona.botellasEnvioGratis, botellasParaGratis: zona.botellasEnvioGratis ? Math.max(0, zona.botellasEnvioGratis - botellas) : 0, gratisDesdeMonto: null, faltaMonto: 0 };
 }
 
 /** Teléfono mexicano a 10 dígitos (quita +52, espacios, guiones). */

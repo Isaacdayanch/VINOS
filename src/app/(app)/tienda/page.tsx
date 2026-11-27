@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { CLAVES, anuncioVigente, hoyMexico, leerConfiguracion, pedidosAbiertos } from "@/lib/tienda";
+import { CLAVES, anuncioVigente, hoyMexico, leerConfiguracion, montoEnvioGratis, pedidosAbiertos } from "@/lib/tienda";
 import { whatsappConfigurado } from "@/lib/whatsapp";
 import { correoConfigurado } from "@/lib/correo";
 import { SubmitButton } from "@/components/SubmitButton";
 import { urlCatalogoPublico } from "@/lib/catalogoPublico";
 import Link from "next/link";
-import { guardarAnuncio, guardarDestinatariosCorreo, guardarDestinatariosWhatsApp, guardarPedidosAbiertos, guardarZona } from "./actions";
+import { guardarAnuncio, guardarDestinatariosCorreo, guardarDestinatariosWhatsApp, guardarEnvioGratisMonto, guardarPedidosAbiertos, guardarZona } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +67,11 @@ export default async function TiendaPage() {
           <h2 className="font-semibold">Zonas de entrega y envío</h2>
           <p className="text-sm text-muted">Se decide por el código postal del cliente. Prende Cuernavaca y Acapulco solo en las fechas que vayas a entregar.</p>
         </div>
+        <form action={guardarEnvioGratisMonto} className="flex flex-wrap items-end gap-3 text-sm rounded-md bg-background p-3">
+          <label className="flex flex-col gap-1"><span className="font-medium">Envío gratis en compras desde ($)</span><input type="number" name="monto" min={0} step={50} defaultValue={montoEnvioGratis(config) ?? ""} placeholder="sin mínimo" className={`${input} w-40`} /></label>
+          <SubmitButton className={boton} pendingText="Guardando…">Guardar</SubmitButton>
+          <p className="text-xs text-muted w-full">Si pones un monto, manda sobre “gratis desde (botellas)” de cada zona. Así unas botellas baratas no te salen con envío gratis. Déjalo vacío para volver a la regla por botellas.</p>
+        </form>
         <div className="divide-y divide-border">
           {zonas.map((z) => (
             <form key={z.id} action={guardarZona.bind(null, z.id)} className="py-4 first:pt-0 last:pb-0 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">

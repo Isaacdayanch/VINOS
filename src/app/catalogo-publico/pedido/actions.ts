@@ -7,8 +7,9 @@ import { cotizarEnvio, leerConfiguracion, pedidosAbiertos, telefonoLimpio, type 
 import { avisarPedidoWeb } from "@/lib/whatsapp";
 import { getPublication } from "../_lib/catalog";
 
-export async function cotizarEnvioAction(codigoPostal: string, botellas: number): Promise<Cotizacion> {
-  return cotizarEnvio(String(codigoPostal ?? ""), Math.max(0, Math.floor(Number(botellas) || 0)));
+// The subtotal here only drives the on-screen quote; crearPedidoWeb re-quotes with the server-priced subtotal.
+export async function cotizarEnvioAction(codigoPostal: string, botellas: number, subtotal: number): Promise<Cotizacion> {
+  return cotizarEnvio(String(codigoPostal ?? ""), Math.max(0, Math.floor(Number(botellas) || 0)), Math.max(0, Number(subtotal) || 0));
 }
 
 export type DatosPedido = {
@@ -59,7 +60,7 @@ export async function crearPedidoWeb(datos: DatosPedido): Promise<ResultadoPedid
     }
     const botellas = lineas.reduce((sum, l) => sum + l.cantidadBotellas, 0);
     const subtotal = lineas.reduce((sum, l) => sum + l.cantidadBotellas * l.precioUnitario, 0);
-    const cotizacion = await cotizarEnvio(codigoPostal, botellas);
+    const cotizacion = await cotizarEnvio(codigoPostal, botellas, subtotal);
     if (!cotizacion.ok) return { ok: false, error: cotizacion.motivo };
 
     const folio = await generarFolioAlAzar("W", async f => (await prisma.pedidoWeb.findUnique({ where: { folio: f }, select: { id: true } })) !== null);

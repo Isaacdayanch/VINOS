@@ -2,15 +2,21 @@
 
 import { prisma } from "@/lib/prisma";
 import { calcularResumenInventario, sincronizarActivoPorStockVarios } from "@/lib/costeo";
-import { generarFolioAlAzar } from "@/lib/folio";
+import { asegurarCodigoCliente } from "@/lib/clienteCodigo";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-async function siguienteFolio() {
-  return generarFolioAlAzar("ORD", async (folio) => {
-    const existente = await prisma.orden.findUnique({ where: { folio }, select: { id: true } });
-    return existente !== null;
-  });
+// Folio = código del cliente + su número de orden con nosotros (ej. "DAN-03"
+// para la 3a orden de Daniel), para que se lea de un vistazo quién es y qué
+// tan seguido compra -- en vez de un código al azar que no dice nada.
+async function siguienteFolioParaCliente(clienteId: string, codigoCliente: string): Promise<string> {
+  const ordenesPrevias = await prisma.orden.count({ where: { clienteId } });
+  for (let intento = 0; intento < 5; intento++) {
+    const folio = `${codigoCliente}-${String(ordenesPrevias + 1 + intento).padStart(2, "0")}`;
+    const existe = await prisma.orden.findUnique({ where: { folio }, select: { id: true } });
+    if (!existe) return folio;
+  }
+  throw new Error("No se pudo generar un folio único para esta orden, intenta de nuevo");
 }
 
 /** Número de un campo de monto; vacío o inválido = 0. */
@@ -77,7 +83,10 @@ export async function crearOrden(formData: FormData) {
   }
 
   const resumen = await calcularResumenInventario();
-  const folio = await siguienteFolio();
+  const cliente = await prisma.cliente.findUnique({ where: { id: clienteId } });
+  if (!cliente) throw new Error("Cliente no encontrado");
+  const codigoCliente = await asegurarCodigoCliente(cliente);
+  const folio = await siguienteFolioParaCliente(clienteId, codigoCliente);
 
   const orden = await prisma.orden.create({
     data: {

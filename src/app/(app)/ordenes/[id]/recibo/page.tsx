@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
+import { calcularOrdinalesOrden, calcularSaldosOrdenes, formatoMXN } from "@/lib/costeo";
 import { BotonImprimir } from "@/components/BotonImprimir";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,6 +43,7 @@ export default async function ReciboOrdenPage({
   const saldo = (await calcularSaldosOrdenes(orden.clienteId)).get(orden.id);
   const pendiente = saldo?.pendiente ?? total - cobrado;
   const abonoAplicado = saldo?.abonoAplicado ?? 0;
+  const { numeroCliente, numeroGeneral } = await calcularOrdinalesOrden(orden);
 
   return (
     <div className="flex flex-col gap-6 bg-background print:bg-background">
@@ -69,6 +70,9 @@ export default async function ReciboOrdenPage({
             <p className="font-medium">{orden.folio}</p>
             <p className="text-muted text-[11px] mt-0.5">
               {new Date(orden.fecha).toLocaleDateString("es-MX")}
+            </p>
+            <p className="text-muted text-[9px] mt-0.5">
+              Pedido #{numeroCliente} contigo · #{numeroGeneral} en general
             </p>
           </div>
         </div>

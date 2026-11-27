@@ -2,7 +2,7 @@ import { cancelarOrden, crearCobro, guardarEnvioOrden, marcarLineaEntregada, rea
 import { DateField } from "@/components/DateField";
 import { SubmitButton } from "@/components/SubmitButton";
 import { prisma } from "@/lib/prisma";
-import { calcularSaldosOrdenes, formatoMXN, totalOrden } from "@/lib/costeo";
+import { calcularOrdinalesOrden, calcularSaldosOrdenes, formatoMXN, totalOrden } from "@/lib/costeo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -31,6 +31,7 @@ export default async function DetalleOrdenPage({
   const saldo = (await calcularSaldosOrdenes(orden.clienteId)).get(orden.id);
   const pendiente = saldo?.pendiente ?? total - cobrado;
   const abonoAplicado = saldo?.abonoAplicado ?? 0;
+  const { numeroCliente, numeroGeneral } = await calcularOrdinalesOrden(orden);
   const hoy = new Date().toISOString().slice(0, 10);
   const registrarCobro = crearCobro.bind(null, orden.id);
 
@@ -51,6 +52,7 @@ export default async function DetalleOrdenPage({
             {orden.cliente.nombre.replace("Cliente Especial - ", "")} ·{" "}
             {cancelada ? "Cancelada" : pendiente > 0.5 ? "Pendiente de pago" : "Pagada"}
             {orden.ubicacion ? ` · ${orden.ubicacion.nombre}` : ""}
+            {" · "}Pedido #{numeroCliente} de este cliente · #{numeroGeneral} en general
           </p>
           <div className="flex flex-wrap gap-3">
             {!cancelada && (

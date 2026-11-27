@@ -40,7 +40,7 @@ export async function confirmarPedidoWeb(pedidoId: string, formData: FormData) {
     else {
       const direccion = [pedido.calle, pedido.colonia, `CP ${pedido.codigoPostal}`, pedido.ciudad].filter(Boolean).join(", ");
       const nuevo = await prisma.cliente.create({
-        data: { nombre: pedido.nombre, telefono: pedido.telefono, email: pedido.email, categoriaPrecio: "LISTA", codigo: await siguienteCodigoCliente(), notas: `Cliente de la página (pedido ${pedido.folio}). Dirección: ${direccion}${pedido.referencias ? `. Referencias: ${pedido.referencias}` : ""}` },
+        data: { nombre: pedido.nombre, telefono: pedido.telefono, email: pedido.email, categoriaPrecio: "LISTA", codigo: await siguienteCodigoCliente(pedido.nombre), notas: `Cliente de la página (pedido ${pedido.folio}). Dirección: ${direccion}${pedido.referencias ? `. Referencias: ${pedido.referencias}` : ""}` },
       });
       clienteId = nuevo.id;
     }

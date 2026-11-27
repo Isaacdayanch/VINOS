@@ -326,6 +326,15 @@ export function totalOrden(orden: { envioCobrado?: number | null; lineas: { cant
   return orden.lineas.reduce((acc, l) => acc + l.cantidadBotellas * l.precioUnitario, 0) + (orden.envioCobrado ?? 0);
 }
 
+/** Qué tan seguido es esta orden: la N-ésima con este cliente, y la N-ésima en general. */
+export async function calcularOrdinalesOrden(orden: { clienteId: string; createdAt: Date }) {
+  const [numeroCliente, numeroGeneral] = await Promise.all([
+    prisma.orden.count({ where: { clienteId: orden.clienteId, createdAt: { lte: orden.createdAt } } }),
+    prisma.orden.count({ where: { createdAt: { lte: orden.createdAt } } }),
+  ]);
+  return { numeroCliente, numeroGeneral };
+}
+
 export async function calcularFinanzas(): Promise<ResumenFinanzas> {
   const [resumenInventario, socios, pagos, cobros, abonosCliente, cobrosConsignacion, ordenes, salidasPersonales, ajustesStock, lineasConsignacion] =
     await Promise.all([

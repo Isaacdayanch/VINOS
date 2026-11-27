@@ -17,7 +17,7 @@ export async function crearCliente(formData: FormData) {
     throw new Error("El nombre es obligatorio");
   }
 
-  const codigo = await siguienteCodigoCliente();
+  const codigo = await siguienteCodigoCliente(nombre);
   await prisma.cliente.create({
     data: { nombre, telefono, email, categoriaPrecio, notas, codigo },
   });
@@ -32,7 +32,7 @@ export async function crearClienteRapido(nombre: string) {
     throw new Error("El nombre es obligatorio");
   }
 
-  const codigo = await siguienteCodigoCliente();
+  const codigo = await siguienteCodigoCliente(nombreLimpio);
   const cliente = await prisma.cliente.create({
     data: { nombre: nombreLimpio, categoriaPrecio: "LISTA", codigo },
   });
